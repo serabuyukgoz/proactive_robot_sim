@@ -15,8 +15,11 @@ class DecodeDatabase():
 
     def __init__(self):
         self.action_dictionary = {} #stores all Human and Robot actions
-        self.action_dictionary_nested = {} #stores all objects
+        self.action_dictionary_nested = {} #it is the differnet techinic to use of dictionary to use it
         self.predicate_dictionary = {} #stores all predicates
+        self.objects_dictionary = {}
+        self.goals_dictionary = {} #it listed all goals could be achieved, and maybe sub goals as an items related to each goal
+        self.init_dictionary = {} #Current state description by time
 
 
     def add_action(self):
@@ -53,23 +56,39 @@ class DecodeDatabase():
         self.action_dictionary_nested["pick_action"] = pick_action
         self.action_dictionary_nested["place_action"] = place_action
 
+    def add_goal_list(self):
+        '''This function is to extract all goals and (maybe) related sub-goals to listed '''
+
+        self.goals_dictionary["soup"] = ""
+        self.goals_dictionary["goal2"] = ""
+
     def return_action_list(self):
         """ This function seperated action which robot can do to use later"""
 
         listed_action = []
         list_as_object = []
+
+        #Twwo different way to exlude robot actions
         for key in self.action_dictionary:
             if self.action_dictionary[key].types == "Robot":
                 #print(key, "->" ,self.action_dictionary[key])
                 list_as_object.append(self.action_dictionary[key])
 
         for key in self.action_dictionary_nested:
-            if self.action_dictionary_nested[key]["types"] == "Human":
+            if self.action_dictionary_nested[key]["types"] == "Robot":
                 #print(key, "->" ,self.action_dictionary_nested[key])
                 listed_action.append(self.action_dictionary_nested[key])
 
 
         return listed_action
+
+    def return_current_state(self):
+        """ This fuction is to show current state of the human  """
+        return 0
+
+    def return_evolving_state(self):
+        """ This fuction is to show the estimated future states of the human  """
+        return 0
 
 if __name__ == "__main__":
 
