@@ -28,6 +28,7 @@ class DecodeDatabase():
         self.action_dictionary["pick_action"] = ActionType("Human", "", "", "")
         self.action_dictionary["place_action"] = ActionType("Human", "", "", "")
 
+        # TODO ---? How to change robot action to satisfy user's plan
         tell_action = {
             "types" : "Robot",
             "parameter" : "",
@@ -36,6 +37,7 @@ class DecodeDatabase():
             "name" : "tell_action"
         }
 
+        # TODO ---? How to remove paranthesis from the definition
         collect_action = {
             "types" : "Human",
             "parameter" : "(?x - food)",
@@ -82,7 +84,7 @@ class DecodeDatabase():
         listed_action = []
         list_as_object = []
 
-        #Twwo different way to exlude robot actions
+        #Two different way to exlude robot actions
         for key in self.action_dictionary:
             if self.action_dictionary[key].types == "Robot":
                 #print(key, "->" ,self.action_dictionary[key])
@@ -92,7 +94,6 @@ class DecodeDatabase():
             if self.action_dictionary_nested[key]["types"] == "Human":
                 #print(key, "->" ,self.action_dictionary_nested[key])
                 listed_action.append(self.action_dictionary_nested[key])
-
 
         return listed_action
 
