@@ -18,7 +18,8 @@ system = { }
 
 def updateSituation(system):
     #create domain
-    domain_file = create_domain()
+    ask_action = system['listener'].return_actions()
+    domain_file = create_domain(ask_action)
     list_of_goals = system['listener'].return_goal_list()
     init = system['listener'].return_current_state()
 
@@ -29,15 +30,19 @@ def updateSituation(system):
 
     #intent + plan
     intent = system['recogniser'].create_recogniser(list_of_goals, domain_file, problem_file)
+
+    desire = system['recogniser'].desirability_detection(intent, len(list_of_goals))
+
     plan_list = system['recogniser'].return_map()
     evolve_map = system['listener'].generate_evolving_state(intent, plan_list)
+
 
 def print_all(react, system):
     print("-----------------------------------------------")
     print("Reaction time in millisec %s" %react )
     print("--- For Equilibrium Maintenance ----")
     #return desirability Function
-    print("Desirability Function -> %s " %(system['recogniser'].desirability_detection()))
+    print("Desirability Function -> %s " %(system['recogniser'].return_desirability_value()))
     #return current state
     separator = '  \n '
     print("Current State -> \n %s" %(separator.join(system['listener'].return_current_state())))

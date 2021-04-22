@@ -2,11 +2,12 @@ import time
 from collections import OrderedDict
 
 class ActionType():
-    def __init__(self, types, parameter, precondition, effect):
+    def __init__(self, types, parameter, precondition, effect, name):
         self.types = types
         self.parameter = parameter
         self.precondition = precondition
         self.effect = effect
+        self.name = name
 
 
 class DecodeDatabase():
@@ -28,9 +29,9 @@ class DecodeDatabase():
 
     def add_action(self):
         #This class normally read from database and etract actions but for now it is only add actions
-        self.action_dictionary["tell_action"] = ActionType("Robot", "", "", "")
-        self.action_dictionary["pick_action"] = ActionType("Human", "", "", "")
-        self.action_dictionary["place_action"] = ActionType("Human", "", "", "")
+        self.action_dictionary["submit_action"] = ActionType("Human", "(?d - dish)", "(collected_all ?d)", "(submitted ?d)", "submit")
+        self.action_dictionary["pick_action"] = ActionType("Human", "(?x - food)", "(not(collected ?x))", "(collected ?x)", "collect")
+        self.action_dictionary["leave_action"] = ActionType("Human", "(?x - food)", "(collected ?x)", "(not(collected ?x))", "leave")
 
         # TODO ---? How to change robot action to satisfy user's plan
         tell_action = {
@@ -81,6 +82,9 @@ class DecodeDatabase():
     def add_init_state(self, state_change):
 
         self.state_description.append(state_change)
+
+    def return_actions(self):
+        return self.action_dictionary
 
     def return_action_list(self):
         """ This function seperated action which robot can do to use later"""

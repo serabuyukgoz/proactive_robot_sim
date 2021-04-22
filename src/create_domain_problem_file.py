@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-def create_domain():
+def create_domain(action_list):
     name_domain = "domain.pddl"
 
     f = open(name_domain, "w+")
@@ -29,31 +29,78 @@ def create_domain():
     "    (and \n "+
     "      (imply (has_a ?s ?x) (collected ?x)) \n "+
     "      (imply (and (not (has_a ?s ?x)) (collected ?x))  (not (collected ?x))) \n "+
-    "    ) )  ) \n "+
+    "    ) )  ) \n ")
 
+    for each in action_list:
+        each_action = action_list[each]
+        f.write(
+            "  (:action " + each_action.name + "\n "+
+            "    :parameters" + each_action.parameter + "\n "+
+            "    :precondition "+ each_action.precondition +  " \n "+
+            "    :effect " + each_action.effect + " \n "+
+            "  ) \n ")
 
-    "  (:action collect \n "+
-    "    :parameters (?x - food) \n "+
-    "    :precondition(not(collected ?x)) \n "+
-    "    :effect(collected ?x) \n "+
-    "  ) \n "+
-
-    "  (:action leave \n "+
-    "    :parameters (?x - food) \n "+
-    "    :precondition(collected ?x) \n "+
-    "    :effect(not(collected ?x)) \n "+
-    "  ) \n "+
-
-    "  (:action submit \n "+
-    "    :parameters(?d - dish) \n "+
-    "    :precondition (collected_all ?d) \n "+
-    "    :effect(submitted ?d) \n "+
-    "  ) \n "+
+    #final paranthesis
+    f.write(
     " ) \n ")
 
     f.close()
 
     return name_domain
+
+# def create_domain():
+#     name_domain = "domain.pddl"
+#
+#     f = open(name_domain, "w+")
+#
+#     f.write(" (define (domain recipe) \n" +
+#           "(:requirements \n" +
+#           " :strips \n" +
+#           " :negative-preconditions \n" +
+#           " :equality \n" +
+#           " :typing \n" +
+#           " :derived-predicates ) \n")
+#
+#
+#     f.write(" (:types  dish food - main ) " +
+#
+#     "  (:predicates (has_a ?s - dish ?x - food) \n " +
+#     "   (collected ?x - food) \n " +
+#     "   (submitted ?x - dish) \n " +
+#     "  (collected_all ?x - dish) ) \n "+
+#
+#
+#
+#     " (:derived (collected_all ?s - dish) \n "+
+#     "    (forall (?x - food) \n "+
+#     "    (and \n "+
+#     "      (imply (has_a ?s ?x) (collected ?x)) \n "+
+#     "      (imply (and (not (has_a ?s ?x)) (collected ?x))  (not (collected ?x))) \n "+
+#     "    ) )  ) \n "+
+#
+#
+#     "  (:action collect \n "+
+#     "    :parameters (?x - food) \n "+
+#     "    :precondition(not(collected ?x)) \n "+
+#     "    :effect(collected ?x) \n "+
+#     "  ) \n "+
+#
+#     "  (:action leave \n "+
+#     "    :parameters (?x - food) \n "+
+#     "    :precondition(collected ?x) \n "+
+#     "    :effect(not(collected ?x)) \n "+
+#     "  ) \n "+
+#
+#     "  (:action submit \n "+
+#     "    :parameters(?d - dish) \n "+
+#     "    :precondition (collected_all ?d) \n "+
+#     "    :effect(submitted ?d) \n "+
+#     "  ) \n "+
+#     " ) \n ")
+#
+#     f.close()
+#
+#     return name_domain
 
 def create_problem(goal, list_init):
     name_problem = "problem_%s.pddl" %goal
