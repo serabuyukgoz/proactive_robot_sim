@@ -29,17 +29,33 @@ class DecodeDatabase():
 
     def add_action(self):
         #This class normally read from database and etract actions but for now it is only add actions
-        self.action_dictionary["submit_action"] = ActionType("Human", "(?d - dish)", "(collected_all ?d)", "(submitted ?d)", "submit")
-        self.action_dictionary["pick_action"] = ActionType("Human", "(?x - food)", "(not(collected ?x))", "(collected ?x)", "collect")
-        self.action_dictionary["leave_action"] = ActionType("Human", "(?x - food)", "(collected ?x)", "(not(collected ?x))", "leave")
+        self.action_dictionary["tell_submit_action"] = ActionType("Robot", "(?d - dish)", "(collected_all ?d)", "(submitted ?d)", "submit")
+        self.action_dictionary["tell_pick_action"] = ActionType("Robot", "(?x - food)", "(not(collected ?x))", "(collected ?x)", "collect")
+        self.action_dictionary["tell_leave_action"] = ActionType("Robot", "(?x - food)", "(collected ?x)", "(not(collected ?x))", "leave")
 
         # TODO ---? How to change robot action to satisfy user's plan
-        tell_action = {
+        tell_collect_action = {
             "types" : "Robot",
-            "parameter" : "",
-            "precondition" : "",
-            "effect" : "",
-            "name" : "tell_action"
+            "parameter" : "(?x - food)",
+            "precondition" : "(not(collected ?x))",
+            "effect" : "(collected ?x)",
+            "name" : "collect"
+        }
+
+        tell_leave_action = {
+            "types" : "Robot",
+            "parameter" : "(?x - food)",
+            "precondition" : "(collected ?x)",
+            "effect" : "(not(collected ?x))",
+            "name" : "leave"
+        }
+
+        tell_submit_action = {
+            "types" : "Robot",
+            "parameter" : "(?d - dish)",
+            "precondition" : "(collected_all ?d)",
+            "effect" : "(submitted ?d)",
+            "name" : "submit"
         }
 
         # TODO ---? How to remove paranthesis from the definition
@@ -67,11 +83,12 @@ class DecodeDatabase():
             "name" : "submit"
         }
 
-
-        self.action_dictionary_nested[tell_action['name']] = tell_action
         self.action_dictionary_nested[collect_action['name']] = collect_action
         self.action_dictionary_nested[leave_action['name']] = leave_action
         self.action_dictionary_nested[submit_action['name']] = submit_action
+        self.action_dictionary_nested[tell_collect_action['name']] = tell_collect_action
+        self.action_dictionary_nested[tell_leave_action['name']] = tell_leave_action
+        self.action_dictionary_nested[tell_submit_action['name']] = tell_submit_action
 
     def add_goal_list(self):
         '''This function is to extract all goals and (maybe) related sub-goals to listed '''
@@ -93,13 +110,13 @@ class DecodeDatabase():
         list_as_object = []
 
         #Two different way to exlude robot actions
-        for key in self.action_dictionary:
-            if self.action_dictionary[key].types == "Robot":
-                #print(key, "->" ,self.action_dictionary[key])
-                list_as_object.append(self.action_dictionary[key])
+        # for key in self.action_dictionary:
+        #     if self.action_dictionary[key].types == "Robot":
+        #         #print(key, "->" ,self.action_dictionary[key])
+        #         list_as_object.append(self.action_dictionary[key])
 
         for key in self.action_dictionary_nested:
-            if self.action_dictionary_nested[key]["types"] == "Human":
+            if self.action_dictionary_nested[key]["types"] == "Robot":
                 #print(key, "->" ,self.action_dictionary_nested[key])
                 listed_action[key] = self.action_dictionary_nested[key]
 
