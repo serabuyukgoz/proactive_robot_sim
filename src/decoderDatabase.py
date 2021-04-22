@@ -1,4 +1,5 @@
-
+import time
+from collections import OrderedDict
 
 class ActionType():
     def __init__(self, types, parameter, precondition, effect):
@@ -21,6 +22,9 @@ class DecodeDatabase():
         self.goals_dictionary = {} #it listed all goals could be achieved, and maybe sub goals as an items related to each goal
         self.init_dictionary = {} #Current state description by time
         self.state_description = [] #list of current states
+
+        self.state_map_history = {}
+        self.state_evolve_map_history = OrderedDict()
 
     def add_action(self):
         #This class normally read from database and etract actions but for now it is only add actions
@@ -81,7 +85,7 @@ class DecodeDatabase():
     def return_action_list(self):
         """ This function seperated action which robot can do to use later"""
 
-        listed_action = []
+        listed_action = {}
         list_as_object = []
 
         #Two different way to exlude robot actions
@@ -93,7 +97,7 @@ class DecodeDatabase():
         for key in self.action_dictionary_nested:
             if self.action_dictionary_nested[key]["types"] == "Human":
                 #print(key, "->" ,self.action_dictionary_nested[key])
-                listed_action.append(self.action_dictionary_nested[key])
+                listed_action[key] = self.action_dictionary_nested[key]
 
         return listed_action
 
@@ -110,17 +114,30 @@ class DecodeDatabase():
 
     def return_evolving_state(self):
         """ This fuction is to show the estimated future states of the human  """
-        return 0
+        els = list(self.state_evolve_map_history)
+        return self.state_evolve_map_history[els[-1]]
+
+    def generate_evolving_state(self, intent_list, plan_list):
+
+        state_map = {}
+        for i in intent_list:
+            evolve = self.evolving_state(plan_list[i])
+            state_map[i] = evolve
+
+        self.state_evolve_map_history[time.time()] = state_map
+
+        return state_map
+
 
     def evolving_state(self, plan):
         evolved_plan = []
         for i in plan:
             key = i.split(" ")
-            print (key)
+        #    print (key)
             pair = self.action_dictionary_nested[key[0]]['effect']
-            print (pair)
+        #    print (pair)
             result = pair.split(" ")
-            print(result)
+        #    print(result)
 
             strs = result[0]
             for s in range(len(result)-1):
@@ -129,7 +146,7 @@ class DecodeDatabase():
 
             evolved_plan.append(strs)
 
-            print("Resulted String -> %s " %strs)
+        #    print("Resulted String -> %s " %strs)
 
         return evolved_plan
 

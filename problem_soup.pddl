@@ -22,5 +22,6 @@
   (has_a cake sugar)  
   (has_a cake water)  
 ( collected pepper ) 
+( collected chocolate ) 
 )(:goal 
 (submitted soup) ) ) 
