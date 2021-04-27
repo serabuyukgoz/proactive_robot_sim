@@ -19,14 +19,18 @@ system = { }
 def updateSituation(system):
     #create domain
     ask_action = system['listener'].return_actions()
-    domain_file = create_domain(ask_action)
+    types_list = system['listener'].return_types()
+    predicate_list = system['listener'].return_predicates()
+    domain_file = create_domain(types_list, predicate_list, ask_action)
     list_of_goals = system['listener'].return_goal_list()
     init = system['listener'].return_current_state()
 
+    object_lists = system['listener'].return_objects_list()
+    relationship_list = system['listener'].return_relationship_list()
     #create plan file for all goals
     problem_file = {}
     for e in list_of_goals:
-        problem_file[e] = create_problem(e, init)
+        problem_file[e] = create_problem(e, object_lists, relationship_list, init)
 
     #intent + plan
     intent = system['recogniser'].create_recogniser(list_of_goals, domain_file, problem_file)

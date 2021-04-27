@@ -19,13 +19,24 @@ class DecodeDatabase():
         self.action_dictionary = {} #stores all Human and Robot actions
         self.action_dictionary_nested = {} #it is the differnet techinic to use of dictionary to use it
         self.predicate_dictionary = {} #stores all predicates
+        self.predicate_list = []
+        self.relationship_list = []
         self.objects_dictionary = {}
         self.goals_dictionary = {} #it listed all goals could be achieved, and maybe sub goals as an items related to each goal
         self.init_dictionary = {} #Current state description by time
         self.state_description = [] #list of current states
-
+        self.types_dictionary = {}
         self.state_map_history = {}
         self.state_evolve_map_history = OrderedDict()
+
+    #def define_action(self, precondition, predicate, effect):
+
+    def add_predicate(self, predicate, parameter):
+
+        #deliminate string with the inner paranthesis
+
+        #the deliminate strign with
+        return 0
 
     def add_action(self):
         #This class normally read from database and etract actions but for now it is only add actions
@@ -33,6 +44,10 @@ class DecodeDatabase():
         self.action_dictionary["tell_pick_action"] = ActionType("Robot", "(?x - food)", "(not(collected ?x))", "(collected ?x)", "collect")
         self.action_dictionary["tell_leave_action"] = ActionType("Robot", "(?x - food)", "(collected ?x)", "(not(collected ?x))", "leave")
 
+        self.add_predicate("(collected_all ?d)", "(?d - dish)")
+        self.add_predicate("(submitted ?d)", "(?d - dish)")
+        self.add_predicate("(collected ?x)", "(?x - food)")
+        self.add_predicate("(not(collected ?x))", "(?x - food)")
         # TODO ---? How to change robot action to satisfy user's plan
         tell_collect_action = {
             "types" : "Robot",
@@ -97,8 +112,18 @@ class DecodeDatabase():
         self.goals_dictionary["cake"] = ""
 
     def add_init_state(self, state_change):
-
         self.state_description.append(state_change)
+
+    def return_types(self):
+        self.types_dictionary["main"] = ['dish', 'food']
+        return self.types_dictionary
+
+    def return_predicates(self):
+        self.predicate_list.append("collected_all ?d - dish")
+        self.predicate_list.append("submitted ?d - dish")
+        self.predicate_list.append("collected ?x - food")
+        self.predicate_list.append("has_a ?s - dish ?x - food")
+        return self.predicate_list
 
     def return_actions(self):
         return self.action_dictionary
@@ -121,6 +146,24 @@ class DecodeDatabase():
                 listed_action[key] = self.action_dictionary_nested[key]
 
         return listed_action
+
+    def return_objects_list(self):
+        self.objects_dictionary["dish"] = ["soup", "cake"]
+        self.objects_dictionary['food'] = ['water', 'flour', 'lentil', 'chocolate', 'sugar', 'salt', 'pepper']
+
+        return self.objects_dictionary
+
+    def return_relationship_list(self):
+        self.relationship_list.append(" has_a soup water " )
+        self.relationship_list.append(" has_a soup salt " )
+        self.relationship_list.append(" has_a soup pepper " )
+        self.relationship_list.append(" has_a soup lentil " )
+        self.relationship_list.append(" has_a cake flour " )
+        self.relationship_list.append(" has_a cake chocolate " )
+        self.relationship_list.append(" has_a cake sugar " )
+        self.relationship_list.append(" has_a cake water " )
+
+        return self.relationship_list
 
     def return_goal_list(self):
         lists = []
