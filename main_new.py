@@ -6,7 +6,6 @@ import copy
 import time
 
 from src.environment import Environment
-from src.decoderDatabase import DecodeDatabase
 from src.planner import run_planning
 from src.intention_recognition import Intention
 
