@@ -6,8 +6,6 @@ import re
 
 #off the shef planner,
 
-
-
 def run_planning(domain, problem):
   fd, tmp_path = tempfile.mkstemp()
   f = open("shell.txt", "w") #temp shell
@@ -22,6 +20,7 @@ def run_planning(domain, problem):
           a = tmp_file.read().partition(';')[0]
           fin = re.findall(r'\((.*?)\)', a)
           return fin
+
   finally:
       os.close(fd)
       try:

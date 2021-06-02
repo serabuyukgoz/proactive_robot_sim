@@ -22,6 +22,7 @@ class Environment():
         self.types_dictionary = {}
 
         self.predicates_list = []
+        self.derived_list = []
 
         self.common_knowledge_dictionary = [] #which represents the general knowledge
         self.init_state = [] #which represents the current state
@@ -59,12 +60,15 @@ class Environment():
         if self.objects_dictionary.get(name) == None:
             self.objects_dictionary[name] = []
 
-    def add_sub_objects(self, name, object):
-        self.objects_dictionary[name].append(object)
+    def add_sub_objects(self, name, objects):
+        self.objects_dictionary[name].append(objects)
 
     def add_common_knowledge(self, info):
         #add informan=tion onto the list
         self.common_knowledge_dictionary.append(info)
+
+    def add_derived(self, info):
+        self.derived_list.append(info)
 
     def add_state_change(self, state_change):
         self.init_state.append(state_change)
@@ -76,6 +80,7 @@ class Environment():
         return copy.deepcopy(self.predicates_list)#.deepCopy()
 
     def return_action_list(self):
+        #returning all actions at the dictionary
         return copy.deepcopy(self.action_dictionary)
 
     def provide_action_list(self):
@@ -84,6 +89,28 @@ class Environment():
 
         for key in action_list:
             if action_list[key].types == "Robot":
+                #print(key, "->" ,self.action_dictionary[key])
+                list_as_object.append(action_list[key])
+
+        return copy.deepcopy(listed_action)
+
+    def return_robot_action_list(self):
+        action_list = self.return_action_list()
+        listed_action = {}
+
+        for key in action_list:
+            if action_list[key].types == "Robot":
+                #print(key, "->" ,self.action_dictionary[key])
+                list_as_object.append(action_list[key])
+
+        return copy.deepcopy(listed_action)
+
+    def return_human_action_list(self):
+        action_list = self.return_action_list()
+        listed_action = {}
+
+        for key in action_list:
+            if action_list[key].types == "Human":
                 #print(key, "->" ,self.action_dictionary[key])
                 list_as_object.append(action_list[key])
 
@@ -109,6 +136,9 @@ class Environment():
     def return_types(self):
         return copy.deepcopy(self.types_dictionary)
 
+    def return_derived_list(self):
+        return copy.deepcopy(self.derived_list)
+
     def create_environment(self):
         types_list = self.return_types()
         predicates_list = self.return_predicates()
@@ -118,7 +148,9 @@ class Environment():
         list_init = self.return_current_state()
         goal_list = self.return_goal_list()
 
-        domain_name = self.create_domain(types_list, predicates_list, action_list)
+        derived_list = self.return_derived_list()
+
+        domain_name = self.create_domain(types_list, predicates_list, action_list, derived_list)
         problem_name = {}
         for g in goal_list:
             problem_name[g] = self.create_problem(g, objects, relationship_list, list_init)
@@ -128,7 +160,7 @@ class Environment():
         return (domain_name, problem_name)
 
 
-    def create_domain(self, types_list, predicates_list, action_list):
+    def create_domain(self, types_list, predicates_list, action_list, derived_list):
         name_domain = "domain.pddl"
 
         f = open(name_domain, "w+")
@@ -152,6 +184,7 @@ class Environment():
             if (len(types_list[items]) > 0):
                 f.write(" - ")
             f.write(items)
+            f.write(" \n ")
 
         f.write(
         " ) \n (:predicates ")
@@ -161,13 +194,17 @@ class Environment():
             f.write(items)
             f.write(") \n ")
 
-        f.write(
-        " ) \n (:derived (collected_all ?s - dish) \n "+
-        "    (forall (?x - food) \n "+
-        "    (and \n "+
-        "      (imply (has_a ?s ?x) (collected ?x)) \n "+
-        "      (imply (and (not (has_a ?s ?x)) (collected ?x))  (not (collected ?x))) \n "+
-        "    ) )  ) \n ")
+        f.write(")")
+        for der in derived_list:
+            f.write(der)
+
+        # f.write(
+        # " ) \n (:derived (collected_all ?s - dish) \n "+
+        # "    (forall (?x - food) \n "+
+        # "    (and \n "+
+        # "      (imply (has_a ?s ?x) (collected ?x)) \n "+
+        # "      (imply (and (not (has_a ?s ?x)) (collected ?x))  (not (collected ?x))) \n "+
+        # "    ) )  ) \n ")
 
         for each in action_list:
             each_action = action_list[each]
@@ -211,7 +248,7 @@ class Environment():
 
         #write init
         for event in list_init:
-          f.write("( %s ) \n" %event)
+          f.write(" %s  \n" %event)
 
         f.write( ")(:goal \n" ) #adding goal
 
@@ -228,6 +265,8 @@ class Environment():
         return copy.deepcopy(self.state_evolve_map_history[els[-1]])
 
     def evolve_state_free_run(self, plan_list, time_stamp):
+        #add the model of state evolvation through the time such as food distord and etc.
+        #Not sure how to model state evolvation of and how to link with time stamp
         evolve_state = {}
         for tim in range(time_stamp):
             key = "t_" + str(tim+1)

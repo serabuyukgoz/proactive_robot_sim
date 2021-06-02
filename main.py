@@ -5,115 +5,139 @@ import copy
 
 import time
 
-
-from src.decoderDatabase import DecodeDatabase
-from src.create_domain_problem_file import create_domain, create_problem
+from src.environment import Environment
 from src.planner import run_planning
 from src.intention_recognition import Intention
 
-import json #just for better printing
+from src.naive_proactivity import Naive
+
+from print_strategy import print_all
 
 # My game start from here
 system = { }
 
+def setClasses():
+    env = Environment()
+    rec = Intention()
+
+    system["env"] = env
+    system["recogniser"] = rec
+
+    nav = Naive()
+    system["nav"] = nav
+
+
+def create_world_state(system):
+
+    system['env'].add_type('main')
+    system['env'].add_sub_types('main', 'dish')
+    system['env'].add_sub_types('main', 'food')
+
+    system['env'].add_action("Robot", "(?d - dish)", "(collected_all ?d)", "(submitted ?d)", "submit")
+    system['env'].add_action("Robot", "(?x - food)", "(not(collected ?x))", "(collected ?x)", "collect")
+    system['env'].add_action("Robot", "(?x - food)", "(collected ?x)", "(not(collected ?x))", "leave")
+
+    system['env'].add_predicate("collected_all ?d - dish")
+    system['env'].add_predicate("submitted ?d - dish")
+    system['env'].add_predicate("collected ?x - food")
+    system['env'].add_predicate("has_a ?s - dish ?x - food")
+
+    system['env'].add_goal('( submitted soup )')
+    system['env'].add_goal('( submitted cake )')
+    system['env'].add_goal('( submitted smoothie )')
+
+    system['env'].add_object('dish')
+    system['env'].add_sub_objects('dish', 'soup')
+    system['env'].add_sub_objects('dish', 'cake')
+    system['env'].add_sub_objects('dish', 'smoothie')
+    system['env'].add_object('food')
+    system['env'].add_sub_objects('food', 'water')
+    system['env'].add_sub_objects('food', 'flour')
+    system['env'].add_sub_objects('food', 'lentil')
+    system['env'].add_sub_objects('food', 'chocolate')
+    system['env'].add_sub_objects('food', 'sugar')
+    system['env'].add_sub_objects('food', 'salt')
+    system['env'].add_sub_objects('food', 'pepper')
+    system['env'].add_sub_objects('food', 'milk')
+    system['env'].add_sub_objects('food', 'sprinkle')
+    system['env'].add_sub_objects('food', 'coco')
+
+    #relationship added
+    system['env'].add_common_knowledge(" has_a soup water " )
+    system['env'].add_common_knowledge(" has_a soup salt " )
+    system['env'].add_common_knowledge(" has_a soup pepper " )
+    system['env'].add_common_knowledge(" has_a soup lentil " )
+    system['env'].add_common_knowledge(" has_a cake flour " )
+    system['env'].add_common_knowledge(" has_a cake chocolate " )
+    system['env'].add_common_knowledge(" has_a cake sugar " )
+    system['env'].add_common_knowledge(" has_a cake water " )
+    system['env'].add_common_knowledge(" has_a smoothie milk " )
+    system['env'].add_common_knowledge(" has_a smoothie water " )
+    system['env'].add_common_knowledge(" has_a smoothie sprinkle " )
+    system['env'].add_common_knowledge(" has_a smoothie coco " )
+
+    #derived predicates_list
+    derived = " \n (:derived (collected_all ?s - dish) \n (forall (?x - food) \n (and \n (imply (has_a ?s ?x) (collected ?x)) \n (imply (and (not (has_a ?s ?x)) (collected ?x))  (not (collected ?x))) \n ) )  ) \n "
+    system['env'].add_derived(derived)
+
+
+    domain_name, problem_name = system['env'].create_environment()
+    return (domain_name, problem_name)
+
 def updateSituation(system):
-    #create domain
-    ask_action = system['listener'].return_actions()
-    types_list = system['listener'].return_types()
-    predicate_list = system['listener'].return_predicates()
-    domain_file = create_domain(types_list, predicate_list, ask_action)
-    list_of_goals = system['listener'].return_goal_list()
-    init = system['listener'].return_current_state()
-
-    object_lists = system['listener'].return_objects_list()
-    relationship_list = system['listener'].return_relationship_list()
-    #create plan file for all goals
-    problem_file = {}
-    for e in list_of_goals:
-        problem_file[e] = create_problem(e, object_lists, relationship_list, init)
-
+    domain_name, problem_name = system['env'].create_environment()
+    list_of_goals = system['env'].return_goal_list()
     #intent + plan
-    intent = system['recogniser'].create_recogniser(list_of_goals, domain_file, problem_file)
+    intent = system['recogniser'].create_recogniser(list_of_goals, domain_name, problem_name)
+    print(intent)
 
     desire = system['recogniser'].desirability_detection(intent, len(list_of_goals))
 
     plan_list = system['recogniser'].return_map()
-    evolve_map = system['listener'].generate_evolving_state(intent, plan_list)
+    evolve_map = system['env'].evolve_state(intent, plan_list, 8)
+    #evolve_map = system['env'].evolve_state([], plan_list, 3)
+    return plan_list
 
-
-def print_all(react, system):
-    print("-----------------------------------------------")
-    print("Reaction time in millisec %s" %react )
-    print("--- For Equilibrium Maintenance ----")
-    #return desirability Function
-    print("Desirability Function -> %s " %(system['recogniser'].return_desirability_value()))
-    #return current state
-    separator = '  \n '
-    print("Current State -> \n %s" %(separator.join(system['listener'].return_current_state())))
-    #return state evolvation
-    print("State Evolvation -> ")
-    print_dict(system['listener'].return_evolving_state())
-    #return action list
-    act_list = system['listener'].return_action_list()
-    print("Action List ->")
-    print_act(act_list)
-
-    print("-----------------------------------------------")
-
-def print_dict(dct):
-    separator = ' \n '
-    for item, amount in dct.items():
-        print(" -- {} : \n {}".format(item, separator.join(amount)))
-
-def print_act(dct):
-    for item, amount in dct.items():
-        print(" ** {}".format(item))
-        for i, a in amount.items():
-            print(" \t {} : {}".format(i, a))
-
-def setClasses():
-    lis = DecodeDatabase()
-    rec = Intention()
-    #ass = Perception(system)
-
-    system["listener"] = lis
-    system["recogniser"] = rec
-#    system["assistance"] = ass
 
 if __name__ =='__main__':
-
     print("Hello World!")
     setClasses()
-    #dd = DecodeDatabase()
-    #print(dd.action_dictionary)
-    system['listener'].add_action()
-    system['listener'].add_goal_list()
-    print("Initial setup done!")
 
+    domain_name, problem_name = create_world_state(system)
 
     #for every change in Situation
     react = time.time()
-    updateSituation(system)
+    selected_plan = updateSituation(system)
     react = time.time() - react
 
     print_all(react, system)
+
+    robot_said = system["nav"].select_action_to_play(selected_plan)
+    print(robot_said)
+
 
     #Situation change
     print("action played -> collected pepper")
-    system['listener'].add_init_state("collected pepper")
+    system['env'].add_state_change("collected pepper")
 
     react = time.time()
-    updateSituation(system)
+    selected_plan = updateSituation(system)
     react = time.time() - react
 
     print_all(react, system)
+
+    robot_said = system["nav"].select_action_to_play(selected_plan)
+    print(robot_said)
 
     #Situation change
     print("action played -> collected chocolate")
-    system['listener'].add_init_state("collected chocolate")
+    system['env'].add_state_change("collected chocolate")
 
     react = time.time()
-    updateSituation(system)
+    selected_plan = updateSituation(system)
     react = time.time() - react
 
     print_all(react, system)
+
+    robot_said = system["nav"].select_action_to_play(selected_plan)
+    print(robot_said)
