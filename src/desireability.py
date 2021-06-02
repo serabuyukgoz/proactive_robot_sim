@@ -1,22 +1,4 @@
 
-
-# class Desireable():
-#     def __init__():
-#         self.state = []
-#         self.value = TRUE
-#         self.estimatedValue = 0
-#         self.estimatedAction = []
-#
-#     def return_object(self):
-#         return {'state' : self.state, 'value' : self.value}
-#
-#     def setValue(self, val):
-#         self.value = val
-#
-#     def setState(self, arr):
-#         self.state = arr
-
-
 class CalculateDesireability():
     def __init__(self):
         self.map_of_desirability = {}
