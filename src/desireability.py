@@ -12,13 +12,13 @@ class CalculateDesireability():
             'value' : value
             }
 
-    def desirabilityFunction(self, state_zero, map_of_states):
+    def desirabilityFunction(self, map_of_states):
         desirability = {}
         for sub_set in map_of_states:
+            desirability[sub_set] = {}
             for key in map_of_states[sub_set]:
                 res = self.isStateDesiable(map_of_states[sub_set][key])
-                naming = str(sub_set) + "_" + str(key)
-                desirability[naming] = {
+                desirability[sub_set][key] = {
                     'state' : map_of_states[sub_set][key],
                     'value' : res
                 }

@@ -286,10 +286,11 @@ class Environment():
         return copy.deepcopy(self.state_evolve_map_history[els[-1]])
 
     def evolve_state_free_run(self, plan_list, time_stamp):
-        TO-DO
+        #TO-DO
         #add the model of state evolvation through the time such as food distord and etc.
         #Not sure how to model state evolvation of and how to link with time stamp
         evolve_state = {}
+        evolve_state["t_0"] = {'current' : self.return_current_state() }
         for tim in range(time_stamp):
             key = "t_" + str(tim+1)
             one_time = {}
@@ -311,6 +312,7 @@ class Environment():
             return copy.deepcopy(map_state)
 
         evolve_state = {}
+        evolve_state["t_0"] = {'current' : self.return_current_state() }
         for tim in range(time_stamp):
             key = "t_" + str(tim+1)
             one_time = {}
@@ -355,3 +357,52 @@ class Environment():
                 evolved_plan.append(strs)
 
         return copy.deepcopy(evolved_plan)
+
+    def add_action_to_state(self, state, action):
+
+        # parameters and variables
+
+        def return_parameter(param):
+            param = param.replace("(", "")
+            param = param.replace(")", "")
+            param = param.replace(" -", "")
+            pp = param.split(" ")
+            print(pp)
+            parameter = {}
+
+            for all in pp:
+                parameter[pp.pop()] = pp.pop()
+            return parameter
+
+        list_parameter = return_parameter(action.parameter)
+
+        for x in list_parameter:
+            key = list_parameter[x]
+            list_parameter[x] = copy.deepcopy(self.objects_dictionary[list_parameter[x]])
+
+
+        # precondition satisfied
+        def list_of_precondition(precon):
+            pp = []
+            if ("(and" in precon):
+                precon = precon.replace("(and", "")
+                precon = precon.replace("))", ")")
+                precon = precon.replace(") (", ");(")
+                pp = precon.split(";")
+            else:
+                pp.append(precon)
+            return pp
+
+
+        # add effect
+
+        next_state = []
+        print(action.precondition)
+        print(action.effect)
+        print("Next State -> ")
+        print(next_state)
+
+
+
+
+        return copy.deepcopy(next_state)

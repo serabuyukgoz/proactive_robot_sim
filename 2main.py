@@ -145,7 +145,10 @@ def updateSituation(system):
     plan_list = system['recogniser'].return_map()
     evolve_map = system['env'].evolve_state(intent, plan_list, 8) #if you listed K value long enough then ot will work!
     #evolve_map = system['env'].evolve_state([], plan_list, 3)
-    des = system['des'].desirabilityFunction([], evolve_map)
+    des = system['des'].desirabilityFunction(evolve_map)
+    print_des(des)
+    act_robot = system['env'].return_robot_action_list()
+    oppo = system['opo'].checkAllOpportunitues(des, act_robot)
 
     return plan_list
 
