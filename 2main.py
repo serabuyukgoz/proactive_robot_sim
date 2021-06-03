@@ -9,6 +9,7 @@ from src.environment import Environment
 from src.planner import run_planning
 from src.intention_recognition import Intention
 from src.desireability import CalculateDesireability
+from src.opportunity import OpportunityDetection
 
 from src.naive_proactivity import Naive
 
@@ -21,10 +22,12 @@ def setClasses():
     env = Environment()
     rec = Intention()
     des = CalculateDesireability()
+    opo = OpportunityDetection(system)
 
     system["env"] = env
     system["recogniser"] = rec
     system["des"] = des
+    system["opo"] = opo
 
     nav = Naive()
     system["nav"] = nav
@@ -50,12 +53,17 @@ def create_world_state(system):
     system['env'].add_action("Robot", "(?x - food)", "(not(collected ?x))", "(collected ?x)", "tell_collect")
     system['env'].add_action("Robot", "(?x - food)", "(collected ?x)", "(not(collected ?x))", "tell_leave")
 
+    #added actions for free run, changes of concepts!
+    system['env'].add_action("Free", "(?wp - weather ?wn - weather)", " ( ) ", "(and (not(current_weather ?wp)) (current_weather ?wn))", "weather_change")
+    system['env'].add_action("Free", "(?tp - time ?tn - time)", "(after ?tp ?tn)", "(and (not(current_time ?wp)) (current_time ?wn))", "time_change")
+
     system['env'].add_predicate("collected_all ?d - dish")
     system['env'].add_predicate("submitted ?d - dish")
     system['env'].add_predicate("collected ?x - food")
     system['env'].add_predicate("needed ?s - dish ?x - food")
     system['env'].add_predicate("current_weather ?w - weather")
     system['env'].add_predicate("current_time ?t - time")
+    system['env'].add_predicate("after ?t1 - time ?t2 - time")
 
     system['env'].add_goal('( submitted soup )')
     system['env'].add_goal('( submitted cake )')
@@ -80,11 +88,11 @@ def create_world_state(system):
     system['env'].add_sub_objects('weather', 'rainy')
     system['env'].add_sub_objects('weather', 'cloudy')
     system['env'].add_object('time')
-    system['env'].add_sub_objects('weather', 'morning')
-    system['env'].add_sub_objects('weather', 'lunch')
-    system['env'].add_sub_objects('weather', 'after_noon')
-    system['env'].add_sub_objects('weather', 'evening')
-    system['env'].add_sub_objects('weather', 'night')
+    system['env'].add_sub_objects('time', 'morning')
+    system['env'].add_sub_objects('time', 'lunch')
+    system['env'].add_sub_objects('time', 'after_noon')
+    system['env'].add_sub_objects('time', 'evening')
+    system['env'].add_sub_objects('time', 'night')
 
     #relationship added
     system['env'].add_common_knowledge(" needed soup water " )
@@ -99,6 +107,12 @@ def create_world_state(system):
     system['env'].add_common_knowledge(" needed smoothie water " )
     system['env'].add_common_knowledge(" needed smoothie sprinkle " )
     system['env'].add_common_knowledge(" needed smoothie coco " )
+
+    system['env'].add_common_knowledge(" after morning lunch " )
+    system['env'].add_common_knowledge(" after lunch after_noon " )
+    system['env'].add_common_knowledge(" after after_noon evening " )
+    system['env'].add_common_knowledge(" after evening night " )
+    system['env'].add_common_knowledge(" after night morning " )
 
     #related to the state description -> it could have chage later
     system['env'].add_state_change("(current_weather rainy)")
@@ -132,8 +146,7 @@ def updateSituation(system):
     evolve_map = system['env'].evolve_state(intent, plan_list, 8) #if you listed K value long enough then ot will work!
     #evolve_map = system['env'].evolve_state([], plan_list, 3)
     des = system['des'].desirabilityFunction([], evolve_map)
-    print("Desirability Function")
-    print_des(des)
+
     return plan_list
 
 

@@ -10,8 +10,12 @@ def print_all(react, system):
     #return state evolvation
     print("State Evolvation -> ")
     print_dict(system['env'].return_state_evolution())
+    #return desireability value
+    print("Desirability Function")
+    #print_des(des)
+
     #return action list
-    act_list = system['env'].return_action_list()
+    act_list = system['env'].return_robot_action_list()
     print("Action List ->")
     print_act(act_list)
 
