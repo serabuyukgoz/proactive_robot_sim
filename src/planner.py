@@ -9,10 +9,12 @@ import re
 def run_planning(domain, problem):
   fd, tmp_path = tempfile.mkstemp()
   f = open("shell.txt", "w") #temp shell
+  #path = '~/Desktop/simulation_trial/DIRNAME'
+  path = '~/planner/fast_downward/downward'
   try:
       subprocess.check_call(
-          'python3.6 ~/Desktop/simulation_trial/DIRNAME/fast-downward.py --plan-file %s %s %s --search "astar(add())"'
-              % (tmp_path, domain, problem),
+          'python3.6 %s/fast-downward.py --plan-file %s %s %s --search "astar(add())"'
+              % (path, tmp_path, domain, problem),
           stdout=f,
           stderr=subprocess.STDOUT,
           shell=True)
