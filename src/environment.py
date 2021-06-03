@@ -17,6 +17,9 @@ class Environment():
     def __init__(self):
 
         self.action_dictionary = {}
+        self.human_action_dictionary = {}
+        self.robot_action_dictionary = {}
+
         self.goals_dictionary = {}
         self.objects_dictionary = {}
         self.types_dictionary = {}
@@ -70,8 +73,21 @@ class Environment():
     def add_derived(self, info):
         self.derived_list.append(info)
 
+    def findNegate(self, strs):
+        if ("(not(" in strs):
+            strs = strs.replace("(not(", "(")
+            strs = strs.replace("))", ")")
+            return strs
+        else:
+            return 0
+
     def add_state_change(self, state_change):
-        self.init_state.append(state_change)
+        #Instead of incrementing negates delete them from state description
+        neg = self.findNegate(state_change)
+        if (neg):
+            self.init_state.remove(neg)
+        else:
+            self.init_state.append(state_change)
 
         #add change into the history
         self.history_of_state_change[time.time()] = self.return_current_state()
@@ -90,7 +106,7 @@ class Environment():
         for key in action_list:
             if action_list[key].types == "Robot":
                 #print(key, "->" ,self.action_dictionary[key])
-                list_as_object.append(action_list[key])
+                listed_action[key] = action_list[key]
 
         return copy.deepcopy(listed_action)
 
@@ -101,8 +117,8 @@ class Environment():
         for key in action_list:
             if action_list[key].types == "Robot":
                 #print(key, "->" ,self.action_dictionary[key])
-                list_as_object.append(action_list[key])
-
+                #listed_action.append(action_list[key])
+                listed_action[key] = action_list[key]
         return copy.deepcopy(listed_action)
 
     def return_human_action_list(self):
@@ -112,7 +128,18 @@ class Environment():
         for key in action_list:
             if action_list[key].types == "Human":
                 #print(key, "->" ,self.action_dictionary[key])
-                list_as_object.append(action_list[key])
+                listed_action[key] = action_list[key]
+
+        return copy.deepcopy(listed_action)
+
+    def return_state_action_list(self):
+        action_list = self.return_action_list()
+        listed_action = {}
+
+        for key in action_list:
+            if action_list[key].types == "Free":
+                #print(key, "->" ,self.action_dictionary[key])
+                listed_action[key] = action_list[key]
 
         return copy.deepcopy(listed_action)
 
@@ -142,7 +169,9 @@ class Environment():
     def create_environment(self):
         types_list = self.return_types()
         predicates_list = self.return_predicates()
-        action_list = self.return_action_list()
+        #action_list = self.return_action_list()
+        action_list = self.return_human_action_list()
+
         objects =  self.return_objects_list()
         relationship_list = self.return_current_knowledge_list()
         list_init = self.return_current_state()
@@ -197,14 +226,6 @@ class Environment():
         f.write(")")
         for der in derived_list:
             f.write(der)
-
-        # f.write(
-        # " ) \n (:derived (collected_all ?s - dish) \n "+
-        # "    (forall (?x - food) \n "+
-        # "    (and \n "+
-        # "      (imply (has_a ?s ?x) (collected ?x)) \n "+
-        # "      (imply (and (not (has_a ?s ?x)) (collected ?x))  (not (collected ?x))) \n "+
-        # "    ) )  ) \n ")
 
         for each in action_list:
             each_action = action_list[each]
@@ -265,6 +286,7 @@ class Environment():
         return copy.deepcopy(self.state_evolve_map_history[els[-1]])
 
     def evolve_state_free_run(self, plan_list, time_stamp):
+        TO-DO
         #add the model of state evolvation through the time such as food distord and etc.
         #Not sure how to model state evolvation of and how to link with time stamp
         evolve_state = {}
@@ -326,6 +348,10 @@ class Environment():
                 strs += " " + key[s+1]
             strs += ")"
 
-            evolved_plan.append(strs)
+            neg = self.findNegate(strs)
+            if (neg):
+                evolved_plan.remove(neg)
+            else:
+                evolved_plan.append(strs)
 
         return copy.deepcopy(evolved_plan)
