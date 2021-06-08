@@ -10,12 +10,8 @@ def print_all(react, system):
     #return state evolvation
     print("State Evolvation -> ")
     print_dict(system['env'].return_state_evolution())
-    #return desireability value
-    print("Desirability Function")
-    #print_des(des)
-
     #return action list
-    act_list = system['env'].return_robot_action_list()
+    act_list = system['env'].return_action_list()
     print("Action List ->")
     print_act(act_list)
 
@@ -39,5 +35,7 @@ def print_act(dct):
 def print_des(dct):
     for item, amount in dct.items():
         print(" == {} : ".format(item))
-        for i in amount.items():
-            print(i)
+        for i, a in amount.items():
+            print(" \t {} : ".format(i))
+            print(" \t \t State : {} ".format(a['state']))
+            print(" \t \t Desireability Value : {} ".format(a['value']))
