@@ -16,7 +16,7 @@ class OpportunityDetection():
         self.sys = system
 
     def checkAllOpportunitues(self, opportunity_map, action_list):
-
+        print("++++ CHECK ALL OPPORTUNITIES ++++")
         list_of_oppotunities = {}
 
         for t in opportunity_map:
@@ -28,7 +28,10 @@ class OpportunityDetection():
                 print(oop)
                 if (oop):
                     list_of_oppotunities[t].append(oop)
+                else:
+                    print("No opportunity found")
 
+        print("Detected Opportuniy Map -> {}".format(list_of_oppotunities))
         return list_of_oppotunities
 
     def opp(self, status, action_list):
@@ -36,21 +39,20 @@ class OpportunityDetection():
             Check opportunities that for states is not desirable
             state value != 1.0
         '''
-        list_of_oppo = {}
-        if (status['value'] != 1.0):
+        list_of_opportunities_for_state = {}
+        if (status['value'] != 1.0): #if it is not maximum desirability
             #for all action add and try to see the
             for a in action_list:
-                print("a in action list")
-                print(a)
+                # a is name of the action
                 next_state = self.add_action(status['state'],action_list[a])
                 #if it is exists
                 if (next_state):
-                    oppo = Opportunity(status['state'], action_list[a], next_state['state'], status['value'], next_state['value'])
-                    list_of_oppo[a] = oppo
+                    oppo = Opportunity(status['state'], action_list[a], next_state['state'], status['value'], next_state['value'] )
+                    list_of_opportunities_for_state[a] = oppo
 
         print("list of opportunuties")
-        print(list_of_oppo)
-        return list_of_oppo
+        print(list_of_opportunities_for_state)
+        return list_of_opportunities_for_state
 
     def add_action(self, state, action):
 
@@ -62,6 +64,8 @@ class OpportunityDetection():
         des_value = -1
 
         if (next_state):
+            print("NEXT STATE {}".format(next_state))
             return {'state': next_state, 'value' : des_value}
         else:
+            print("THERE IS NO NEXT STATE")
             return 0

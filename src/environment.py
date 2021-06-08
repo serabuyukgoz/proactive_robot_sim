@@ -399,10 +399,7 @@ class Environment():
         next_state = []
         print(action.precondition)
         print(action.effect)
-        print("Next State -> ")
-        print(next_state)
-
-
+        print("Next State -> {}".format(next_state))
 
 
         return copy.deepcopy(next_state)

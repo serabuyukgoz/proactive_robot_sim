@@ -33,6 +33,7 @@ def print_act(dct):
         print(" \t Name : {}  \n \t Parameter : {} \n \t Precondition : {} \n \t Effect : {}".format(amount.name, amount.parameter, amount.precondition, amount.effect))
 
 def print_des(dct):
+    print("Desireability Function ->")
     for item, amount in dct.items():
         print(" == {} : ".format(item))
         for i, a in amount.items():
