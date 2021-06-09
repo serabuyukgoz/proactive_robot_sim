@@ -367,19 +367,13 @@ class Environment():
             param = param.replace(")", "")
             param = param.replace(" -", "")
             pp = param.split(" ")
-            print(pp)
             parameter = {}
 
             for all in pp:
                 parameter[pp.pop()] = pp.pop()
-            return parameter
 
-        list_parameter = return_parameter(action.parameter)
-
-        for x in list_parameter:
-            key = list_parameter[x]
-            list_parameter[x] = copy.deepcopy(self.objects_dictionary[list_parameter[x]])
-
+            print(parameter)
+            return copy.deepcopy(parameter)
 
         # precondition satisfied
         def list_of_precondition(precon):
@@ -391,13 +385,26 @@ class Environment():
                 pp = precon.split(";")
             else:
                 pp.append(precon)
-            return pp
+            print(pp)
+            return copy.deepcopy(pp)
 
 
         # add effect
 
         next_state = []
-        print(action.precondition)
+
+        list_parameter = return_parameter(action.parameter)
+
+        for x in list_parameter:
+            key = list_parameter[x]
+            list_parameter[x] = copy.deepcopy(self.objects_dictionary[list_parameter[x]])
+
+        ll_precon = list_of_precondition(action.precondition)
+        ll_effect = list_of_precondition(action.effect)
+
+        print("Parameters -> {}".format(list_parameter))
+        print("Precondition -> {}".format(ll_precon))
+        print("Effect -> {}".format(ll_effect))
         print(action.effect)
         print("Next State -> {}".format(next_state))
 
