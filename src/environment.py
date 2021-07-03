@@ -361,6 +361,7 @@ class Environment():
     def add_action_to_state(self, state, action):
 
         # parameters and variables
+        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 
         def return_parameter(param):
             param = param.replace("(", "")
@@ -372,7 +373,7 @@ class Environment():
             for all in pp:
                 parameter[pp.pop()] = pp.pop()
 
-            print(parameter)
+            #print(parameter)
             return copy.deepcopy(parameter)
 
         # precondition satisfied
@@ -385,10 +386,35 @@ class Environment():
                 pp = precon.split(";")
             else:
                 pp.append(precon)
-            print(pp)
+            #print(pp)
             return copy.deepcopy(pp)
 
+        # to link reach each variable as a parameter
+        def specify_parameters(parameter_map):
+            result_length = 1
 
+            for key in parameter_map:
+                result_length = result_length * len(parameter_map[key])
+
+            #create empty array
+            maped_parameter = []
+            for i in range(result_length):
+                maped_parameter.append({})
+
+            for key in parameter_map:
+                for index in range(result_length):
+                    #get right parameter to place by using offset rule (MOD)
+                    param_mod = index % len(parameter_map[key])
+                    maped_parameter[index][key] = parameter_map[key][param_mod]
+            return copy.deepcopy(maped_parameter)
+
+        def turn_precondition(each_parameter, list_precon):
+            new_list = []
+            for key in each_parameter:
+                for precon in list_precon:
+                    new_list.append(precon.replace(key, each_parameter[key]))
+
+            return copy.deepcopy(new_list)
         # add effect
 
         next_state = []
@@ -396,17 +422,45 @@ class Environment():
         list_parameter = return_parameter(action.parameter)
 
         for x in list_parameter:
+            print('printed x {}'.format(x))
             key = list_parameter[x]
             list_parameter[x] = copy.deepcopy(self.objects_dictionary[list_parameter[x]])
 
         ll_precon = list_of_precondition(action.precondition)
         ll_effect = list_of_precondition(action.effect)
 
+        ll_parameters = specify_parameters(list_parameter)
+
+        for each_parameter in ll_parameters:
+            #check scenario for each parameter
+
+            #but first turn update precondition
+            each_precon = turn_precondition(each_parameter, ll_precon)
+
+            # if all precondition is in and also consider not :( if there is not then if not part is not belong to list
+
+            if (all([x in state for x in each_precon])):
+                #all precondition is in list
+                each_effect = turn_precondition(each_parameter, ll_effect)
+                print(each_effect)
+                new_state = copy.deepcopy(state)
+                new_state.append(each_effect)
+                print(new_state)
+                #add effect to the state and return state
+            else:
+                # some precondition missing
+                print('')
+
+
+
+        #Create list of next states!!! then ot could check all to create the map
+
+
         print("Parameters -> {}".format(list_parameter))
         print("Precondition -> {}".format(ll_precon))
         print("Effect -> {}".format(ll_effect))
         print(action.effect)
         print("Next State -> {}".format(next_state))
-
+        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 
         return copy.deepcopy(next_state)

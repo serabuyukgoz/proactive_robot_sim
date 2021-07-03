@@ -22,6 +22,7 @@ class CalculateDesireability():
                     'state' : map_of_states[sub_set][key],
                     'value' : res
                 }
+                
         return desirability
 
 
@@ -29,6 +30,9 @@ class CalculateDesireability():
         """
             If state is desirable for all rules, then state is undesirable == FALSE,
             otherwise state is desirable == TRUE
+
+            It is a fuzzy (probabilistic) description of desirability. State desirability
+            decreases according to desireability of undesreable situations.
         """
 
         status = []
