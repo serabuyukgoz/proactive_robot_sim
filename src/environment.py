@@ -4,6 +4,7 @@ import time
 from collections import OrderedDict
 import copy
 import re
+from src.string_modification import *
 
 class ActionType():
     def __init__(self, types, parameter, precondition, effect, name):
@@ -33,6 +34,9 @@ class Environment():
         self.history_of_state_change = {}
         self.history_of_state_evolution = {}
         self.state_evolve_map_history = OrderedDict()
+
+        self.map_of_states = {} #which will create a map of states
+        self.name_state_hash_map = {} #hashmap of states
 
     def add_action(self, types, parameter, precondition, effect, name):
         action_name = name + "_action"
@@ -184,6 +188,14 @@ class Environment():
         for g in goal_list:
             problem_name[g] = self.create_problem(g, objects, relationship_list, list_init)
 
+        '''
+            After environment created
+            Specifiy action_list could be done
+            Create the environment state graph from the initial state that robot in
+        '''
+
+        # defined_action = self.create_action_list_map()
+        # self.create_evolve_map(list_init, defined_action)
 
         #Retruned PDDL Files as whole; domain and all goals
         return (domain_name, problem_name)
@@ -285,182 +297,104 @@ class Environment():
         els = list(self.state_evolve_map_history)
         return copy.deepcopy(self.state_evolve_map_history[els[-1]])
 
-    def evolve_state_free_run(self, plan_list, time_stamp):
-        #TO-DO
-        #add the model of state evolvation through the time such as food distord and etc.
-        #Not sure how to model state evolvation of and how to link with time stamp
-        evolve_state = {}
-        evolve_state["t_0"] = {'current' : self.return_current_state() }
-        for tim in range(time_stamp):
-            key = "t_" + str(tim+1)
-            one_time = {}
-            for intent in plan_list:
-                #calculate intent
-                pp = self.calculate_state(plan_list[intent] ,tim+1)
-                one_time[intent] = copy.deepcopy(pp)
+    def return_state_map(self):
+        return copy.deepcopy(self.map_of_states)
 
-            evolve_state[key] = copy.deepcopy(one_time)
+    def return_state_hash_map(self):
+        return copy.deepcopy(self.name_state_hash_map)
 
-        self.state_evolve_map_history[time.time()] = copy.deepcopy(evolve_state)
-        return copy.deepcopy(evolve_state)
+    def create_action_list_map(self):
+        action_list = self.return_action_list()
+        listed_action = {}
 
-    def evolve_state(self, intent_list, plan_list, time_stamp):
+        for key in action_list:
+            #print(key, "->" ,self.action_dictionary[key])
+            action = action_list[key]
+            #action part
+            list_parameter = return_parameter(action.parameter)
 
-        #free run or intention depend on if there is an intention;
-        if not intent_list:
-            map_state = self.evolve_state_free_run(plan_list, time_stamp)
-            return copy.deepcopy(map_state)
+            for x in list_parameter:
+                #print('printed x {}'.format(x))
+                key = list_parameter[x]
+                list_parameter[x] = copy.deepcopy(self.objects_dictionary[list_parameter[x]])
 
-        evolve_state = {}
-        evolve_state["t_0"] = {'current' : self.return_current_state() }
-        for tim in range(time_stamp):
-            key = "t_" + str(tim+1)
-            one_time = {}
-            for intent in intent_list:
-                #calculate intent
-                pp = self.calculate_state(plan_list[intent] ,tim+1)
+            ll_precon = list_of_precondition(action.precondition)
+            ll_effect = list_of_precondition(action.effect)
 
-                #to check if there is a plan
-                if pp:
-                    one_time[intent] = copy.deepcopy(pp)
+            ll_parameters = specify_parameters(list_parameter)
 
-            #to check if there is a plan or not
-            if one_time:
-                evolve_state[key] = copy.deepcopy(one_time)
-
-        self.state_evolve_map_history[time.time()] = copy.deepcopy(evolve_state)
-        return evolve_state
-
-    def calculate_state(self, plan, leng):
-        #to prevent index out of boundary
-        if leng > len(plan):
-            return []
-
-        evolved_plan = self.return_current_state()
-        for index in range(leng):
-            i = plan[index]
-            key = i.split(" ") #to get predicate
-
-            act = key[0] + "_action"
-            pair = self.action_dictionary[act].effect
-            result = pair.split(" ")
-
-            strs = result[0]
-            for s in range(len(result)-1):
-                strs += " " + key[s+1]
-            strs += ")"
-
-            neg = self.findNegate(strs)
-            if (neg):
-                evolved_plan.remove(neg)
-            else:
-                evolved_plan.append(strs)
-
-        return copy.deepcopy(evolved_plan)
-
-    def add_action_to_state(self, state, action):
-
-        # parameters and variables
-        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-
-        def return_parameter(param):
-            param = param.replace("(", "")
-            param = param.replace(")", "")
-            param = param.replace(" -", "")
-            pp = param.split(" ")
-            parameter = {}
-
-            for all in pp:
-                parameter[pp.pop()] = pp.pop()
-
-            #print(parameter)
-            return copy.deepcopy(parameter)
-
-        # precondition satisfied
-        def list_of_precondition(precon):
-            pp = []
-            if ("(and" in precon):
-                precon = precon.replace("(and", "")
-                precon = precon.replace("))", ")")
-                precon = precon.replace(") (", ");(")
-                pp = precon.split(";")
-            else:
-                pp.append(precon)
-            #print(pp)
-            return copy.deepcopy(pp)
-
-        # to link reach each variable as a parameter
-        def specify_parameters(parameter_map):
-            result_length = 1
-
-            for key in parameter_map:
-                result_length = result_length * len(parameter_map[key])
-
-            #create empty array
-            maped_parameter = []
-            for i in range(result_length):
-                maped_parameter.append({})
-
-            for key in parameter_map:
-                for index in range(result_length):
-                    #get right parameter to place by using offset rule (MOD)
-                    param_mod = index % len(parameter_map[key])
-                    maped_parameter[index][key] = parameter_map[key][param_mod]
-            return copy.deepcopy(maped_parameter)
-
-        def turn_precondition(each_parameter, list_precon):
-            new_list = []
-            for key in each_parameter:
-                for precon in list_precon:
-                    new_list.append(precon.replace(key, each_parameter[key]))
-
-            return copy.deepcopy(new_list)
-        # add effect
-
-        next_state = []
-
-        list_parameter = return_parameter(action.parameter)
-
-        for x in list_parameter:
-            print('printed x {}'.format(x))
-            key = list_parameter[x]
-            list_parameter[x] = copy.deepcopy(self.objects_dictionary[list_parameter[x]])
-
-        ll_precon = list_of_precondition(action.precondition)
-        ll_effect = list_of_precondition(action.effect)
-
-        ll_parameters = specify_parameters(list_parameter)
-
-        for each_parameter in ll_parameters:
-            #check scenario for each parameter
-
-            #but first turn update precondition
-            each_precon = turn_precondition(each_parameter, ll_precon)
-
-            # if all precondition is in and also consider not :( if there is not then if not part is not belong to list
-
-            if (all([x in state for x in each_precon])):
-                #all precondition is in list
+            for each_parameter in ll_parameters:
+                #check scenario for each parameter
+                lists = [each_parameter[x] for x in each_parameter]
+                parameter = ' '.join(lists)
+                name_of_action = '(' + action.name + ' ' + parameter + ')'
+                #print('======== {} ======'.format(name_of_action))
+                #but first turn update precondition
+                each_precon = turn_precondition(each_parameter, ll_precon)
                 each_effect = turn_precondition(each_parameter, ll_effect)
-                print(each_effect)
-                new_state = copy.deepcopy(state)
-                new_state.append(each_effect)
-                print(new_state)
-                #add effect to the state and return state
-            else:
-                # some precondition missing
-                print('')
+                listed_action[name_of_action] = {
+                    'name' : name_of_action,
+                    'precondition' : each_precon,
+                    'effect' : each_effect
+                }
+
+        return copy.deepcopy(listed_action)
+
+
+    def create_evolve_map(self, current_state, action_list):
+        #Function to check if state placed in hash map already
+        def check_in_map(maps, key):
+            for i in maps:
+                k = maps[i]
+                if (len(key) == len(k)):
+                    if (all([x in k for x in key])):
+                        return i
+            return None
+
+        name_state = self.add_naming(current_state)
+        for action in action_list:
+            new_state = self.add_action_to_state(current_state, action_list[action])
+            if (len(new_state) > 0):
+                name = check_in_map(self.name_state_hash_map, new_state)
+                if (name):
+                    self.map_of_states[name_state].append([action, name])
+                else:
+                    new_name = self.add_naming(new_state)
+                    self.map_of_states[name_state].append([action, new_name])
+                    self.create_evolve_map(new_state, action_list)
+
+    def add_naming(self, state):
+        #function for adding state to the hashmap and evoluation map
+        name_state = ';'.join(state)
+        self.name_state_hash_map[name_state] = state
+
+        if (name_state not in self.map_of_states):
+            self.map_of_states[name_state] = []
+
+        return name_state
+    def add_action_to_state(self, state, action):
+        # add effect
+        new_state = []
+
+        wanted_precon, unwanted_precon = seperate_not_predicate(action['precondition'])
+        # if all precondition is in and also consider not :( if there is not then if not part is not belong to list
+        satisfied_wanted = all([x in state for x in wanted_precon])
+        satisfied_unwanted = all([elem not in state for elem in unwanted_precon])
+        if (satisfied_wanted and satisfied_unwanted):
+            #add effect to the state and return state
+            w, u = seperate_not_predicate(action['effect'])
+            new_state = copy.deepcopy(state)
+            new_state = new_state + w #add to element
+            new_state = [i for i in new_state if i not in u] #remove the elements which named as not
+        # else:
+        #     # some precondition is not fit
+        #     # action is not applicable
+        #     print('')
 
 
 
-        #Create list of next states!!! then ot could check all to create the map
+        #Create list of next states!!! then ot could check all to create the maple
 
+        #add a place to add action one by one so states could be visible
 
-        print("Parameters -> {}".format(list_parameter))
-        print("Precondition -> {}".format(ll_precon))
-        print("Effect -> {}".format(ll_effect))
-        print(action.effect)
-        print("Next State -> {}".format(next_state))
-        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-
-        return copy.deepcopy(next_state)
+        return copy.deepcopy(new_state)
