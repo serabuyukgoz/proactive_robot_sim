@@ -12,17 +12,28 @@ class CalculateDesireability():
             'value' : value
             }
 
-    def desirabilityFunction(self, map_of_states):
+    def desirabilityFunction(self, map_of_states, hashmap):
         desirability = {}
-        for sub_set in map_of_states:
-            desirability[sub_set] = {}
-            for key in map_of_states[sub_set]:
-                res = self.isStateDesiable(map_of_states[sub_set][key])
-                desirability[sub_set][key] = {
-                    'state' : map_of_states[sub_set][key],
-                    'value' : res
-                }
-                
+
+        # for sub_set in map_of_states:
+        #     desirability[sub_set] = {}
+        #     for key in map_of_states[sub_set]:
+        #         state = hashmap[key[1]]
+        #         res = self.isStateDesiable(state)
+        #         desirability[key[1]] = {
+        #             #'state' : state,
+        #             'value' : res
+        #         }
+
+        for key in hashmap:
+            desirability[key] = {}
+            state = hashmap[key]
+            res = self.isStateDesiable(state)
+            desirability[key] = {
+                #'state' : state,
+                'value' : res
+            }
+
         return desirability
 
 
@@ -50,7 +61,7 @@ class CalculateDesireability():
             # Multiply elements one by one
             result = 1
             for x in myList:
-                 result = result * x
+                result = result * x
             return result
 
         return multiplyList(status)
