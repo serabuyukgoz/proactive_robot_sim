@@ -17,13 +17,14 @@ class ActionType():
 class Environment():
     def __init__(self):
 
-        self.action_dictionary = {}
+        self.action_dictionary = {} #all actions store there
         self.human_action_dictionary = {}
         self.robot_action_dictionary = {}
 
         self.goals_dictionary = {}
         self.objects_dictionary = {}
         self.types_dictionary = {}
+        self.constant_dictionary = {}
 
         self.predicates_list = []
         self.derived_list = []
@@ -70,12 +71,22 @@ class Environment():
     def add_sub_objects(self, name, objects):
         self.objects_dictionary[name].append(objects)
 
+    def add_constants(self, name):
+        #to check if obejct already decleared before
+        if self.constant_dictionary.get(name) == None:
+            self.constant_dictionary[name] = []
+
+    def add_sub_constants(self, name, objects):
+        self.constant_dictionary[name].append(objects)
+
     def add_common_knowledge(self, info):
         #add informan=tion onto the list
         self.common_knowledge_dictionary.append(info)
 
     def add_derived(self, info):
         self.derived_list.append(info)
+
+    #Till here it was all about creating PDDL file
 
     def findNegate(self, strs):
         if ("(not(" in strs):
@@ -103,12 +114,12 @@ class Environment():
         #returning all actions at the dictionary
         return copy.deepcopy(self.action_dictionary)
 
-    def provide_action_list(self):
+    def return_unvoluntary_action_list(self):
         action_list = self.return_action_list()
         listed_action = {}
 
         for key in action_list:
-            if action_list[key].types == "Robot":
+            if action_list[key].types != "Robot":
                 #print(key, "->" ,self.action_dictionary[key])
                 listed_action[key] = action_list[key]
 
@@ -123,7 +134,9 @@ class Environment():
                 #print(key, "->" ,self.action_dictionary[key])
                 #listed_action.append(action_list[key])
                 listed_action[key] = action_list[key]
-        return copy.deepcopy(listed_action)
+
+        mapped_action = self.create_action_list_map(action_list)
+        return copy.deepcopy(mapped_action)
 
     def return_human_action_list(self):
         action_list = self.return_action_list()
@@ -131,17 +144,6 @@ class Environment():
 
         for key in action_list:
             if action_list[key].types == "Human":
-                #print(key, "->" ,self.action_dictionary[key])
-                listed_action[key] = action_list[key]
-
-        return copy.deepcopy(listed_action)
-
-    def return_state_action_list(self):
-        action_list = self.return_action_list()
-        listed_action = {}
-
-        for key in action_list:
-            if action_list[key].types == "Free":
                 #print(key, "->" ,self.action_dictionary[key])
                 listed_action[key] = action_list[key]
 
@@ -162,10 +164,14 @@ class Environment():
         return copy.deepcopy(self.common_knowledge_dictionary)
 
     def return_current_state(self):
-        return copy.deepcopy(self.init_state)
+        name = self.return_name_of_state(self.init_state)
+        return name, copy.deepcopy(self.init_state)
 
     def return_types(self):
         return copy.deepcopy(self.types_dictionary)
+
+    def return_constants_list(self):
+        return copy.deepcopy(self.constant_dictionary)
 
     def return_derived_list(self):
         return copy.deepcopy(self.derived_list)
@@ -177,13 +183,13 @@ class Environment():
         action_list = self.return_human_action_list()
 
         objects =  self.return_objects_list()
+        constants_list = self.return_constants_list()
         relationship_list = self.return_current_knowledge_list()
-        list_init = self.return_current_state()
+        list_init_name, list_init = self.return_current_state()
         goal_list = self.return_goal_list()
 
         derived_list = self.return_derived_list()
-
-        domain_name = self.create_domain(types_list, predicates_list, action_list, derived_list)
+        domain_name = self.create_domain(types_list, constants_list, predicates_list, action_list, derived_list)
         problem_name = {}
         for g in goal_list:
             problem_name[g] = self.create_problem(g, objects, relationship_list, list_init)
@@ -201,7 +207,7 @@ class Environment():
         return (domain_name, problem_name)
 
 
-    def create_domain(self, types_list, predicates_list, action_list, derived_list):
+    def create_domain(self, types_list, constants_list, predicates_list, action_list, derived_list):
         name_domain = "domain.pddl"
 
         f = open(name_domain, "w+")
@@ -223,6 +229,19 @@ class Environment():
                 f.write(" ")
 
             if (len(types_list[items]) > 0):
+                f.write(" - ")
+            f.write(items)
+            f.write(" \n ")
+
+
+        f.write( " ) \n (:constants \n ")
+
+        for items in constants_list:
+            for item in constants_list[items]:
+                f.write(item)
+                f.write(" ")
+
+            if (len(constants_list[items]) > 0):
                 f.write(" - ")
             f.write(items)
             f.write(" \n ")
@@ -281,7 +300,8 @@ class Environment():
 
         #write init
         for event in list_init:
-          f.write(" %s  \n" %event)
+          f.write(event)
+          f.write(" \n ")
 
         f.write( ")(:goal \n" ) #adding goal
 
@@ -303,20 +323,20 @@ class Environment():
     def return_state_hash_map(self):
         return copy.deepcopy(self.name_state_hash_map)
 
-    def create_action_list_map(self):
-        action_list = self.return_action_list()
+    def create_action_list_map(self, action_list):
+
         listed_action = {}
 
         for key in action_list:
-            #print(key, "->" ,self.action_dictionary[key])
+            print(key, "->" ,action_list[key])
             action = action_list[key]
             #action part
             list_parameter = return_parameter(action.parameter)
+            map_parameters = {**self.constant_dictionary, **self.objects_dictionary} #merge two dictionary
 
             for x in list_parameter:
-                #print('printed x {}'.format(x))
                 key = list_parameter[x]
-                list_parameter[x] = copy.deepcopy(self.objects_dictionary[list_parameter[x]])
+                list_parameter[x] = map_parameters[list_parameter[x]]
 
             ll_precon = list_of_precondition(action.precondition)
             ll_effect = list_of_precondition(action.effect)
@@ -337,41 +357,55 @@ class Environment():
                     'precondition' : each_precon,
                     'effect' : each_effect
                 }
+        print(listed_action)
 
         return copy.deepcopy(listed_action)
 
+    def return_name_of_state(self, key):
+        for i in self.name_state_hash_map:
+            k = self.name_state_hash_map[i]
+            if (len(key) == len(k)):
+                if (all([x in k for x in key])):
+                    return i
+        return None
 
     def create_evolve_map(self, current_state, action_list):
         #Function to check if state placed in hash map already
-        def check_in_map(maps, key):
-            for i in maps:
-                k = maps[i]
-                if (len(key) == len(k)):
-                    if (all([x in k for x in key])):
-                        return i
-            return None
-
         name_state = self.add_naming(current_state)
         for action in action_list:
             new_state = self.add_action_to_state(current_state, action_list[action])
             if (len(new_state) > 0):
-                name = check_in_map(self.name_state_hash_map, new_state)
+                name = self.return_name_of_state(new_state)
                 if (name):
-                    self.map_of_states[name_state].append([action, name])
+                    #self.map_of_states[name_state].append([action, name])
+                    self.map_of_states[name_state].append(name)
                 else:
                     new_name = self.add_naming(new_state)
-                    self.map_of_states[name_state].append([action, new_name])
+                    #self.map_of_states[name_state].append([action, new_name])
+                    self.map_of_states[name_state].append(new_name)
                     self.create_evolve_map(new_state, action_list)
 
     def add_naming(self, state):
         #function for adding state to the hashmap and evoluation map
-        name_state = ';'.join(state)
+        if (len(state) > 0):
+            name_state = ';'.join(state)
+        else:
+            name_state = '(Empty)'
         self.name_state_hash_map[name_state] = state
 
         if (name_state not in self.map_of_states):
             self.map_of_states[name_state] = []
 
         return name_state
+
+    def add_action_to_state_name(self, state_name, action):
+
+        state = self.name_state_hash_map[state_name]
+        new_state = self.add_action_to_state(state, action)
+        new_state_name = self.return_name_of_state(new_state)
+
+        return new_state_name, new_state
+
     def add_action_to_state(self, state, action):
         # add effect
         new_state = []
@@ -383,6 +417,7 @@ class Environment():
         if (satisfied_wanted and satisfied_unwanted):
             #add effect to the state and return state
             w, u = seperate_not_predicate(action['effect'])
+            print('want : {} , unwanted : {}'.format(w,u))
             new_state = copy.deepcopy(state)
             new_state = new_state + w #add to element
             new_state = [i for i in new_state if i not in u] #remove the elements which named as not

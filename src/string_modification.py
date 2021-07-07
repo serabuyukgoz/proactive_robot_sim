@@ -9,7 +9,9 @@ def return_parameter(param):
     parameter = {}
 
     for all in pp:
-        parameter[pp.pop()] = pp.pop()
+        all = re.sub(r"\s+", "", all)
+        if (all != ""):
+            parameter[pp.pop()] = pp.pop()
 
     #print(parameter)
     return copy.deepcopy(parameter)
