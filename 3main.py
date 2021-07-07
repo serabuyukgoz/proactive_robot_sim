@@ -35,228 +35,111 @@ def setClasses():
 
 def create_world_state(system):
 
-    (define (domain recipe)
-    (:requirements
-    :strips
-    :negative-preconditions
-    :equality
-    :typing
-    :derived-predicates )
-    (:types obj user weather time - main )
-
-     (:constants
-            sunshine hail rainy cloudy - weather
-            morning noon evening - time
-            hat compass backpack walking_stick dog book water_bottle umbrella - obj
-     )
-    (:predicates
-
-     (collected ?x - objects)
-     (outside ?u - user)
-     (current_weather ?w - weather)
-
-     (current_time ?t - time)
-     (after ?t1 - time ?t2 - time)
-
-     (hiking ?u - user)
-     (promenade ?u - user)
-     (watching_tv ?u - user)
-     (reading_book ?u - user)
-     (breakfast ?u - user)
-
-     (weather_dealt)
-     (dishes_dirty)
-    )
-
-
-    (:derived (weather_dealt)
-
-      (or
-      (and (current_weather sunshine) (collected hat))
-      (and (current_weather rainy) (collected umbrella))
-
-    ) )
-
-
-    (:action had_breakfast
-      :parameters(?u - user)
-      :precondition(breakfast ?u)
-      :effect(dishes_dirty)
-    )
-
-    (:action wait
-      :parameters(?u - user ?to - time ?tn - time)
-      :precondition(and (current_time ?to)(after ?to ?tn))
-      :effect(and (not (current_time ?to)) (current_time ?tn))
-    )
-
-    (:action leave_home
-      :parameters(?u - user)
-      :precondition(and (not(outside ?u)) (weather_dealt))
-      :effect(outside ?u)
-    )
-
-    (:action clean_dishes
-      :parameters()
-      :precondition(dishes_dirty)
-      :effect(not(dishes_dirty))
-    )
-
-    (:action go_hiking
-      :parameters(?u - user)
-      :precondition(and (collected backpack) (collected compass) (outside ?u))
-      :effect(hiking ?u)
-    )
-
-    (:action go_promenade
-      :parameters(?u - user)
-      :precondition(and (collected walking_stick) (collected dog) (outside ?u))
-      :effect(promenade ?u)
-    )
-
-    (:action watch_tv
-      :parameters(?u - user)
-      :precondition(and (not (outside ?u)) )
-      :effect(watching_tv ?u)
-    )
-
-    (:action read_book
-      :parameters(?u - user)
-      :precondition(and (not (outside ?u)) (collected book))
-      :effect(reading_book ?u)
-    )
-
-      (:action collect
-        :parameters(?x - obj)
-        :precondition (not(collected ?x))
-        :effect (collected ?x)
-      )
-
-      (:action leave
-        :parameters(?x - obj)
-        :precondition (collected ?x)
-        :effect (not(collected ?x))
-      )
-     )
-
-(define (problem recipe-ex1)
-  (:domain recipe)
-  (:objects
-    ali - user
-  )
- (:init
-    (current_weather sunshine)
-    (current_time morning)
- )
-
-  (:goal
-    (hiking ali)
-  )
-
-)
-
-
     system['env'].add_type('main')
-    system['env'].add_sub_types('main', 'activity')
-    system['env'].add_sub_types('main', 'food')
+    system['env'].add_sub_types('main', 'obj')
+    system['env'].add_sub_types('main', 'user')
     system['env'].add_sub_types('main', 'weather')
     system['env'].add_sub_types('main', 'time')
 
     #adding user's action for intention recognition
 
-    system['env'].add_action("Human", "(?d - dish)", "(collected_all ?d)", "(submitted ?d)", "submit")
-    system['env'].add_action("Human", "(?x - food)", "(not(collected ?x))", "(collected ?x)", "collect")
-    system['env'].add_action("Human", "(?x - food)", "(collected ?x)", "(not(collected ?x))", "leave")
-
+    system['env'].add_action("Human", "(?u - user)", "(and (not(outside ?u)) (weather_dealt))", "(outside ?u)", "leave_home")
+    system['env'].add_action("Human", " ( ) ", "(dishes_dirty)", "(not(dishes_dirty))", "clean_dishes")
+    system['env'].add_action("Human", "(?u - user)", "(and (collected backpack) (collected compass) (outside ?u))", "(hiking ?u)", "go_hiking")
+    system['env'].add_action("Human", "(?u - user)", "(and (collected walking_stick) (collected dog) (outside ?u))", "(watching_tv ?u)", "go_promenade")
+    system['env'].add_action("Human", "(?u - user)", "(and (not (outside ?u)) )", "(watching_tv ?u)", "watch_tv")
+    system['env'].add_action("Human", "(?u - user)", "(and (not (outside ?u)) (collected book))", "(reading_book ?u)", "read_book")
+    system['env'].add_action("Human", "(?x - obj)", "(not(collected ?x))", "(collected ?x)", "collect")
+    system['env'].add_action("Human", "(?x - obj)", "(collected ?x)", "(not(collected ?x))", "leave")
     #added robot actions for equilibrium maintenance, all of robot's action is communicative
 
-#    system['env'].add_action("Robot", "(?d - dish)", "(collected_all ?d)", "(submitted ?d)", "tell_submit")
-#    system['env'].add_action("Robot", "(?x - food)", "(not(collected ?x))", "(collected ?x)", "tell_collect")
-#    system['env'].add_action("Robot", "(?x - food)", "(collected ?x)", "(not(collected ?x))", "tell_leave")
+    system['env'].add_action("Robot", "(?d - dish)", "(collected_all ?d)", "(submitted ?d)", "tell_clean_dishes")
+    system['env'].add_action("Robot", "(?x - obj)", "(not(collected ?x))", "(collected ?x)", "tell_gather")
+    system['env'].add_action("Robot", "(?u - user)", "(collected ?x)", "(not(outside ?u))", "warn_weather")
 
     #added actions for free run, changes of concepts!
-#    system['env'].add_action("Free", "(?wp - weather ?wn - weather)", " ( ) ", "(and (not(current_weather ?wp)) (current_weather ?wn))", "weather_change")
-#    system['env'].add_action("Free", "(?tp - time ?tn - time)", "(after ?tp ?tn)", "(and (not(current_time ?tp)) (current_time ?tn))", "time_change")
+#    system['env'].add_action("Free", "(?wp - weather ?wn - weather)", "(current_weather ?wp)", "(and (not (current_weather ?wp)) (current_weather ?wn))", "weather_change")
+#    system['env'].add_action("Free", "(?tp - time ?tn - time)", "(after ?tp ?tn)", "(and (not (current_time ?tp)) (current_time ?tn))", "time_change")
+    system['env'].add_action("Free", "(?u - user)", "(breakfast ?u)", "(dishes_dirty)", "had_breakfast")
 
-    system['env'].add_predicate("collected_all ?d - dish")
-    system['env'].add_predicate("submitted ?d - dish")
-    system['env'].add_predicate("collected ?x - food")
-    system['env'].add_predicate("needed ?s - dish ?x - food")
+    system['env'].add_predicate("collected ?x - objects")
+    system['env'].add_predicate("outside ?u - user")
     system['env'].add_predicate("current_weather ?w - weather")
     system['env'].add_predicate("current_time ?t - time")
     system['env'].add_predicate("after ?t1 - time ?t2 - time")
 
-    system['env'].add_goal('( go hiking )')
-    system['env'].add_goal('( go promenade )')
+    system['env'].add_predicate("hiking ?u - user")
+    system['env'].add_predicate("promenade ?u - user")
+    system['env'].add_predicate("watching_tv ?u - user")
+    system['env'].add_predicate("reading_book ?u - user")
+    system['env'].add_predicate("breakfast ?u - user")
 
-    system['env'].add_object('dish')
-    system['env'].add_sub_objects('dish', 'soup')
-    system['env'].add_sub_objects('dish', 'cake')
-    system['env'].add_sub_objects('dish', 'smoothie')
-    system['env'].add_object('food')
-    system['env'].add_sub_objects('food', 'water')
-    system['env'].add_sub_objects('food', 'flour')
-#    system['env'].add_sub_objects('food', 'lentil')
-    system['env'].add_sub_objects('food', 'chocolate')
-#    system['env'].add_sub_objects('food', 'sugar')
-    system['env'].add_sub_objects('food', 'salt')
-    # system['env'].add_sub_objects('food', 'pepper')
-    # system['env'].add_sub_objects('food', 'milk')
-    # system['env'].add_sub_objects('food', 'sprinkle')
-    # system['env'].add_sub_objects('food', 'coco')
-    # system['env'].add_object('weather')
-    # system['env'].add_sub_objects('weather', 'rainy')
-    # system['env'].add_sub_objects('weather', 'cloudy')
-    # system['env'].add_object('time')
-    # system['env'].add_sub_objects('time', 'morning')
-    # system['env'].add_sub_objects('time', 'lunch')
-    # system['env'].add_sub_objects('time', 'after_noon')
-    # system['env'].add_sub_objects('time', 'evening')
-    # system['env'].add_sub_objects('time', 'night')
+    system['env'].add_predicate("weather_dealt")
+    system['env'].add_predicate("dishes_dirty")
+
+    # system['env'].add_goal('( hiking ?u - user)')
+    # system['env'].add_goal('( promenade ?u - user)')
+    # system['env'].add_goal('( reading_book ?u - user)')
+    # system['env'].add_goal('( watching_tv ?u - user)')
+
+    system['env'].add_goal('(hiking ali)')
+    system['env'].add_goal('(promenade ali)')
+    system['env'].add_goal('(reading_book ali)')
+    system['env'].add_goal('(watching_tv ali)')
+
+    system['env'].add_object('user')
+    system['env'].add_sub_objects('user', 'ali')
+
+    system['env'].add_constants('weather')
+    system['env'].add_sub_constants('weather', 'sunshine')
+    system['env'].add_sub_constants('weather', 'hail')
+    system['env'].add_sub_constants('weather', 'rainy')
+    system['env'].add_sub_constants('weather', 'cloudy')
+    system['env'].add_constants('time')
+    system['env'].add_sub_constants('time', 'morning')
+    system['env'].add_sub_constants('time', 'noon')
+    system['env'].add_sub_constants('time', 'evening')
+    system['env'].add_constants('obj')
+    system['env'].add_sub_constants('obj', 'hat')
+    system['env'].add_sub_constants('obj', 'compass')
+    system['env'].add_sub_constants('obj', 'backpack')
+    system['env'].add_sub_constants('obj', 'walking_stick')
+    system['env'].add_sub_constants('obj', 'dog')
+    system['env'].add_sub_constants('obj', 'book')
+    system['env'].add_sub_constants('obj', 'water_bottle')
+    system['env'].add_sub_constants('obj', 'umbrella')
 
     #relationship added
-    system['env'].add_common_knowledge(" needed soup water " )
-    system['env'].add_common_knowledge(" needed soup salt " )
-#    system['env'].add_common_knowledge(" needed soup pepper " )
-#    system['env'].add_common_knowledge(" needed soup lentil " )
-    system['env'].add_common_knowledge(" needed cake flour " )
-    system['env'].add_common_knowledge(" needed cake chocolate " )
-#    system['env'].add_common_knowledge(" needed cake sugar " )
-#    system['env'].add_common_knowledge(" needed cake water " )
-#    system['env'].add_common_knowledge(" needed smoothie milk " )
-    system['env'].add_common_knowledge(" needed smoothie water " )
-#    system['env'].add_common_knowledge(" needed smoothie sprinkle " )
-    system['env'].add_common_knowledge(" needed smoothie chocolate " )
-
-    # system['env'].add_common_knowledge(" after morning lunch " )
-    # system['env'].add_common_knowledge(" after lunch after_noon " )
-    # system['env'].add_common_knowledge(" after after_noon evening " )
-    # system['env'].add_common_knowledge(" after evening night " )
-    # system['env'].add_common_knowledge(" after night morning " )
+    system['env'].add_common_knowledge(" after morning lunch " )
+    system['env'].add_common_knowledge(" after lunch after_noon " )
+    system['env'].add_common_knowledge(" after after_noon evening " )
+    system['env'].add_common_knowledge(" after evening night " )
+    system['env'].add_common_knowledge(" after night morning " )
 
     #related to the state description -> it could have chage later
-    # system['env'].add_state_change("(current_weather rainy)")
-    # system['env'].add_state_change("(current_time morning)")
+    system['env'].add_state_change("(current_weather sunshine)")
+    system['env'].add_state_change("(current_time morning)")
+    system['env'].add_state_change("(breakfast ali)")
 
     #derived predicates_list
-    derived = " \n (:derived (collected_all ?s - dish) \n (forall (?x - food) \n (and \n (imply (needed ?s ?x) (collected ?x)) \n (imply (and (not (needed ?s ?x)) (collected ?x))  (not (collected ?x))) \n ) )  ) \n "
+    derived = " \n (:derived (weather_dealt) \n (or \n (and (current_weather sunshine) (collected hat)) \n (and (current_weather rainy) (collected umbrella)) \n  )  ) \n "
     system['env'].add_derived(derived)
 
 
 
     #ALSO add what is undesired situations to define which state will be undesired!
-    system['des'].add_situation('get_wet', ['(current_weather rainy)' , '(left house)'], 0.1)
-    system['des'].add_situation('cake_spoiled', ['(submitted cake)'], 0.5)
-    system['des'].add_situation('pepper_alergy', ['(collected pepper)'], 0.0)
-    system['des'].add_situation('too_much_sugar', ['(collected chocolate)'], 0.5)
+    system['des'].add_situation('get_wet', ['(current_weather rainy)' , '(outside ?u - user)'], 0.5)
+    system['des'].add_situation('get_hurt', ['(current_weather hail)' , '(outside ?u - user)'], 1.0)
+    system['des'].add_situation('dirt_dishes', ['(dishes_dirty)'], 0.2)
 
     domain_name, problem_name = system['env'].create_environment()
 
     return (domain_name, problem_name)
 
 def free_run_creation(system):
-    list_init = system['env'].return_current_state()
-    defined_action = system['env'].create_action_list_map()
+    list_init_name, list_init = system['env'].return_current_state()
+    unvoluntary_action_list = system['env'].return_unvoluntary_action_list()
+    defined_action = system['env'].create_action_list_map(unvoluntary_action_list)
     system['env'].create_evolve_map(list_init, defined_action)
     maps = system['env'].return_state_map()
     hashmap_state = system['env'].return_state_hash_map()
@@ -292,9 +175,9 @@ def updateSituation(system):
     print('______________________')
     print('Desirabilily Calculation \n {}'.format(des))
     act_robot = system['env'].return_robot_action_list()
-    cur_state = system['env'].return_current_state()
-    #oppo = system['opo'].checkAllOpportunitues(des, act_robot)
-    oppo = system['opo'].findOpportunity(cur_state, des, evolve_map, hashmap_state)
+    cur_state_name, cur_state = system['env'].return_current_state()
+    K = 2 #look up strategy
+    oppo = system['opo'].findOpportunity(evolve_map, des, cur_state_name, act_robot, K)
 
     return plan_list
 
@@ -324,21 +207,3 @@ if __name__ =='__main__':
     react = time.time()
     selected_plan = updateSituation(system)
     react = time.time() - react
-
-    #print_all(react, system)
-
-    robot_said = system["nav"].select_action_to_play(selected_plan)
-    #print(robot_said)
-
-    #Situation change
-    #print("action played -> collected chocolate")
-    system['env'].add_state_change("(collected chocolate)")
-
-    react = time.time()
-    selected_plan = updateSituation(system)
-    react = time.time() - react
-
-    #print_all(react, system)
-
-    robot_said = system["nav"].select_action_to_play(selected_plan)
-    #print(robot_said)

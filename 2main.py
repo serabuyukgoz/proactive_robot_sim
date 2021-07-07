@@ -49,9 +49,9 @@ def create_world_state(system):
 
     #added robot actions for equilibrium maintenance, all of robot's action is communicative
 
-#    system['env'].add_action("Robot", "(?d - dish)", "(collected_all ?d)", "(submitted ?d)", "tell_submit")
-#    system['env'].add_action("Robot", "(?x - food)", "(not(collected ?x))", "(collected ?x)", "tell_collect")
-#    system['env'].add_action("Robot", "(?x - food)", "(collected ?x)", "(not(collected ?x))", "tell_leave")
+    system['env'].add_action("Robot", "(?d - dish)", "(collected_all ?d)", "(submitted ?d)", "tell_submit")
+    system['env'].add_action("Robot", "(?x - food)", "(not(collected ?x))", "(collected ?x)", "tell_collect")
+    system['env'].add_action("Robot", "(?x - food)", "(collected ?x)", "(not(collected ?x))", "tell_leave")
 
     #added actions for free run, changes of concepts!
 #    system['env'].add_action("Free", "(?wp - weather ?wn - weather)", " ( ) ", "(and (not(current_weather ?wp)) (current_weather ?wn))", "weather_change")
@@ -135,8 +135,9 @@ def create_world_state(system):
     return (domain_name, problem_name)
 
 def free_run_creation(system):
-    list_init = system['env'].return_current_state()
-    defined_action = system['env'].create_action_list_map()
+    list_init_name, list_init = system['env'].return_current_state()
+    unvoluntary_action_list = system['env'].return_unvoluntary_action_list()
+    defined_action = system['env'].create_action_list_map(unvoluntary_action_list)
     system['env'].create_evolve_map(list_init, defined_action)
     maps = system['env'].return_state_map()
     hashmap_state = system['env'].return_state_hash_map()
@@ -172,9 +173,9 @@ def updateSituation(system):
     print('______________________')
     print('Desirabilily Calculation \n {}'.format(des))
     act_robot = system['env'].return_robot_action_list()
-    cur_state = system['env'].return_current_state()
-    #oppo = system['opo'].checkAllOpportunitues(des, act_robot)
-    oppo = system['opo'].findOpportunity(cur_state, des, evolve_map, hashmap_state)
+    cur_state_name, cur_state = system['env'].return_current_state()
+    K = 2 #look up strategy
+    oppo = system['opo'].findOpportunity(evolve_map, des, cur_state_name, act_robot, K)
 
     return plan_list
 
