@@ -6,6 +6,8 @@ import copy
 import re
 from src.string_modification import *
 
+from src.planner import run_planning
+
 class ActionType():
     def __init__(self, types, parameter, precondition, effect, name):
         self.types = types
@@ -15,7 +17,10 @@ class ActionType():
         self.name = name
 
 class Environment():
-    def __init__(self):
+    def __init__(self, system):
+
+        self.domain_name = ""
+        self.sys = system
 
         self.action_dictionary = {} #all actions store there
         self.human_action_dictionary = {}
@@ -204,6 +209,7 @@ class Environment():
         # self.create_evolve_map(list_init, defined_action)
 
         #Retruned PDDL Files as whole; domain and all goals
+        self.domain_name = domain_name
         return (domain_name, problem_name)
 
 
@@ -303,11 +309,11 @@ class Environment():
           f.write(event)
           f.write(" \n ")
 
-        f.write( ")(:goal \n" ) #adding goal
+        f.write( ")(:goal (and \n" ) #adding goal
 
         #add goal
         f.write("%s" %goal)
-        f.write (" ) ) ") #last paranthesis
+        f.write (" ) ) ) ") #last paranthesis
 
         f.close()
 
@@ -328,7 +334,7 @@ class Environment():
         listed_action = {}
 
         for key in action_list:
-            print(key, "->" ,action_list[key])
+            #print(key, "->" ,action_list[key])
             action = action_list[key]
             #action part
             list_parameter = return_parameter(action.parameter)
@@ -357,7 +363,7 @@ class Environment():
                     'precondition' : each_precon,
                     'effect' : each_effect
                 }
-        print(listed_action)
+        #print(listed_action)
 
         return copy.deepcopy(listed_action)
 
@@ -369,21 +375,46 @@ class Environment():
                     return i
         return None
 
+    # def create_evolve_map(self, current_state, action_list):
+    #     #Function to check if state placed in hash map already
+    #     name_state = self.add_naming(current_state)
+    #     for action in action_list:
+    #         new_state = self.add_action_to_state(current_state, action_list[action])
+    #         if (len(new_state) > 0):
+    #             name = self.return_name_of_state(new_state)
+    #             if (name):
+    #                 #self.map_of_states[name_state].append([action, name])
+    #                 self.map_of_states[name_state].append(name)
+    #             else:
+    #                 new_name = self.add_naming(new_state)
+    #                 #self.map_of_states[name_state].append([action, new_name])
+    #                 self.map_of_states[name_state].append(new_name)
+    #                 self.create_evolve_map(new_state, action_list)
+
     def create_evolve_map(self, current_state, action_list):
         #Function to check if state placed in hash map already
         name_state = self.add_naming(current_state)
-        for action in action_list:
-            new_state = self.add_action_to_state(current_state, action_list[action])
-            if (len(new_state) > 0):
-                name = self.return_name_of_state(new_state)
-                if (name):
-                    #self.map_of_states[name_state].append([action, name])
-                    self.map_of_states[name_state].append(name)
-                else:
-                    new_name = self.add_naming(new_state)
-                    #self.map_of_states[name_state].append([action, new_name])
-                    self.map_of_states[name_state].append(new_name)
-                    self.create_evolve_map(new_state, action_list)
+        undone_state = [[name_state, current_state]]
+        #undone_state.append(current_state)
+        while(undone_state):
+            state = undone_state.pop()
+            name_state = state[0]
+            current_state = state[1]
+            for action in action_list:
+                new_state = self.add_action_to_state_plan(current_state, action_list[action], action_list)
+                if (len(new_state) > 0):
+                    name = self.return_name_of_state(new_state)
+                    if (name):
+                        #self.map_of_states[name_state].append([action, name])
+                        self.map_of_states[name_state].append(name)
+                    else:
+                        new_name = self.add_naming(new_state)
+                        #self.map_of_states[name_state].append([action, new_name])
+                        self.map_of_states[name_state].append(new_name)
+                        #self.create_evolve_map(new_state, action_list)
+                        undone_state.append([new_name, new_state])
+            print(self.map_of_states[name_state])
+
 
     def add_naming(self, state):
         #function for adding state to the hashmap and evoluation map
@@ -417,19 +448,30 @@ class Environment():
         if (satisfied_wanted and satisfied_unwanted):
             #add effect to the state and return state
             w, u = seperate_not_predicate(action['effect'])
-            print('want : {} , unwanted : {}'.format(w,u))
             new_state = copy.deepcopy(state)
             new_state = new_state + w #add to element
             new_state = [i for i in new_state if i not in u] #remove the elements which named as not
-        # else:
-        #     # some precondition is not fit
-        #     # action is not applicable
-        #     print('')
 
-
-
-        #Create list of next states!!! then ot could check all to create the maple
-
-        #add a place to add action one by one so states could be visible
 
         return copy.deepcopy(new_state)
+
+    def add_action_to_state_plan(self, state, action, action_list):
+
+        list_g = action['effect']
+        g = " ".join(list_g)
+        print(g)
+        list_init = state
+        relationship_list = self.return_current_knowledge_list()
+        objects = self.return_objects_list()
+        problem_name = self.create_problem(g, objects, relationship_list, list_init)
+
+        planned_action_list = run_planning(self.domain_name, problem_name)
+        print(action_list)
+        print(planned_action_list)
+        print(state)
+        for each_action in planned_action_list:
+            action_format = action_list[each_action]
+            state = self.add_action_to_state(state, each_action)
+            print(state)
+
+        return

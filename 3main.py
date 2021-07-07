@@ -19,7 +19,7 @@ from print_strategy import print_all, print_des
 system = { }
 
 def setClasses():
-    env = Environment()
+    env = Environment(system)
     rec = Intention()
     des = CalculateDesireability()
     opo = OpportunityDetection(system)
@@ -58,8 +58,8 @@ def create_world_state(system):
     system['env'].add_action("Robot", "(?u - user)", "(collected ?x)", "(not(outside ?u))", "warn_weather")
 
     #added actions for free run, changes of concepts!
-#    system['env'].add_action("Free", "(?wp - weather ?wn - weather)", "(current_weather ?wp)", "(and (not (current_weather ?wp)) (current_weather ?wn))", "weather_change")
-#    system['env'].add_action("Free", "(?tp - time ?tn - time)", "(after ?tp ?tn)", "(and (not (current_time ?tp)) (current_time ?tn))", "time_change")
+    system['env'].add_action("Free", "(?wp - weather ?wn - weather)", "(current_weather ?wp)", "(and (not (current_weather ?wp)) (current_weather ?wn))", "weather_change")
+    system['env'].add_action("Free", "(?tp - time ?tn - time)", "(after ?tp ?tn)", "(and (not (current_time ?tp)) (current_time ?tn))", "time_change")
     system['env'].add_action("Free", "(?u - user)", "(breakfast ?u)", "(dishes_dirty)", "had_breakfast")
 
     system['env'].add_predicate("collected ?x - objects")
