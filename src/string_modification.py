@@ -1,5 +1,6 @@
 import copy
 import re
+import itertools
 
 def return_parameter(param):
     param = param.replace("(", "")
@@ -31,25 +32,23 @@ def list_of_precondition(precon):
 
 # to link reach each variable as a parameter
 def specify_parameters(parameter_map):
-    result_length = 1
 
+    list_map = []
     for key in parameter_map:
-        result_length = result_length * len(parameter_map[key])
+        temp = []
+        for each in parameter_map[key]:
+            k = {key : each}
+            temp.append(k)
+        list_map.append(temp)
 
-    #create empty array
-    maped_parameter = []
-    for i in range(result_length):
-        maped_parameter.append({})
-
-    for key in parameter_map:
-        for index in range(result_length):
-            #get right parameter to place by using offset rule (MOD)
-            '''
-                If 2 parameter is from same domain then it is not working!
-            '''
-            param_mod = index % len(parameter_map[key])
-            maped_parameter[index][key] = parameter_map[key][param_mod]
-    return copy.deepcopy(maped_parameter)
+    map = list(itertools.product(*list_map))
+    create_list = []
+    for all_elem in map:
+        z = {}
+        for i in all_elem:
+            z = {**z, **i}
+        create_list.append(z)
+    return copy.deepcopy(create_list)
 
 def turn_precondition(each_parameter, list_precon):
     new_list = []
