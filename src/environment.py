@@ -309,11 +309,11 @@ class Environment():
           f.write(event)
           f.write(" \n ")
 
-        f.write( ")(:goal (and \n" ) #adding goal
+        f.write( ")(:goal \n" ) #adding goal
 
         #add goal
         f.write("%s" %goal)
-        f.write (" ) ) ) ") #last paranthesis
+        f.write ("  ) ) ") #last paranthesis
 
         f.close()
 
@@ -401,7 +401,8 @@ class Environment():
             name_state = state[0]
             current_state = state[1]
             for action in action_list:
-                new_state = self.add_action_to_state_plan(current_state, action_list[action], action_list)
+                #new_state = self.add_action_to_state_plan(current_state, action_list[action], action_list)
+                new_state = self.add_action_to_state(current_state, action_list[action])
                 if (len(new_state) > 0):
                     name = self.return_name_of_state(new_state)
                     if (name):
@@ -413,8 +414,8 @@ class Environment():
                         self.map_of_states[name_state].append(new_name)
                         #self.create_evolve_map(new_state, action_list)
                         undone_state.append([new_name, new_state])
-            print(self.map_of_states[name_state])
-
+            #print(self.map_of_states[name_state])
+    #
 
     def add_naming(self, state):
         #function for adding state to the hashmap and evoluation map
@@ -466,12 +467,15 @@ class Environment():
         problem_name = self.create_problem(g, objects, relationship_list, list_init)
 
         planned_action_list = run_planning(self.domain_name, problem_name)
+        print(len(planned_action_list))
         print(action_list)
         print(planned_action_list)
         print(state)
         for each_action in planned_action_list:
+            each_action = "(" + each_action  + ")"
+            print(each_action)
             action_format = action_list[each_action]
-            state = self.add_action_to_state(state, each_action)
+            state = self.add_action_to_state(state, action_format)
             print(state)
 
         return
