@@ -1,12 +1,12 @@
 from src.string_modification import *
 
 class Opportunity():
-    def __init__(self, opportunity_type, action, state, k, oop):
+    def __init__(self, opportunity_type, action, state, k, oop_deg):
         self.action = action
         self.state = state
         self.k = k
         #self.state_prime = state_prime I dont need to where where i will end up
-        self.opportunity = oop
+        self.opportunity = oop_deg
         self.opportunity_type = opportunity_type
 
 class OpportunityDetection():
@@ -44,7 +44,7 @@ class OpportunityDetection():
                 res = res['value']
             else:
                 #if it it ended up a state that unknown
-                res = self.sys['env'].isStateDesiable(new_state)
+                res = self.sys['des'].isStateDesiable(new_state)
 
                 print('res from function {}'.format(res))
             bnf.append(res)
