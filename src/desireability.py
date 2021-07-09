@@ -1,7 +1,10 @@
-
+import copy
 class CalculateDesireability():
     def __init__(self):
         self.map_of_desirability = {}
+        self.desirable_situation = {}
+
+        self.original_desirability_values = {}
 
     def add_situation(self, situ, rule, value):
         """
@@ -12,18 +15,17 @@ class CalculateDesireability():
             'value' : value
             }
 
+    def update_desirability_Function(intent_list, value):
+        #past values deleted when new intention assigned
+        self.desirable_situation = {}
+        for each_intent in intent_list:
+            self.desirable_situation[intent] = {
+                'rule' : intent_list[each_intent],
+                'value' : value
+            }
+
     def desirabilityFunction(self, map_of_states, hashmap):
         desirability = {}
-
-        # for sub_set in map_of_states:
-        #     desirability[sub_set] = {}
-        #     for key in map_of_states[sub_set]:
-        #         state = hashmap[key[1]]
-        #         res = self.isStateDesiable(state)
-        #         desirability[key[1]] = {
-        #             #'state' : state,
-        #             'value' : res
-        #         }
 
         for key in hashmap:
             desirability[key] = {}
@@ -57,6 +59,14 @@ class CalculateDesireability():
                 calculated_res = self.map_of_desirability[key]['value'] #which is value that set by user 0 for fatal, and 0.5 for half desire,
             status.append(calculated_res)
 
+        for key in self.desirable_situation:
+            high_light = self.isIntended(state, self.desirable_situation[intent]['rule'])
+            if (insight):
+                calculated_res = 1.0 #Intented State
+            else:
+                calculated_res = self.desirable_situation[intent]['value'] #which is value that set by user 0 for fatal, and 0.5 for half desire,
+            status.append(calculated_res)
+
         def multiplyList(myList) :
             # Multiply elements one by one
             result = 1
@@ -74,3 +84,7 @@ class CalculateDesireability():
             otherwise state is desirable == TRUE
         """
         return not(all([x in state for x in rule]))
+
+    def isIntended(self, state, rule):
+
+        return any([x in state for x in rule])
