@@ -391,6 +391,7 @@ class Environment():
     #                 self.map_of_states[name_state].append(new_name)
     #                 self.create_evolve_map(new_state, action_list)
 
+    #iterative way to create all possibilities of states
     def create_evolve_map(self, current_state, action_list):
         #Function to check if state placed in hash map already
         name_state = self.add_naming(current_state)
@@ -415,7 +416,7 @@ class Environment():
                         #self.create_evolve_map(new_state, action_list)
                         undone_state.append([new_name, new_state])
             #print(self.map_of_states[name_state])
-    #
+
 
     def add_naming(self, state):
         #function for adding state to the hashmap and evoluation map

@@ -1,4 +1,4 @@
-def print_all(react, system):
+def print_all(react, opp, opp_int, system):
     print("-----------------------------------------------")
     print("Reaction time in millisec %s" %react )
     print("--- For Equilibrium Maintenance ----")
@@ -6,14 +6,23 @@ def print_all(react, system):
     #print("Desirability Function -> %s " %(system['recogniser'].return_desirability_value()))
     #return current state
     separator = '  \n '
-    print("Current State -> \n %s" %(separator.join(system['env'].return_current_state())))
+    cur_state_name, cur_state = system['env'].return_current_state()
+    print("Current State -> \n %s" %(cur_state_name))
     #return state evolvation
     print("State Evolvation -> ")
-    print_dict(system['env'].return_state_evolution())
+    #print_dict(system['env'].return_state_evolution())
     #return action list
-    act_list = system['env'].return_action_list()
+    #act_list = system['env'].return_action_list()
+    act_list = system['env'].return_unvoluntary_action_list()
     print("Action List ->")
     print_act(act_list)
+    act_scheme = system['env'].return_robot_action_list()
+    print("Robot Action Scheme List ->")
+    print_robot_act(act_scheme)
+    print("Opp List from Intention Recognition ->")
+    print_oop(opp_int)
+    print("Opp List ->")
+    print_oop(opp)
 
     print("-----------------------------------------------")
 
@@ -31,6 +40,15 @@ def print_act(dct):
     for item, amount in dct.items():
         print(" ** {}".format(item))
         print(" \t Name : {}  \n \t Parameter : {} \n \t Precondition : {} \n \t Effect : {}".format(amount.name, amount.parameter, amount.precondition, amount.effect))
+
+def print_robot_act(dct):
+    for item, amount in dct.items():
+        print(" + {}".format(item))
+        print(" \t Precondition : {} \n \t Effect : {}".format(amount['precondition'], amount['effect']))
+
+def print_oop(dct):
+    for item in dct:
+        print(" {}({}, {}, {}) = {}".format(item.opportunity_type, item.action, item.state, item.k, item.opportunity))
 
 def print_des(dct):
     print("Desireability Function ->")

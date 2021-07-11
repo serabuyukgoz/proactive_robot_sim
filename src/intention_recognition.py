@@ -50,10 +50,10 @@ class Intention():
         for i in intent_list:
             intent_map[i] = []
             for list_element in maped[i]:
-                temp = each_action = "(" + each_action  + ")"
+                temp = "(" + list_element  + ")"
                 intent_map[i].append(temp)
 
-        return intent_list, intent_map
+        return intent_list, intent_map, minval
 
     # def return_desirability_value(self):
     #     els = list(self.history_of_desirability)

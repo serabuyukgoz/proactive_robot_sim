@@ -14,6 +14,7 @@ from src.opportunity import OpportunityDetection
 from src.naive_proactivity import Naive
 
 from print_strategy import print_all, print_des, print_evolve_map
+from extract_graph import graph
 
 # My game start from here
 system = { }
@@ -37,63 +38,63 @@ def create_world_state(system):
 
     system['env'].add_type('main')
     system['env'].add_sub_types('main', 'obj')
-    system['env'].add_sub_types('main', 'user')
+    system['env'].add_sub_types('main', 'agent')
     system['env'].add_sub_types('main', 'weather')
     system['env'].add_sub_types('main', 'time')
 
-    #adding user's action for intention recognition
+    #adding agent's action for intention recognition
 
-    system['env'].add_action("Human", "(?u - user)", "(not(outside ?u))", "(outside ?u)", "leave_home")
+    system['env'].add_action("Human", "(?u - agent)", "(not(outside ?u))", "(outside ?u)", "leave_home")
     system['env'].add_action("Human", " ( ) ", "(dishes_dirty)", "(not(dishes_dirty))", "clean_dishes")
-    # system['env'].add_action("Human", "(?u - user)", "(and (collected backpack) (collected compass) (outside ?u))", "(hiking ?u)", "go_hiking")
-    # system['env'].add_action("Human", "(?u - user)", "(and (collected walking_stick) (collected dog) (outside ?u))", "(promenade ?u)", "go_promenade")
-    # system['env'].add_action("Human", "(?u - user)", "(and (not (outside ?u)) )", "(watching_tv ?u)", "watch_tv")
-    # system['env'].add_action("Human", "(?u - user)", "(and (not (outside ?u)) (collected book))", "(reading_book ?u)", "read_book")
+    # system['env'].add_action("Human", "(?u - agent)", "(and (collected backpack) (collected compass) (outside ?u))", "(hiking ?u)", "go_hiking")
+    # system['env'].add_action("Human", "(?u - agent)", "(and (collected walking_stick) (collected dog) (outside ?u))", "(promenade ?u)", "go_promenade")
+    # system['env'].add_action("Human", "(?u - agent)", "(and (not (outside ?u)) )", "(watching_tv ?u)", "watch_tv")
+    # system['env'].add_action("Human", "(?u - agent)", "(and (not (outside ?u)) (collected book))", "(reading_book ?u)", "read_book")
     system['env'].add_action("Human", "(?x - obj)", "(not(collected ?x))", "(collected ?x)", "collect")
     system['env'].add_action("Human", "(?x - obj)", "(collected ?x)", "(not(collected ?x))", "leave")
     #added robot actions for equilibrium maintenance, all of robot's action is communicative
 
-    system['env'].add_action("Robot", "(?d - dish)", "(dishes_dirty)", "(not(dishes_dirty))", "tell_clean_dishes")
+    system['env'].add_action("Robot", "( )", "(dishes_dirty)", "(not(dishes_dirty))", "tell_clean_dishes")
     system['env'].add_action("Robot", "(?x - obj)", "(not(collected ?x))", "(collected ?x)", "tell_gather")
-    system['env'].add_action("Robot", "(?u - user)", "(current_weather hail)", "(not(outside ?u))", "warn_hail")
-    system['env'].add_action("Robot", "( )", "(current_weather rain)", "(collected umbrella)", "warn_rain")
+    system['env'].add_action("Robot", "(?u - agent)", "(current_weather hail)", "(not(outside ?u))", "warn_hail")
+#    system['env'].add_action("Robot", "( )", "(current_weather rain)", "(collected umbrella)", "warn_rain")
 
     #added actions for free run, changes of concepts!
     system['env'].add_action("Free", "(?wp - weather ?wn - weather)", "(current_weather ?wp)", "(and (not (current_weather ?wp)) (current_weather ?wn))", "weather_change")
     system['env'].add_action("Free", "(?tp - time ?tn - time)", "(after ?tp ?tn)", "(and (not (current_time ?tp)) (current_time ?tn))", "time_change")
-    system['env'].add_action("Free", "(?u - user)", "(breakfast ?u)", "(and  (not (breakfast ?u)) (dishes_dirty))", "had_breakfast")
+    system['env'].add_action("Free", "(?u - agent)", "(breakfast ?u)", "(and  (not (breakfast ?u)) (dishes_dirty))", "had_breakfast")
 
     system['env'].add_predicate("collected ?x - objects")
-    system['env'].add_predicate("outside ?u - user")
+    system['env'].add_predicate("outside ?u - agent")
     system['env'].add_predicate("current_weather ?w - weather")
     system['env'].add_predicate("current_time ?t - time")
     system['env'].add_predicate("after ?t1 - time ?t2 - time")
 
-    # system['env'].add_predicate("hiking ?u - user")
-    # system['env'].add_predicate("promenade ?u - user")
-    # system['env'].add_predicate("watching_tv ?u - user")
-    # system['env'].add_predicate("reading_book ?u - user")
-    system['env'].add_predicate("breakfast ?u - user")
+    # system['env'].add_predicate("hiking ?u - agent")
+    # system['env'].add_predicate("promenade ?u - agent")
+    # system['env'].add_predicate("watching_tv ?u - agent")
+    # system['env'].add_predicate("reading_book ?u - agent")
+    system['env'].add_predicate("breakfast ?u - agent")
 
     system['env'].add_predicate("weather_dealt")
     system['env'].add_predicate("dishes_dirty")
 
-    # system['env'].add_goal('( hiking ?u - user)')
-    # system['env'].add_goal('( promenade ?u - user)')
-    # system['env'].add_goal('( reading_book ?u - user)')
-    # system['env'].add_goal('( watching_tv ?u - user)')
+    # system['env'].add_goal('( hiking ?u - agent)')
+    # system['env'].add_goal('( promenade ?u - agent)')
+    # system['env'].add_goal('( reading_book ?u - agent)')
+    # system['env'].add_goal('( watching_tv ?u - agent)')
 
     #hiking
-    system['env'].add_goal('(and (collected backpack) (collected compass) (outside ali))')
+    system['env'].add_goal('(and (collected backpack) (collected compass) (collected water_bottle) (outside user))')
     #promenade
-    system['env'].add_goal('(and (collected walking_stick) (collected dog) (outside ali))')
-    #watching_tv
-    system['env'].add_goal('(and (not (outside ali)) )')
+    system['env'].add_goal('(and (collected walking_stick) (collected dog) (collected water_bottle) (outside user))')
+    # #watching_tv
+    # system['env'].add_goal('(and (not (outside user)) )')
     #reading_book
-    system['env'].add_goal('(and (not (outside ali)) (collected book))')
+    # system['env'].add_goal('(and (not (outside user)) (collected backpack) (collected book))')
 
-    system['env'].add_object('user')
-    system['env'].add_sub_objects('user', 'ali')
+    system['env'].add_object('agent')
+    system['env'].add_sub_objects('agent', 'user')
 
     system['env'].add_constants('weather')
     system['env'].add_sub_constants('weather', 'sunshine')
@@ -124,12 +125,12 @@ def create_world_state(system):
     #related to the state description -> it could have chage later
     system['env'].add_state_change("(current_weather sunshine)")
     system['env'].add_state_change("(current_time morning)")
-    system['env'].add_state_change("(breakfast ali)")
+    system['env'].add_state_change("(breakfast user)")
 
     #ALSO add what is undesired situations to define which state will be undesired!
-    system['des'].add_situation('get_wet', ['(current_weather rainy)' , '(outside ?u - user)'], 0.5)
-    system['des'].add_situation('get_hurt', ['(current_weather hail)' , '(outside ?u - user)'], 1.0)
-    system['des'].add_situation('dirt_dishes', ['(dishes_dirty)'], 0.2)
+    system['des'].add_situation('get_wet', ['(current_weather rainy)' , '(outside ?u - agent)'], 0.7)
+    system['des'].add_situation('get_hurt', ['(current_weather hail)' , '(outside ?u - agent)'], 1.0)
+    system['des'].add_situation('dirt_dishes', ['(dishes_dirty)'], 0.4)
 
     domain_name, problem_name = system['env'].create_environment()
 
@@ -139,27 +140,32 @@ def free_run_creation(system):
     list_init_name, list_init = system['env'].return_current_state()
     unvoluntary_action_list = system['env'].return_unvoluntary_action_list()
     defined_action = system['env'].create_action_list_map(unvoluntary_action_list)
+    react = time.time()
     system['env'].create_evolve_map(list_init, defined_action)
+    react = time.time() - react
     maps = system['env'].return_state_map()
     hashmap_state = system['env'].return_state_hash_map()
     #history_map = system['env'].return_state_evolution()
-    print('---------------------------------------------')
-    print('State Evolvation adjacency List-> {}'.format(maps))
-    print('------------------------------------------------')
-    print('Name of State Hash Map {}'.format(hashmap_state))
-    print('---------------------------------------------')
+    # print('---------------------------------------------')
+    # print('State Evolvation adjacency List-> {}'.format(maps))
+    # print('------------------------------------------------')
+    # print('Name of State Hash Map {}'.format(hashmap_state))
+    # print('---------------------------------------------')
 
+    f= open('evolve_map.txt',"w+")
+
+    f.write(" State Evolvation adjacency List-> \n")
+    f.write(str(maps))
+    f.write(" Name of State Hash Map -> \n")
+    f.write(str(hashmap_state))
+    f.close()
+
+    return react
 
 def updateSituation(system):
     domain_name, problem_name = system['env'].create_environment()
     list_of_goals = system['env'].return_goal_list()
-    #intent + plan
-    intent = system['recogniser'].create_recogniser(list_of_goals, domain_name, problem_name)
-    #print(intent)
-
-    desire = system['recogniser'].desirability_detection(intent, len(list_of_goals))
-
-    plan_list = system['recogniser'].return_map()
+    intent, intent_map, dynamic_k = system['recogniser'].create_recogniser(list_of_goals, domain_name, problem_name)
 
     '''
         we do not need to create the map over and over again,
@@ -167,18 +173,51 @@ def updateSituation(system):
         Since known all actions and combinations already registered
         Which is an adjacency list
     '''
-
+    act_robot = system['env'].return_robot_action_list()
+    cur_state_name, cur_state = system['env'].return_current_state()
     evolve_map = system['env'].return_state_map()
     hashmap_state = system['env'].return_state_hash_map()
+
+    #Define intention recogniton as opportunity
+    i = 0.2 #desirability value
+    unvoluntary_action_list = system['env'].return_unvoluntary_action_list()
+    defined_action = system['env'].create_action_list_map(unvoluntary_action_list)
+
+    ########################
+    #Change K
+    K = 2 #look up strategy
+    #K = dynamic_k
+    #K = 0
+    ########################
+
+    #############################
+    #cut off brances
+    evolve_map = system['des'].cut_off_branches(evolve_map, hashmap_state, intent_map,defined_action, cur_state_name, K)
+
+    #limitate with K
+    #evolve_map = system['des'].limitate(evolve_map, hashmap_state, cur_state_name, dynamic_k)
+    print_evolve_map(evolve_map)
+    ###############################
+
+    #######################################
     des = system['des'].desirabilityFunction(evolve_map, hashmap_state)
     print('______________________')
     print('Desirabilily Calculation \n {}'.format(des))
-    act_robot = system['env'].return_robot_action_list()
-    cur_state_name, cur_state = system['env'].return_current_state()
-    K = 2 #look up strategy
-    oppo = system['opo'].findOpportunity(evolve_map, des, cur_state_name, act_robot, K)
 
-    return plan_list
+    #Change Desirability Value
+    #system['des'].update_desirability_Function(intent_map, i)
+
+    # des = system['des'].desirabilityFunction(evolve_map, hashmap_state)
+    # print('______________________')
+    # print('Desirabilily Calculation Modifed Intention\n {}'.format(des))
+    #############################################
+
+
+    opp_eqm = system['opo'].findOpportunity(evolve_map, des, cur_state_name, act_robot, K)
+
+    oop_intent = system['opo'].set_as_oop(intent_map, cur_state_name, cur_state, des, defined_action, i)
+
+    return opp_eqm, oop_intent, evolve_map
 
 
 if __name__ =='__main__':
@@ -186,14 +225,14 @@ if __name__ =='__main__':
     setClasses()
 
     domain_name, problem_name = create_world_state(system)
-    free_run_creation(system) #for equilibrium maintenance, create the map of the all possible state
+    reaction_time = free_run_creation(system) #for equilibrium maintenance, create the map of the all possible state
     #for every change in Situation
-    # react = time.time()
-    # selected_plan = updateSituation(system)
-    # react = time.time() - react
-    #
-    # #print_all(react, system)
-    #
+    react = time.time()
+    opp_emq, opp_hir, state_evolvation = updateSituation(system)
+    react = time.time() - react
+
+
+
     # robot_said = system["nav"].select_action_to_play(selected_plan)
     # #print(robot_said)
     #
@@ -210,3 +249,10 @@ if __name__ =='__main__':
     map = system['env'].return_state_map()
     print_evolve_map(map)
     print('Length = {}'.format(len(map)))
+    print('Final Map --------')
+    print_evolve_map(state_evolvation)
+    print_all(react, opp_emq, opp_hir, system)
+
+    print('Final Map Length = {}'.format(len(state_evolvation)))
+    print("Calculation Time -> {}".format(reaction_time))
+    graph(state_evolvation)
