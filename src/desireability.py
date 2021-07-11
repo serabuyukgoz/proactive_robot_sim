@@ -109,7 +109,7 @@ class CalculateDesireability():
                     if (delta == True):
                         if (each_branch not in new_map[each_head]):
                             new_map[each_head].append(each_branch)
-                            print(head)
+                            #print(head)
                 head.append(new_map[each_head])
         return copy.deepcopy(new_map)
 

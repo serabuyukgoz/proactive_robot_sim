@@ -457,26 +457,26 @@ class Environment():
 
         return copy.deepcopy(new_state)
 
-    def add_action_to_state_plan(self, state, action, action_list):
-
-        list_g = action['effect']
-        g = " ".join(list_g)
-        print(g)
-        list_init = state
-        relationship_list = self.return_current_knowledge_list()
-        objects = self.return_objects_list()
-        problem_name = self.create_problem(g, objects, relationship_list, list_init)
-
-        planned_action_list = run_planning(self.domain_name, problem_name)
-        print(len(planned_action_list))
-        print(action_list)
-        print(planned_action_list)
-        print(state)
-        for each_action in planned_action_list:
-            each_action = "(" + each_action  + ")"
-            print(each_action)
-            action_format = action_list[each_action]
-            state = self.add_action_to_state(state, action_format)
-            print(state)
-
-        return
+    # def add_action_to_state_plan(self, state, action, action_list):
+    #
+    #     list_g = action['effect']
+    #     g = " ".join(list_g)
+    #     #print(g)
+    #     list_init = state
+    #     relationship_list = self.return_current_knowledge_list()
+    #     objects = self.return_objects_list()
+    #     problem_name = self.create_problem(g, objects, relationship_list, list_init)
+    #
+    #     planned_action_list = run_planning(self.domain_name, problem_name)
+    #     # print(len(planned_action_list))
+    #     # print(action_list)
+    #     # print(planned_action_list)
+    #     # print(state)
+    #     for each_action in planned_action_list:
+    #         each_action = "(" + each_action  + ")"
+    #         #print(each_action)
+    #         action_format = action_list[each_action]
+    #         state = self.add_action_to_state(state, action_format)
+    #         #print(state)
+    #
+    #     return
