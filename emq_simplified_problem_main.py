@@ -6,7 +6,7 @@ import copy
 import time
 
 from src.environment import Environment
-from src.planner import run_planning
+from src.planner import Planner
 from src.intention_recognition import Intention
 from src.desireability import CalculateDesireability
 from src.opportunity import OpportunityDetection
@@ -22,15 +22,15 @@ system = { }
 
 def setClasses():
     env = Environment(system)
-    rec = Intention()
-    des = CalculateDesireability()
-    opo = OpportunityDetection(system)
+    pla = Planner()
+    rec = Intention(pla)
     emq = Equilibrium_Maintenance(system)
+
 
     system["env"] = env
     system["recogniser"] = rec
     system["emq"] = emq
-
+    system['pla'] = pla
 
     nav = Naive()
     system["nav"] = nav
@@ -229,6 +229,16 @@ def updateSituation(system):
 if __name__ =='__main__':
     print("Hello World!")
     setClasses()
+    '''
+       Please update the path name with your path name of fast_downward library
+    '''
+    #path = '~/Desktop/simulation_trial/DIRNAME'
+    system['pla'].set_path('~/planner/fast_downward/downward')
+    '''
+      Other search methods also could be use depend on the complexity of problem
+      Such as; "astar(lmcut())" , "astar(ipdb())" ...
+    '''
+    system['pla'].set_search_method("astar(add())")
 
     domain_name, problem_name = create_world_state(system)
     #for every change in Situation

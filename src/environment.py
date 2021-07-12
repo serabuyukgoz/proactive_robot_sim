@@ -6,7 +6,6 @@ import copy
 import re
 from src.string_modification import *
 
-from src.planner import run_planning
 
 class ActionType():
     def __init__(self, types, parameter, precondition, effect, name):
