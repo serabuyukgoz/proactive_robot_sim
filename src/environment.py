@@ -41,9 +41,6 @@ class Environment():
         self.history_of_state_evolution = {}
         self.state_evolve_map_history = OrderedDict()
 
-        self.map_of_states = {} #which will create a map of states
-        self.name_state_hash_map = {} #hashmap of states
-
     def add_action(self, types, parameter, precondition, effect, name):
         action_name = name + "_action"
         self.action_dictionary[action_name] = ActionType(types, parameter, precondition, effect, name)
@@ -140,7 +137,7 @@ class Environment():
                 #listed_action.append(action_list[key])
                 listed_action[key] = action_list[key]
 
-        mapped_action = self.create_action_list_map(listed_action)
+        mapped_action = self.create_action_list_map(action_list)
         return copy.deepcopy(mapped_action)
 
     def return_human_action_list(self):
@@ -169,8 +166,7 @@ class Environment():
         return copy.deepcopy(self.common_knowledge_dictionary)
 
     def return_current_state(self):
-        name = self.return_name_of_state(self.init_state)
-        return name, copy.deepcopy(self.init_state)
+        return copy.deepcopy(self.init_state)
 
     def return_types(self):
         return copy.deepcopy(self.types_dictionary)
@@ -190,7 +186,7 @@ class Environment():
         objects =  self.return_objects_list()
         constants_list = self.return_constants_list()
         relationship_list = self.return_current_knowledge_list()
-        list_init_name, list_init = self.return_current_state()
+        list_init = self.return_current_state()
         goal_list = self.return_goal_list()
 
         derived_list = self.return_derived_list()
@@ -319,16 +315,6 @@ class Environment():
 
         return name_problem
 
-    def return_state_evolution(self):
-        els = list(self.state_evolve_map_history)
-        return copy.deepcopy(self.state_evolve_map_history[els[-1]])
-
-    def return_state_map(self):
-        return copy.deepcopy(self.map_of_states)
-
-    def return_state_hash_map(self):
-        return copy.deepcopy(self.name_state_hash_map)
-
     def create_action_list_map(self, action_list):
 
         listed_action = {}
@@ -363,59 +349,8 @@ class Environment():
                     'precondition' : each_precon,
                     'effect' : each_effect
                 }
-        #print(listed_action)
 
         return copy.deepcopy(listed_action)
-
-    def return_name_of_state(self, key):
-        for i in self.name_state_hash_map:
-            k = self.name_state_hash_map[i]
-            if (len(key) == len(k)):
-                if (all([x in k for x in key])):
-                    return i
-        return None
-
-    # def create_evolve_map(self, current_state, action_list):
-    #     #Function to check if state placed in hash map already
-    #     name_state = self.add_naming(current_state)
-    #     for action in action_list:
-    #         new_state = self.add_action_to_state(current_state, action_list[action])
-    #         if (len(new_state) > 0):
-    #             name = self.return_name_of_state(new_state)
-    #             if (name):
-    #                 #self.map_of_states[name_state].append([action, name])
-    #                 self.map_of_states[name_state].append(name)
-    #             else:
-    #                 new_name = self.add_naming(new_state)
-    #                 #self.map_of_states[name_state].append([action, new_name])
-    #                 self.map_of_states[name_state].append(new_name)
-    #                 self.create_evolve_map(new_state, action_list)
-
-    #iterative way to create all possibilities of states
-    def create_evolve_map(self, current_state, action_list):
-        #Function to check if state placed in hash map already
-        name_state = self.add_naming(current_state)
-        undone_state = [[name_state, current_state]]
-        #undone_state.append(current_state)
-        while(undone_state):
-            state = undone_state.pop()
-            name_state = state[0]
-            current_state = state[1]
-            for action in action_list:
-                #new_state = self.add_action_to_state_plan(current_state, action_list[action], action_list)
-                new_state = self.add_action_to_state(current_state, action_list[action])
-                if (len(new_state) > 0):
-                    name = self.return_name_of_state(new_state)
-                    if (name):
-                        #self.map_of_states[name_state].append([action, name])
-                        self.map_of_states[name_state].append(name)
-                    else:
-                        new_name = self.add_naming(new_state)
-                        #self.map_of_states[name_state].append([action, new_name])
-                        self.map_of_states[name_state].append(new_name)
-                        #self.create_evolve_map(new_state, action_list)
-                        undone_state.append([new_name, new_state])
-            #print(self.map_of_states[name_state])
 
 
     def add_naming(self, state):
@@ -430,53 +365,3 @@ class Environment():
             self.map_of_states[name_state] = []
 
         return name_state
-
-    def add_action_to_state_name(self, state_name, action):
-
-        state = self.name_state_hash_map[state_name]
-        new_state = self.add_action_to_state(state, action)
-        new_state_name = self.return_name_of_state(new_state)
-
-        return new_state_name, new_state
-
-    def add_action_to_state(self, state, action):
-        # add effect
-        new_state = []
-
-        wanted_precon, unwanted_precon = seperate_not_predicate(action['precondition'])
-        # if all precondition is in and also consider not :( if there is not then if not part is not belong to list
-        satisfied_wanted = all([x in state for x in wanted_precon])
-        satisfied_unwanted = all([elem not in state for elem in unwanted_precon])
-        if (satisfied_wanted and satisfied_unwanted):
-            #add effect to the state and return state
-            w, u = seperate_not_predicate(action['effect'])
-            new_state = copy.deepcopy(state)
-            new_state = new_state + w #add to element
-            new_state = [i for i in new_state if i not in u] #remove the elements which named as not
-
-
-        return copy.deepcopy(new_state)
-
-    # def add_action_to_state_plan(self, state, action, action_list):
-    #
-    #     list_g = action['effect']
-    #     g = " ".join(list_g)
-    #     #print(g)
-    #     list_init = state
-    #     relationship_list = self.return_current_knowledge_list()
-    #     objects = self.return_objects_list()
-    #     problem_name = self.create_problem(g, objects, relationship_list, list_init)
-    #
-    #     planned_action_list = run_planning(self.domain_name, problem_name)
-    #     # print(len(planned_action_list))
-    #     # print(action_list)
-    #     # print(planned_action_list)
-    #     # print(state)
-    #     for each_action in planned_action_list:
-    #         each_action = "(" + each_action  + ")"
-    #         #print(each_action)
-    #         action_format = action_list[each_action]
-    #         state = self.add_action_to_state(state, action_format)
-    #         #print(state)
-    #
-    #     return

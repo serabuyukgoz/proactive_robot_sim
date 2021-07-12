@@ -89,9 +89,15 @@ class CalculateDesireability():
     def isIntended(self, state, rule):
         return any([x in state for x in rule])
 
-    def cut_off_branches(self, evolve_map, hashmap_state, intention_map, action_list, cur_state_name, K):
-        new_map = {}
-        head = [[cur_state_name]]
+    # def return_name_of_state(self, key, maps):
+    #     for i in maps:
+    #         k = maps[i]
+    #         if (len(key) == len(k)):
+    #             if (all([x in k for x in key])):
+    #                 return i
+    #     return None
+
+    def cut_off_branches(self, evolve_map, hashmap_state, intention_map, action_list, cur_state_name):
 
         list_intention = []
         for each_intention in intention_map:
@@ -99,28 +105,15 @@ class CalculateDesireability():
                 act = action_list[action]
                 list_intention = list_intention + act['effect']
 
-        for i in range(K+1):
-            for each_head in head[i]:
-                new_map[each_head] = []
-                for each_branch in evolve_map[each_head]:
-                    #check is linked with intention rule?
+        #cur_state_name = self.return_name_of_state(cur_state, hashmap_state)
 
-                    delta = self.isIntended(hashmap_state[each_branch], list_intention)
-                    if (delta == True):
-                        if (each_branch not in new_map[each_head]):
-                            new_map[each_head].append(each_branch)
-                            #print(head)
-                head.append(new_map[each_head])
-        return copy.deepcopy(new_map)
-
-    def limitate(self, evolve_map, hashmap_state, cur_state_name, K):
-        new_map = {}
-        head = [[cur_state_name]]
-        for i in range(K+1):
-            for each_head in head[i]:
-                new_map[each_head] = []
-                for each_branch in evolve_map[each_head]:
-                    #check is linked with intention rule?
-                    new_map[each_head].append(each_branch)
-                head.append(new_map[each_head])
-        return copy.deepcopy(new_map)
+        print(evolve_map[cur_state_name])
+        for each_branch in evolve_map[cur_state_name]:
+            #check is linked with intention rule?
+            delta = self.isIntended(hashmap_state[each_branch], list_intention)
+            if (delta != True):
+                print(delta)
+                print(len(evolve_map[cur_state_name]))
+                evolve_map[cur_state_name].remove(each_branch)
+                print(len(evolve_map[cur_state_name]))
+        return copy.deepcopy(evolve_map)

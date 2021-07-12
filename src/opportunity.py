@@ -31,7 +31,7 @@ class OpportunityDetection():
             Hypotetically adding action to state
             Then find the desirability of the action
         '''
-        new_state_name, new_state = self.sys['env'].add_action_to_state_name(state, action)
+        new_state_name, new_state = self.sys['emq'].add_action_to_state_name(state, action)
 
         if (new_state_name):
             # If the new state already known return desireability of state
@@ -39,7 +39,7 @@ class OpportunityDetection():
             res = res['value']
         else:
             # If new action lead to an unknown state, calculate desireability
-            res = self.sys['des'].isStateDesiable(new_state)
+            res = self.sys['emq'].des.isStateDesiable(new_state)
 
         return res
 

@@ -10,6 +10,7 @@ from src.planner import run_planning
 from src.intention_recognition import Intention
 from src.desireability import CalculateDesireability
 from src.opportunity import OpportunityDetection
+from src.equilibrium_maintenance import Equilibrium_Maintenance
 
 from src.naive_proactivity import Naive
 
@@ -24,11 +25,12 @@ def setClasses():
     rec = Intention()
     des = CalculateDesireability()
     opo = OpportunityDetection(system)
+    emq = Equilibrium_Maintenance(system)
 
     system["env"] = env
     system["recogniser"] = rec
-    system["des"] = des
-    system["opo"] = opo
+    system["emq"] = emq
+
 
     nav = Naive()
     system["nav"] = nav
@@ -128,9 +130,9 @@ def create_world_state(system):
     system['env'].add_state_change("(breakfast user)")
 
     #ALSO add what is undesired situations to define which state will be undesired!
-    system['des'].add_situation('get_wet', ['(current_weather rainy)' , '(outside ?u - agent)'], 0.7)
-    system['des'].add_situation('get_hurt', ['(current_weather hail)' , '(outside ?u - agent)'], 1.0)
-    system['des'].add_situation('dirt_dishes', ['(dishes_dirty)'], 0.4)
+    system['emq'].des.add_situation('get_wet', ['(current_weather rainy)' , '(outside ?u - agent)'], 0.7)
+    system['emq'].des.add_situation('get_hurt', ['(current_weather hail)' , '(outside ?u - agent)'], 1.0)
+    system['emq'].des.add_situation('dirt_dishes', ['(dishes_dirty)'], 0.4)
 
     domain_name, problem_name = system['env'].create_environment()
 
@@ -153,7 +155,7 @@ def updateSituation(system):
 
     act_robot = system['env'].return_robot_action_list()
     unvoluntary_action_list = system['env'].return_unvoluntary_action_list()
-    cur_state_name, cur_state = system['env'].return_current_state()
+    cur_state = system['env'].return_current_state()
 
     defined_action = system['env'].create_action_list_map(unvoluntary_action_list)
 
@@ -163,11 +165,6 @@ def updateSituation(system):
 
         First create evolve_map - hypothetical map to forecast future
     '''
-    react = time.time()
-    evolve_map = system['emq'].create_evolve_map(cur_state, defined_action)
-    react = time.time() - react
-
-    hashmap_state = system['emq'].return_state_hash_map()
 
     #Define intention recogniton as opportunity
     i = 0.2 #desirability value
@@ -181,10 +178,19 @@ def updateSituation(system):
     #K = 0
     ########################
 
+    react = time.time()
+    evolve_map = system['emq'].create_evolve_map(cur_state, defined_action, K)
+    react = time.time() - react
+
+    hashmap_state = system['emq'].return_state_hash_map()
+    #print_evolve_map(evolve_map)
+
+    cur_state_name = system['emq'].return_name_of_state(cur_state)
+
     #############################
     # 2)
     #cut off brances
-    evolve_map = system['emq'].des.cut_off_branches(evolve_map, hashmap_state, intent_map, defined_action, cur_state_name, K)
+    evolve_map = system['emq'].des.cut_off_branches(evolve_map, hashmap_state, intent_map, defined_action, cur_state_name)
 
     #limitate with K
     #evolve_map = system['des'].limitate(evolve_map, hashmap_state, cur_state_name, dynamic_k)
@@ -215,7 +221,7 @@ def updateSituation(system):
     ###########
 
 
-    opp_eqm = system['emq'].opp.findOpportunity(evolve_map, des, cur_state_name, act_robot, K)
+    opp_eqm = system['emq'].oop.findOpportunity(evolve_map, des, cur_state_name, act_robot, K)
 
     return opp_eqm, oop_intent, evolve_map, react
 
@@ -231,13 +237,11 @@ if __name__ =='__main__':
     react = time.time() - react
 
 
-    map = system['env'].return_state_map()
-    print_evolve_map(map)
-    print('Length = {}'.format(len(map)))
-    print('Final Map --------')
     print_evolve_map(state_evolvation)
+    print('Length = {}'.format(len(state_evolvation)))
+    print('Final Map --------')
     print_all(react, opp_emq, opp_hir, system)
 
-    print('Final Map Length = {}'.format(len(state_evolvation)))
     print("Calculation Time -> {}".format(reaction_time))
+    print('Length = {}'.format(len(state_evolvation)))
     graph(state_evolvation)

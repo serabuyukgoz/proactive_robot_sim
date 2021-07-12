@@ -6,7 +6,8 @@ def print_all(react, opp, opp_int, system):
     #print("Desirability Function -> %s " %(system['recogniser'].return_desirability_value()))
     #return current state
     separator = '  \n '
-    cur_state_name, cur_state = system['env'].return_current_state()
+    cur_state = system['env'].return_current_state()
+    cur_state_name = system['emq'].return_name_of_state(cur_state)
     print("Current State -> \n %s" %(cur_state_name))
     #return state evolvation
     print("State Evolvation -> ")
