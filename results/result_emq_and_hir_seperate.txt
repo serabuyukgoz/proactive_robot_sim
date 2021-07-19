@@ -1,0 +1,421 @@
+S0:
+
+State: S0
+Opp List ->
+ oop3((tell_clean_dishes ), S0, 1) = 0.6
+ oop5((tell_clean_dishes ), S0, 1) = 0.6
+ oop3((tell_gather compass), S0, 1) = 0.4
+ oop5((tell_gather compass), S0, 1) = 0.6
+ oop3((tell_gather backpack), S0, 1) = 0.4
+ oop5((tell_gather backpack), S0, 1) = 0.6
+ oop3((tell_gather walking_stick), S0, 1) = 0.4
+ oop5((tell_gather walking_stick), S0, 1) = 0.6
+ oop3((tell_gather dog), S0, 1) = 0.4
+ oop5((tell_gather dog), S0, 1) = 0.6
+ oop3((tell_gather water_bottle), S0, 1) = 0.4
+ oop5((tell_gather water_bottle), S0, 1) = 0.6
+ oop3((tell_gather tea), S0, 1) = 0.4
+ oop5((tell_gather tea), S0, 1) = 0.6
+ oop3((tell_gather milk), S0, 1) = 0.4
+ oop5((tell_gather milk), S0, 1) = 0.6
+ oop3((tell_gather chocolate), S0, 1) = 0.4
+ oop5((tell_gather chocolate), S0, 1) = 0.6
+ oop3((tell_gather flour), S0, 1) = 0.4
+ oop5((tell_gather flour), S0, 1) = 0.6
+ oop3((tell_gather sugar), S0, 1) = 0.4
+ oop5((tell_gather sugar), S0, 1) = 0.6
+ oop3((warn_hail user), S0, 1) = 0.6
+ oop5((warn_hail user), S0, 1) = 0.6
+ oop3((tell_clean_dishes ), S0, 2) = 0.6
+ oop5((tell_clean_dishes ), S0, 2) = 0.6
+ oop3((tell_gather compass), S0, 2) = 0.6
+ oop5((tell_gather compass), S0, 2) = 0.6
+ oop3((tell_gather backpack), S0, 2) = 0.6
+ oop5((tell_gather backpack), S0, 2) = 0.6
+ oop3((tell_gather walking_stick), S0, 2) = 0.6
+ oop5((tell_gather walking_stick), S0, 2) = 0.6
+ oop3((tell_gather dog), S0, 2) = 0.6
+ oop5((tell_gather dog), S0, 2) = 0.6
+ oop3((tell_gather water_bottle), S0, 2) = 0.6
+ oop5((tell_gather water_bottle), S0, 2) = 0.6
+ oop3((tell_gather tea), S0, 2) = 0.6
+ oop5((tell_gather tea), S0, 2) = 0.6
+ oop3((tell_gather milk), S0, 2) = 0.6
+ oop5((tell_gather milk), S0, 2) = 0.6
+ oop3((tell_gather chocolate), S0, 2) = 0.6
+ oop5((tell_gather chocolate), S0, 2) = 0.6
+ oop3((tell_gather flour), S0, 2) = 0.6
+ oop5((tell_gather flour), S0, 2) = 0.6
+ oop3((tell_gather sugar), S0, 2) = 0.6
+ oop5((tell_gather sugar), S0, 2) = 0.6
+ oop3((warn_hail user), S0, 2) = 0.6
+ oop5((warn_hail user), S0, 2) = 0.6
+-----------------------------------------------
+MAximised value 0.6
+Intent Map: {'hiking': ['(leave_home user)', '(collect water_bottle)', '(collect compass)', '(collect backpack)'],
+'promenade': ['(leave_home user)', '(collect water_bottle)', '(collect walking_stick)', '(collect dog)'],
+'watching TV': ['(collect water_bottle)', '(collect tea)', '(collect sugar)', '(collect milk)'],
+'Baking Cake': ['(collect sugar)', '(collect milk)', '(collect flour)', '(collect chocolate)']}
+Calculation Time -> 0.4477851390838623
+Length = 16, 631
+
+
+
+S1.0: (current_weather sunshine);(current_time morning);(dishes_dirty);(collected water_bottle)
+
+Opp List ->
+ oop0((tell_clean_dishes ), S1.0, 0) = 0.6
+ oop0((tell_gather compass), S1.0, 0) = 0.4
+ oop0((tell_gather backpack), S1.0, 0) = 0.4
+ oop0((tell_gather walking_stick), S1.0, 0) = 0.4
+ oop0((tell_gather dog), S1.0, 0) = 0.4
+ oop0((tell_gather water_bottle), S1.0, 0) = 0.6
+ oop0((tell_gather tea), S1.0, 0) = 0.4
+ oop0((tell_gather milk), S1.0, 0) = 0.4
+ oop0((tell_gather chocolate), S1.0, 0) = 0.4
+ oop0((tell_gather flour), S1.0, 0) = 0.4
+ oop0((tell_gather sugar), S1.0, 0) = 0.4
+ oop0((warn_hail user), S1.0, 0) = 0.6
+ oop1((tell_clean_dishes ), S1.0, 1) = 0.6
+ oop2((tell_clean_dishes ), S1.0, 1) = 0.6
+ oop3((tell_clean_dishes ), S1.0, 1) = 0.6
+ oop5((tell_clean_dishes ), S1.0, 1) = 0.6
+ oop1((tell_gather compass), S1.0, 1) = 0.6
+ oop2((tell_gather compass), S1.0, 1) = 0.4
+ oop3((tell_gather compass), S1.0, 1) = 0.6
+ oop5((tell_gather compass), S1.0, 1) = 0.6
+ oop1((tell_gather backpack), S1.0, 1) = 0.6
+ oop2((tell_gather backpack), S1.0, 1) = 0.4
+ oop3((tell_gather backpack), S1.0, 1) = 0.6
+ oop5((tell_gather backpack), S1.0, 1) = 0.6
+ oop1((tell_gather walking_stick), S1.0, 1) = 0.6
+ oop2((tell_gather walking_stick), S1.0, 1) = 0.4
+ oop3((tell_gather walking_stick), S1.0, 1) = 0.6
+ oop5((tell_gather walking_stick), S1.0, 1) = 0.6
+ oop1((tell_gather dog), S1.0, 1) = 0.6
+ oop2((tell_gather dog), S1.0, 1) = 0.4
+ oop3((tell_gather dog), S1.0, 1) = 0.6
+ oop5((tell_gather dog), S1.0, 1) = 0.6
+ oop1((tell_gather water_bottle), S1.0, 1) = 0.6
+ oop2((tell_gather water_bottle), S1.0, 1) = 0.4
+ oop3((tell_gather water_bottle), S1.0, 1) = 0.6
+ oop5((tell_gather water_bottle), S1.0, 1) = 0.6
+ oop1((tell_gather tea), S1.0, 1) = 0.6
+ oop2((tell_gather tea), S1.0, 1) = 0.4
+ oop3((tell_gather tea), S1.0, 1) = 0.6
+ oop5((tell_gather tea), S1.0, 1) = 0.6
+ oop1((tell_gather milk), S1.0, 1) = 0.6
+ oop2((tell_gather milk), S1.0, 1) = 0.4
+ oop3((tell_gather milk), S1.0, 1) = 0.6
+ oop5((tell_gather milk), S1.0, 1) = 0.6
+ oop1((tell_gather chocolate), S1.0, 1) = 0.6
+ oop2((tell_gather chocolate), S1.0, 1) = 0.4
+ oop3((tell_gather chocolate), S1.0, 1) = 0.6
+ oop5((tell_gather chocolate), S1.0, 1) = 0.6
+ oop1((tell_gather flour), S1.0, 1) = 0.6
+ oop2((tell_gather flour), S1.0, 1) = 0.4
+ oop3((tell_gather flour), S1.0, 1) = 0.6
+ oop5((tell_gather flour), S1.0, 1) = 0.6
+ oop1((tell_gather sugar), S1.0, 1) = 0.6
+ oop2((tell_gather sugar), S1.0, 1) = 0.4
+ oop3((tell_gather sugar), S1.0, 1) = 0.6
+ oop5((tell_gather sugar), S1.0, 1) = 0.6
+ oop1((warn_hail user), S1.0, 1) = 0.6
+ oop2((warn_hail user), S1.0, 1) = 0.4
+ oop3((warn_hail user), S1.0, 1) = 0.6
+ oop5((warn_hail user), S1.0, 1) = 0.6
+ oop1((tell_clean_dishes ), S1.0, 2) = 0.6
+ oop2((tell_clean_dishes ), S1.0, 2) = 0.6
+ oop3((tell_clean_dishes ), S1.0, 2) = 0.6
+ oop5((tell_clean_dishes ), S1.0, 2) = 0.6
+ oop1((tell_gather compass), S1.0, 2) = 0.6
+ oop2((tell_gather compass), S1.0, 2) = 0.4
+ oop3((tell_gather compass), S1.0, 2) = 0.6
+ oop5((tell_gather compass), S1.0, 2) = 0.6
+ oop1((tell_gather backpack), S1.0, 2) = 0.6
+ oop2((tell_gather backpack), S1.0, 2) = 0.4
+ oop3((tell_gather backpack), S1.0, 2) = 0.6
+ oop5((tell_gather backpack), S1.0, 2) = 0.6
+ oop1((tell_gather walking_stick), S1.0, 2) = 0.6
+ oop2((tell_gather walking_stick), S1.0, 2) = 0.4
+ oop3((tell_gather walking_stick), S1.0, 2) = 0.6
+ oop5((tell_gather walking_stick), S1.0, 2) = 0.6
+ oop1((tell_gather dog), S1.0, 2) = 0.6
+ oop2((tell_gather dog), S1.0, 2) = 0.4
+ oop3((tell_gather dog), S1.0, 2) = 0.6
+ oop5((tell_gather dog), S1.0, 2) = 0.6
+ oop1((tell_gather water_bottle), S1.0, 2) = 0.6
+ oop2((tell_gather water_bottle), S1.0, 2) = 0.4
+ oop3((tell_gather water_bottle), S1.0, 2) = 0.6
+ oop5((tell_gather water_bottle), S1.0, 2) = 0.6
+ oop1((tell_gather tea), S1.0, 2) = 0.6
+ oop2((tell_gather tea), S1.0, 2) = 0.4
+ oop3((tell_gather tea), S1.0, 2) = 0.6
+ oop5((tell_gather tea), S1.0, 2) = 0.6
+ oop1((tell_gather milk), S1.0, 2) = 0.6
+ oop2((tell_gather milk), S1.0, 2) = 0.4
+ oop3((tell_gather milk), S1.0, 2) = 0.6
+ oop5((tell_gather milk), S1.0, 2) = 0.6
+ oop1((tell_gather chocolate), S1.0, 2) = 0.6
+ oop2((tell_gather chocolate), S1.0, 2) = 0.4
+ oop3((tell_gather chocolate), S1.0, 2) = 0.6
+ oop5((tell_gather chocolate), S1.0, 2) = 0.6
+ oop1((tell_gather flour), S1.0, 2) = 0.6
+ oop2((tell_gather flour), S1.0, 2) = 0.4
+ oop3((tell_gather flour), S1.0, 2) = 0.6
+ oop5((tell_gather flour), S1.0, 2) = 0.6
+ oop1((tell_gather sugar), S1.0, 2) = 0.6
+ oop2((tell_gather sugar), S1.0, 2) = 0.4
+ oop3((tell_gather sugar), S1.0, 2) = 0.6
+ oop5((tell_gather sugar), S1.0, 2) = 0.6
+ oop1((warn_hail user), S1.0, 2) = 0.6
+ oop2((warn_hail user), S1.0, 2) = 0.4
+ oop3((warn_hail user), S1.0, 2) = 0.6
+ oop5((warn_hail user), S1.0, 2) = 0.6
+-----------------------------------------------
+MAximised value 0.6
+Intent Map: {'hiking': ['(leave_home user)', '(collect compass)', '(collect backpack)'],
+            'promenade': ['(leave_home user)', '(collect walking_stick)', '(collect dog)'],
+            'watching TV': ['(collect tea)', '(collect sugar)', '(collect milk)']}
+Calculation Time -> 0.6855871677398682
+Length = 16, 1000
+
+
+S2.0: (current_weather sunshine);(current_time morning);(dishes_dirty);(collected water_bottle);(collected backpack)
+
+Opp List ->
+ oop0((tell_clean_dishes ), S2.0, 0) = 0.6
+ oop0((tell_gather compass), S2.0, 0) = 0.4
+ oop0((tell_gather backpack), S2.0, 0) = 0.6
+ oop0((tell_gather walking_stick), S2.0, 0) = 0.4
+ oop0((tell_gather dog), S2.0, 0) = 0.4
+ oop0((tell_gather water_bottle), S2.0, 0) = 0.6
+ oop0((tell_gather tea), S2.0, 0) = 0.4
+ oop0((tell_gather milk), S2.0, 0) = 0.4
+ oop0((tell_gather chocolate), S2.0, 0) = 0.4
+ oop0((tell_gather flour), S2.0, 0) = 0.4
+ oop0((tell_gather sugar), S2.0, 0) = 0.4
+ oop0((warn_hail user), S2.0, 0) = 0.6
+ oop1((tell_clean_dishes ), S2.0, 1) = 0.6
+ oop2((tell_clean_dishes ), S2.0, 1) = 0.6
+ oop3((tell_clean_dishes ), S2.0, 1) = 0.6
+ oop5((tell_clean_dishes ), S2.0, 1) = 0.6
+ oop1((tell_gather compass), S2.0, 1) = 0.6
+ oop2((tell_gather compass), S2.0, 1) = 0.4
+ oop3((tell_gather compass), S2.0, 1) = 0.6
+ oop5((tell_gather compass), S2.0, 1) = 0.6
+ oop1((tell_gather backpack), S2.0, 1) = 0.6
+ oop2((tell_gather backpack), S2.0, 1) = 0.4
+ oop3((tell_gather backpack), S2.0, 1) = 0.6
+ oop5((tell_gather backpack), S2.0, 1) = 0.6
+ oop1((tell_gather walking_stick), S2.0, 1) = 0.6
+ oop2((tell_gather walking_stick), S2.0, 1) = 0.4
+ oop3((tell_gather walking_stick), S2.0, 1) = 0.6
+ oop5((tell_gather walking_stick), S2.0, 1) = 0.6
+ oop1((tell_gather dog), S2.0, 1) = 0.6
+ oop2((tell_gather dog), S2.0, 1) = 0.4
+ oop3((tell_gather dog), S2.0, 1) = 0.6
+ oop5((tell_gather dog), S2.0, 1) = 0.6
+ oop1((tell_gather water_bottle), S2.0, 1) = 0.6
+ oop2((tell_gather water_bottle), S2.0, 1) = 0.4
+ oop3((tell_gather water_bottle), S2.0, 1) = 0.6
+ oop5((tell_gather water_bottle), S2.0, 1) = 0.6
+ oop1((tell_gather tea), S2.0, 1) = 0.6
+ oop2((tell_gather tea), S2.0, 1) = 0.4
+ oop3((tell_gather tea), S2.0, 1) = 0.6
+ oop5((tell_gather tea), S2.0, 1) = 0.6
+ oop1((tell_gather milk), S2.0, 1) = 0.6
+ oop2((tell_gather milk), S2.0, 1) = 0.4
+ oop3((tell_gather milk), S2.0, 1) = 0.6
+ oop5((tell_gather milk), S2.0, 1) = 0.6
+ oop1((tell_gather chocolate), S2.0, 1) = 0.6
+ oop2((tell_gather chocolate), S2.0, 1) = 0.4
+ oop3((tell_gather chocolate), S2.0, 1) = 0.6
+ oop5((tell_gather chocolate), S2.0, 1) = 0.6
+ oop1((tell_gather flour), S2.0, 1) = 0.6
+ oop2((tell_gather flour), S2.0, 1) = 0.4
+ oop3((tell_gather flour), S2.0, 1) = 0.6
+ oop5((tell_gather flour), S2.0, 1) = 0.6
+ oop1((tell_gather sugar), S2.0, 1) = 0.6
+ oop2((tell_gather sugar), S2.0, 1) = 0.4
+ oop3((tell_gather sugar), S2.0, 1) = 0.6
+ oop5((tell_gather sugar), S2.0, 1) = 0.6
+ oop1((warn_hail user), S2.0, 1) = 0.6
+ oop2((warn_hail user), S2.0, 1) = 0.4
+ oop3((warn_hail user), S2.0, 1) = 0.6
+ oop5((warn_hail user), S2.0, 1) = 0.6
+ oop1((tell_clean_dishes ), S2.0, 2) = 0.6
+ oop2((tell_clean_dishes ), S2.0, 2) = 0.6
+ oop3((tell_clean_dishes ), S2.0, 2) = 0.6
+ oop5((tell_clean_dishes ), S2.0, 2) = 0.6
+ oop1((tell_gather compass), S2.0, 2) = 0.6
+ oop2((tell_gather compass), S2.0, 2) = 0.4
+ oop3((tell_gather compass), S2.0, 2) = 0.6
+ oop5((tell_gather compass), S2.0, 2) = 0.6
+ oop1((tell_gather backpack), S2.0, 2) = 0.6
+ oop2((tell_gather backpack), S2.0, 2) = 0.4
+ oop3((tell_gather backpack), S2.0, 2) = 0.6
+ oop5((tell_gather backpack), S2.0, 2) = 0.6
+ oop1((tell_gather walking_stick), S2.0, 2) = 0.6
+ oop2((tell_gather walking_stick), S2.0, 2) = 0.4
+ oop3((tell_gather walking_stick), S2.0, 2) = 0.6
+ oop5((tell_gather walking_stick), S2.0, 2) = 0.6
+ oop1((tell_gather dog), S2.0, 2) = 0.6
+ oop2((tell_gather dog), S2.0, 2) = 0.4
+ oop3((tell_gather dog), S2.0, 2) = 0.6
+ oop5((tell_gather dog), S2.0, 2) = 0.6
+ oop1((tell_gather water_bottle), S2.0, 2) = 0.6
+ oop2((tell_gather water_bottle), S2.0, 2) = 0.4
+ oop3((tell_gather water_bottle), S2.0, 2) = 0.6
+ oop5((tell_gather water_bottle), S2.0, 2) = 0.6
+ oop1((tell_gather tea), S2.0, 2) = 0.6
+ oop2((tell_gather tea), S2.0, 2) = 0.4
+ oop3((tell_gather tea), S2.0, 2) = 0.6
+ oop5((tell_gather tea), S2.0, 2) = 0.6
+ oop1((tell_gather milk), S2.0, 2) = 0.6
+ oop2((tell_gather milk), S2.0, 2) = 0.4
+ oop3((tell_gather milk), S2.0, 2) = 0.6
+ oop5((tell_gather milk), S2.0, 2) = 0.6
+ oop1((tell_gather chocolate), S2.0, 2) = 0.6
+ oop2((tell_gather chocolate), S2.0, 2) = 0.4
+ oop3((tell_gather chocolate), S2.0, 2) = 0.6
+ oop5((tell_gather chocolate), S2.0, 2) = 0.6
+ oop1((tell_gather flour), S2.0, 2) = 0.6
+ oop2((tell_gather flour), S2.0, 2) = 0.4
+ oop3((tell_gather flour), S2.0, 2) = 0.6
+ oop5((tell_gather flour), S2.0, 2) = 0.6
+ oop1((tell_gather sugar), S2.0, 2) = 0.6
+ oop2((tell_gather sugar), S2.0, 2) = 0.4
+ oop3((tell_gather sugar), S2.0, 2) = 0.6
+ oop5((tell_gather sugar), S2.0, 2) = 0.6
+ oop1((warn_hail user), S2.0, 2) = 0.6
+ oop2((warn_hail user), S2.0, 2) = 0.4
+ oop3((warn_hail user), S2.0, 2) = 0.6
+ oop5((warn_hail user), S2.0, 2) = 0.6
+-----------------------------------------------
+MAximised value 0.6
+Intent Map: {'hiking':
+                  ['(leave_home user)', '(collect compass)']}
+Calculation Time -> 0.011794090270996094
+Length = 16, 1000
+
+
+
+S3.0: (current_weather sunshine);(current_time morning);(dishes_dirty);
+(collected water_bottle);(collected backpack);(collected compass)
+
+Opp List ->
+ oop0((tell_clean_dishes ), S3.0, 0) = 0.6
+ oop0((tell_gather compass), S3.0, 0) = 0.6
+ oop0((tell_gather backpack), S3.0, 0) = 0.6
+ oop0((tell_gather walking_stick), S3.0, 0) = 0.4
+ oop0((tell_gather dog), S3.0, 0) = 0.4
+ oop0((tell_gather water_bottle), S3.0, 0) = 0.6
+ oop0((tell_gather tea), S3.0, 0) = 0.4
+ oop0((tell_gather milk), S3.0, 0) = 0.4
+ oop0((tell_gather chocolate), S3.0, 0) = 0.4
+ oop0((tell_gather flour), S3.0, 0) = 0.4
+ oop0((tell_gather sugar), S3.0, 0) = 0.4
+ oop0((warn_hail user), S3.0, 0) = 0.6
+
+ oop1((tell_clean_dishes ), S3.0, 1) = 0.6
+ oop2((tell_clean_dishes ), S3.0, 1) = 0.6
+ oop3((tell_clean_dishes ), S3.0, 1) = 0.6
+ oop5((tell_clean_dishes ), S3.0, 1) = 0.6
+ oop1((tell_gather compass), S3.0, 1) = 0.6
+ oop2((tell_gather compass), S3.0, 1) = 0.4
+ oop3((tell_gather compass), S3.0, 1) = 0.6
+ oop5((tell_gather compass), S3.0, 1) = 0.6
+ oop1((tell_gather backpack), S3.0, 1) = 0.6
+ oop2((tell_gather backpack), S3.0, 1) = 0.4
+ oop3((tell_gather backpack), S3.0, 1) = 0.6
+ oop5((tell_gather backpack), S3.0, 1) = 0.6
+ oop1((tell_gather walking_stick), S3.0, 1) = 0.6
+ oop2((tell_gather walking_stick), S3.0, 1) = 0.4
+ oop3((tell_gather walking_stick), S3.0, 1) = 0.6
+ oop5((tell_gather walking_stick), S3.0, 1) = 0.6
+ oop1((tell_gather dog), S3.0, 1) = 0.6
+ oop2((tell_gather dog), S3.0, 1) = 0.4
+ oop3((tell_gather dog), S3.0, 1) = 0.6
+ oop5((tell_gather dog), S3.0, 1) = 0.6
+ oop1((tell_gather water_bottle), S3.0, 1) = 0.6
+ oop2((tell_gather water_bottle), S3.0, 1) = 0.4
+ oop3((tell_gather water_bottle), S3.0, 1) = 0.6
+ oop5((tell_gather water_bottle), S3.0, 1) = 0.6
+ oop1((tell_gather tea), S3.0, 1) = 0.6
+ oop2((tell_gather tea), S3.0, 1) = 0.4
+ oop3((tell_gather tea), S3.0, 1) = 0.6
+ oop5((tell_gather tea), S3.0, 1) = 0.6
+ oop1((tell_gather milk), S3.0, 1) = 0.6
+ oop2((tell_gather milk), S3.0, 1) = 0.4
+ oop3((tell_gather milk), S3.0, 1) = 0.6
+ oop5((tell_gather milk), S3.0, 1) = 0.6
+ oop1((tell_gather chocolate), S3.0, 1) = 0.6
+ oop2((tell_gather chocolate), S3.0, 1) = 0.4
+ oop3((tell_gather chocolate), S3.0, 1) = 0.6
+ oop5((tell_gather chocolate), S3.0, 1) = 0.6
+ oop1((tell_gather flour), S3.0, 1) = 0.6
+ oop2((tell_gather flour), S3.0, 1) = 0.4
+ oop3((tell_gather flour), S3.0, 1) = 0.6
+ oop5((tell_gather flour), S3.0, 1) = 0.6
+ oop1((tell_gather sugar), S3.0, 1) = 0.6
+ oop2((tell_gather sugar), S3.0, 1) = 0.4
+ oop3((tell_gather sugar), S3.0, 1) = 0.6
+ oop5((tell_gather sugar), S3.0, 1) = 0.6
+ oop1((warn_hail user), S3.0, 1) = 0.6
+ oop2((warn_hail user), S3.0, 1) = 0.4
+ oop3((warn_hail user), S3.0, 1) = 0.6
+ oop5((warn_hail user), S3.0, 1) = 0.6
+ oop1((tell_clean_dishes ), S3.0, 2) = 0.6
+ oop2((tell_clean_dishes ), S3.0, 2) = 0.6
+ oop3((tell_clean_dishes ), S3.0, 2) = 0.6
+ oop5((tell_clean_dishes ), S3.0, 2) = 0.6
+ oop1((tell_gather compass), S3.0, 2) = 0.6
+ oop2((tell_gather compass), S3.0, 2) = 0.4
+ oop3((tell_gather compass), S3.0, 2) = 0.6
+ oop5((tell_gather compass), S3.0, 2) = 0.6
+ oop1((tell_gather backpack), S3.0, 2) = 0.6
+ oop2((tell_gather backpack), S3.0, 2) = 0.4
+ oop3((tell_gather backpack), S3.0, 2) = 0.6
+ oop5((tell_gather backpack), S3.0, 2) = 0.6
+ oop1((tell_gather walking_stick), S3.0, 2) = 0.6
+ oop2((tell_gather walking_stick), S3.0, 2) = 0.4
+ oop3((tell_gather walking_stick), S3.0, 2) = 0.6
+ oop5((tell_gather walking_stick), S3.0, 2) = 0.6
+ oop1((tell_gather dog), S3.0, 2) = 0.6
+ oop2((tell_gather dog), S3.0, 2) = 0.4
+ oop3((tell_gather dog), S3.0, 2) = 0.6
+ oop5((tell_gather dog), S3.0, 2) = 0.6
+ oop1((tell_gather water_bottle), S3.0, 2) = 0.6
+ oop2((tell_gather water_bottle), S3.0, 2) = 0.4
+ oop3((tell_gather water_bottle), S3.0, 2) = 0.6
+ oop5((tell_gather water_bottle), S3.0, 2) = 0.6
+ oop1((tell_gather tea), S3.0, 2) = 0.6
+ oop2((tell_gather tea), S3.0, 2) = 0.4
+ oop3((tell_gather tea), S3.0, 2) = 0.6
+ oop5((tell_gather tea), S3.0, 2) = 0.6
+ oop1((tell_gather milk), S3.0, 2) = 0.6
+ oop2((tell_gather milk), S3.0, 2) = 0.4
+ oop3((tell_gather milk), S3.0, 2) = 0.6
+ oop5((tell_gather milk), S3.0, 2) = 0.6
+ oop1((tell_gather chocolate), S3.0, 2) = 0.6
+ oop2((tell_gather chocolate), S3.0, 2) = 0.4
+ oop3((tell_gather chocolate), S3.0, 2) = 0.6
+ oop5((tell_gather chocolate), S3.0, 2) = 0.6
+ oop1((tell_gather flour), S3.0, 2) = 0.6
+ oop2((tell_gather flour), S3.0, 2) = 0.4
+ oop3((tell_gather flour), S3.0, 2) = 0.6
+ oop5((tell_gather flour), S3.0, 2) = 0.6
+ oop1((tell_gather sugar), S3.0, 2) = 0.6
+ oop2((tell_gather sugar), S3.0, 2) = 0.4
+ oop3((tell_gather sugar), S3.0, 2) = 0.6
+ oop5((tell_gather sugar), S3.0, 2) = 0.6
+ oop1((warn_hail user), S3.0, 2) = 0.6
+ oop2((warn_hail user), S3.0, 2) = 0.4
+ oop3((warn_hail user), S3.0, 2) = 0.6
+ oop5((warn_hail user), S3.0, 2) = 0.6
+-----------------------------------------------
+MAximised value 0.6
+Intent Map: {'hiking': ['(leave_home user)']}
+Calculation Time -> 0.011185646057128906
+Length = 16, 1000
