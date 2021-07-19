@@ -49,7 +49,8 @@ def print_robot_act(dct):
 
 def print_oop(dct):
     for item in dct:
-        print(" {}({}, {}, {}) = {}".format(item.opportunity_type, item.action, item.state, item.k, item.opportunity))
+        if (item.opportunity > 0.0):
+            print(" {}({}, {}, {}) = {}".format(item.opportunity_type, item.action, item.state, item.k, item.opportunity))
 
 def print_des(dct):
     print("Desireability Function ->")
