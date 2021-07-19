@@ -136,7 +136,7 @@ class Environment():
                 #listed_action.append(action_list[key])
                 listed_action[key] = action_list[key]
 
-        mapped_action = self.create_action_list_map(action_list)
+        mapped_action = self.create_action_list_map(listed_action)
         return copy.deepcopy(mapped_action)
 
     def return_human_action_list(self):
