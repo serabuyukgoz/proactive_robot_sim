@@ -165,8 +165,8 @@ def updateSituation(system):
     ########################
     # 1)
     #Change K
-    #K = 2 #look up strategy
-    K = dynamic_k
+    K = 2 #look up strategy
+    #K = dynamic_k
     #K = 0
     ########################
 
@@ -215,7 +215,7 @@ def updateSituation(system):
 
     opp_eqm = system['emq'].oop.findOpportunity(evolve_map, des, cur_state_name, act_robot, K)
 
-    return opp_eqm, oop_intent, evolve_map, react, des, intent_map, K
+    return opp_eqm, oop_intent, evolve_map, react, des, intent_map
 
 def executor(opp_emq):
     maxy = max(node.opportunity for node in opp_emq)
@@ -242,54 +242,13 @@ if __name__ =='__main__':
     # S0
     system['env'].add_state_change("(current_weather sunshine)")
     system['env'].add_state_change("(current_time morning)")
-#    system['env'].add_state_change("(breakfast user)")
-
+    system['env'].add_state_change("(breakfast user)")
     #for every change in Situation
     react = time.time()
-    opp_emq, opp_hir, state_evolvation, reaction_time, des, intent_map_res, K = updateSituation(system)
+    opp_emq, opp_hir, state_evolvation, reaction_time, des, intent_map_res = updateSituation(system)
     react = time.time() - react
 
     max_value = executor(opp_emq)
-
-    #s1.0
-
-    #add change in the world
-
-#    system['env'].add_state_change("(not (breakfast user))")
-    system['env'].add_state_change("(dishes_dirty)")
-    system['env'].add_state_change("(collected water_bottle)")
-
-    react = time.time()
-    opp_emq, opp_hir, state_evolvation, reaction_time, des, intent_map_res, K = updateSituation(system)
-    react = time.time() - react
-
-    max_value = executor(opp_emq)
-    #
-    #s2.0
-
-    #add change in the world
-
-    system['env'].add_state_change("(collected backpack)")
-
-    react = time.time()
-    opp_emq, opp_hir, state_evolvation, reaction_time, des, intent_map_res, K = updateSituation(system)
-    react = time.time() - react
-
-    max_value = executor(opp_emq)
-    #
-    #s3.0
-
-    #add change in the world
-
-    system['env'].add_state_change("(collected compass)")
-
-    react = time.time()
-    opp_emq, opp_hir, state_evolvation, reaction_time, des, intent_map_res, K = updateSituation(system)
-    react = time.time() - react
-
-    max_value = executor(opp_emq)
-
-    ############################################################################
 
 #    print_evolve_map(state_evolvation)
 #    print('Final Map --------')
@@ -303,5 +262,84 @@ if __name__ =='__main__':
 
     print("Calculation Time -> {}".format(reaction_time))
     print('Length = {}, {}'.format(len(state_evolvation[cur_state_name]),len(state_evolvation)))
-    print('K = {}'.format(K))
+#    graph(state_evolvation, copy.deepcopy(des), cur_state_name)
+
+    #s1.0
+
+    #add change in the world
+
+#    system['env'].add_state_change("(not (breakfast user))")
+    system['env'].add_state_change("(dishes_dirty)")
+    system['env'].add_state_change("(collected water_bottle)")
+
+    react = time.time()
+    opp_emq, opp_hir, state_evolvation, reaction_time, des, intent_map_res = updateSituation(system)
+    react = time.time() - react
+
+    max_value = executor(opp_emq)
+
+#    print_evolve_map(state_evolvation)
+#    print('Final Map --------')
+    print_all(react, opp_emq, opp_hir, system)
+    print("MAximised value {}".format(max_value))
+
+    cur_state = system['env'].return_current_state()
+    cur_state_name = system['emq'].return_name_of_state(cur_state)
+
+    print("Intent Map: {}".format(intent_map_res))
+
+    print("Calculation Time -> {}".format(reaction_time))
+    print('Length = {}, {}'.format(len(state_evolvation[cur_state_name]),len(state_evolvation)))
     #graph(state_evolvation, copy.deepcopy(des), cur_state_name)
+
+    #s2.0
+
+    #add change in the world
+
+    system['env'].add_state_change("(collected backpack)")
+
+    react = time.time()
+    opp_emq, opp_hir, state_evolvation, reaction_time, des, intent_map_res = updateSituation(system)
+    react = time.time() - react
+
+    max_value = executor(opp_emq)
+
+#    print_evolve_map(state_evolvation)
+#    print('Final Map --------')
+    print_all(react, opp_emq, opp_hir, system)
+    print("MAximised value {}".format(max_value))
+
+    cur_state = system['env'].return_current_state()
+    cur_state_name = system['emq'].return_name_of_state(cur_state)
+
+    print("Intent Map: {}".format(intent_map_res))
+
+    print("Calculation Time -> {}".format(reaction_time))
+    print('Length = {}, {}'.format(len(state_evolvation[cur_state_name]),len(state_evolvation)))
+    #graph(state_evolvation, copy.deepcopy(des), cur_state_name)
+
+    #s3.0
+
+    #add change in the world
+
+    system['env'].add_state_change("(collected compass)")
+
+    react = time.time()
+    opp_emq, opp_hir, state_evolvation, reaction_time, des, intent_map_res = updateSituation(system)
+    react = time.time() - react
+
+    max_value = executor(opp_emq)
+
+#    print_evolve_map(state_evolvation)
+#    print('Final Map --------')
+    print_all(react, opp_emq, opp_hir, system)
+    print("MAximised value {}".format(max_value))
+
+    cur_state = system['env'].return_current_state()
+    cur_state_name = system['emq'].return_name_of_state(cur_state)
+
+    print("Intent Map: {}".format(intent_map_res))
+
+    print("Calculation Time -> {}".format(reaction_time))
+    print('Length = {}, {}'.format(len(state_evolvation[cur_state_name]),len(state_evolvation)))
+    graph(state_evolvation, copy.deepcopy(des), cur_state_name)

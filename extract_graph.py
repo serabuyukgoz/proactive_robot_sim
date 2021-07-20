@@ -54,7 +54,7 @@ def graph(adjacency_list, des_map, current_name):
 
     my_G.graph
     #nx.draw(my_G, with_labels=True, node_color = map_color, node_shape="s", node_size=1500)
-    nx.draw(my_G, with_labels=True, node_shape="s", node_color = map_color, node_size=1500, pos=nx.drawing.nx_agraph.graphviz_layout(
+    nx.draw(my_G, with_labels=True, node_shape="s", node_color = map_color, node_size=10000, pos=nx.drawing.nx_agraph.graphviz_layout(
         my_G,
         prog='dot',
         args='-Grankdir=LR'
