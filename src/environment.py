@@ -88,11 +88,10 @@ class Environment():
         self.derived_list.append(info)
 
     #Till here it was all about creating PDDL file
-
     def findNegate(self, strs):
-        if ("(not(" in strs):
-            strs = strs.replace("(not(", "(")
-            strs = strs.replace("))", ")")
+        if (re.findall(r'\s*\(\s*not\s*\(\s*', strs)):
+            strs = re.sub(r'\s*\(\s*not\s*\(\s*', '(', strs)
+            strs = re.sub(r'\s*\)\s*\)\s*', ')', strs)
             return strs
         else:
             return 0
