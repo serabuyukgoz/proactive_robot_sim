@@ -294,9 +294,8 @@ class Environment():
         " \n ) \n (:init   \n" )
 
         for items in relationship_list:
-            f.write(" (")
             f.write(items)
-            f.write(") \n ")
+            f.write("\n ")
 
         #write init
         for event in list_init:
