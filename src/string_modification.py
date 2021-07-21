@@ -3,18 +3,21 @@ import re
 import itertools
 
 def return_parameter(param):
-    param = param.replace("(", "")
-    param = param.replace(")", "")
+#    param = param.replace("(", "")
+    param = re.sub(r'\s*\(\s*', '', param)
+    param = re.sub(r'\s*\)\s*', '', param)
     param = param.replace(" -", "")
     pp = param.split(" ")
     parameter = {}
 
+    #Clear empty parameters
     for all in pp:
         all = re.sub(r"\s+", "", all)
         if (all != ""):
-            parameter[pp.pop()] = pp.pop()
+            name = pp.pop(0)
+            value = pp.pop(0)
+            parameter[name] = value
 
-    #print(parameter)
     return copy.deepcopy(parameter)
 
 # precondition satisfied
