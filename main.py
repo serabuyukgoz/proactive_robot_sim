@@ -62,8 +62,12 @@ def create_world_state(system):
 #    system['env'].add_action("Robot", "( )", "(current_weather rain)", "(collected umbrella)", "warn_rain")
 
     #added actions for free run, changes of concepts!
-    system['env'].add_action("Free", "(?wp - weather ?wn - weather)", "(current_weather ?wp)", "(and (not (current_weather ?wp)) (current_weather ?wn))", "weather_change")
-    system['env'].add_action("Free", "(?tp - time ?tn - time)", "(after ?tp ?tn)", "(and (not (current_time ?tp)) (current_time ?tn))", "time_change")
+    system['env'].add_action("Free", "(?wp - weather ?wn - weather)", "(and (current_weather ?wp) (not (current_weather ?wn)))", "(and (not (current_weather ?wp)) (current_weather ?wn))", "weather_change")
+    #system['env'].add_action("Free", "(?tp - time ?tn - time)", "(after ?tp ?tn)", "(and (not (current_time ?tp)) (current_time ?tn))", "time_change")
+    system['env'].add_action("Free", "( )", "(current_time morning)", "(and (not (current_time morning)) (current_time noon))", "morning_passed")
+    system['env'].add_action("Free", "( )", "(current_time noon)", "(and (not (current_time noon)) (current_time evening))", "noon_passed")
+    system['env'].add_action("Free", "( )", "(current_time evening)", "(and (not (current_time evening)) (current_time morning))", "after_noon_passed")
+
     system['env'].add_action("Free", "(?u - agent)", "(breakfast ?u)", "(and  (not (breakfast ?u)) (dishes_dirty))", "had_breakfast")
 
     system['env'].add_predicate("collected ?x - objects")
@@ -115,16 +119,16 @@ def create_world_state(system):
 
 
     #relationship added
-    system['env'].add_common_knowledge(" after morning lunch " )
-    system['env'].add_common_knowledge(" after lunch after_noon " )
-    system['env'].add_common_knowledge(" after after_noon evening " )
-    system['env'].add_common_knowledge(" after evening night " )
-    system['env'].add_common_knowledge(" after night morning " )
+    # system['env'].add_common_knowledge("(after morning lunch)" )
+    # system['env'].add_common_knowledge("(after lunch after_noon)" )
+    # system['env'].add_common_knowledge("(after after_noon evening)" )
+    # system['env'].add_common_knowledge("(after evening night)" )
+    # system['env'].add_common_knowledge("(after night morning)" )
 
     #ALSO add what is undesired situations to define which state will be undesired!
-    system['emq'].des.add_situation('get_wet', ['(current_weather rainy)' , '(outside ?u - agent)'], 0.7)
-    system['emq'].des.add_situation('get_hurt', ['(current_weather hail)' , '(outside ?u - agent)'], 1.0)
-    system['emq'].des.add_situation('dirt_dishes', ['(dishes_dirty)'], 0.4)
+    system['emq'].des.add_situation('get_wet', ['(current_weather rainy)' , '(outside ?u - agent)'], 0.4)
+    system['emq'].des.add_situation('get_hurt', ['(current_weather hail)' , '(outside ?u - agent)'], 0.0)
+    system['emq'].des.add_situation('dirt_dishes', ['(dishes_dirty)'], 0.7)
 
     domain_name, problem_name = system['env'].create_environment()
 
@@ -159,14 +163,14 @@ def updateSituation(system):
     '''
 
     #Define intention recogniton as opportunity
-    i = 0.2 #desirability value
+    i = 0.1 #desirability value
 
 
     ########################
     # 1)
     #Change K
-    #K = 2 #look up strategy
-    K = dynamic_k
+    K = 2 #look up strategy
+    #K = dynamic_k
     #K = 0
     ########################
 
@@ -178,15 +182,17 @@ def updateSituation(system):
     #print_evolve_map(evolve_map)
 
     cur_state_name = system['emq'].return_name_of_state(cur_state)
-
+    print('Future map of current state')
+    print(evolve_map[cur_state_name])
+    print('current_state {}'.format(cur_state))
     #############################
     # 2)
     #cut off brances
-    evolve_map = system['emq'].des.cut_off_branches(evolve_map, hashmap_state, intent_map, defined_action, cur_state_name)
+    #evolve_map = system['emq'].des.cut_off_branches(evolve_map, hashmap_state, intent_map, defined_action, cur_state_name)
 
     #limitate with K
     #evolve_map = system['des'].limitate(evolve_map, hashmap_state, cur_state_name, dynamic_k)
-    print_evolve_map(evolve_map)
+    #print_evolve_map(evolve_map)
     ###############################
 
     #######################################
@@ -196,7 +202,7 @@ def updateSituation(system):
     #print('Desirabilily Calculation \n {}'.format(des))
 
     #Change Desirability Value
-    system['emq'].des.update_desirability_Function(intent_map, i)
+    #system['emq'].des.update_desirability_Function(intent_map, i)
 
     des = system['emq'].des.desirabilityFunction(evolve_map, hashmap_state)
     # print('______________________')
@@ -229,8 +235,8 @@ if __name__ =='__main__':
     '''
        Please update the path name with your path name of fast_downward library
     '''
-    #path = '~/Desktop/simulation_trial/DIRNAME'
-    system['pla'].set_path('~/planner/fast_downward/downward')
+    system['pla'].set_path('~/Desktop/simulation_trial/DIRNAME')
+    #system['pla'].set_path('~/planner/fast_downward/downward')
     '''
       Other search methods also could be use depend on the complexity of problem
       Such as; "astar(lmcut())" , "astar(ipdb())" ...
@@ -242,7 +248,7 @@ if __name__ =='__main__':
     # S0
     system['env'].add_state_change("(current_weather sunshine)")
     system['env'].add_state_change("(current_time morning)")
-#    system['env'].add_state_change("(breakfast user)")
+    system['env'].add_state_change("(breakfast user)")
 
     #for every change in Situation
     react = time.time()
@@ -251,11 +257,13 @@ if __name__ =='__main__':
 
     max_value = executor(opp_emq)
 
+    print()
+
     #s1.0
 
     #add change in the world
 
-#    system['env'].add_state_change("(not (breakfast user))")
+    system['env'].add_state_change("(not (breakfast user))")
     system['env'].add_state_change("(dishes_dirty)")
     system['env'].add_state_change("(collected water_bottle)")
 
@@ -264,7 +272,7 @@ if __name__ =='__main__':
     react = time.time() - react
 
     max_value = executor(opp_emq)
-    #
+
     #s2.0
 
     #add change in the world
@@ -276,7 +284,7 @@ if __name__ =='__main__':
     react = time.time() - react
 
     max_value = executor(opp_emq)
-    #
+
     #s3.0
 
     #add change in the world
