@@ -72,28 +72,19 @@ def create_world_state(system):
     system['env'].add_predicate("current_time ?t - time")
     system['env'].add_predicate("after ?t1 - time ?t2 - time")
 
-    # system['env'].add_predicate("hiking ?u - agent")
-    # system['env'].add_predicate("promenade ?u - agent")
-    # system['env'].add_predicate("watching_tv ?u - agent")
-    # system['env'].add_predicate("reading_book ?u - agent")
     system['env'].add_predicate("breakfast ?u - agent")
 
     system['env'].add_predicate("weather_dealt")
     system['env'].add_predicate("dishes_dirty")
 
-    # system['env'].add_goal('( hiking ?u - agent)')
-    # system['env'].add_goal('( promenade ?u - agent)')
-    # system['env'].add_goal('( reading_book ?u - agent)')
-    # system['env'].add_goal('( watching_tv ?u - agent)')
-
     #hiking
     system['env'].add_goal('(and (collected backpack) (collected compass) (collected water_bottle) (outside user))')
     #promenade
     system['env'].add_goal('(and (collected walking_stick) (collected dog) (collected water_bottle) (outside user))')
-    # #watching_tv
-    # system['env'].add_goal('(and (not (outside user)) )')
-    #reading_book
-    # system['env'].add_goal('(and (not (outside user)) (collected backpack) (collected book))')
+    #watching_tv
+    system['env'].add_goal('(and (not (outside user)) (collected water_bottle) (collected sugar) (collected tea) (collected milk))')
+    # Baking Cake
+    system['env'].add_goal('(and (not (outside user)) (collected sugar) (collected chocolate) (collected milk) (collected flour))')
 
     system['env'].add_object('agent')
     system['env'].add_sub_objects('agent', 'user')
@@ -108,14 +99,20 @@ def create_world_state(system):
     system['env'].add_sub_constants('time', 'noon')
     system['env'].add_sub_constants('time', 'evening')
     system['env'].add_constants('obj')
-    system['env'].add_sub_constants('obj', 'hat')
+#    system['env'].add_sub_constants('obj', 'hat')
     system['env'].add_sub_constants('obj', 'compass')
     system['env'].add_sub_constants('obj', 'backpack')
     system['env'].add_sub_constants('obj', 'walking_stick')
     system['env'].add_sub_constants('obj', 'dog')
-    system['env'].add_sub_constants('obj', 'book')
+#    system['env'].add_sub_constants('obj', 'book')
     system['env'].add_sub_constants('obj', 'water_bottle')
-    system['env'].add_sub_constants('obj', 'umbrella')
+#    system['env'].add_sub_constants('obj', 'umbrella')
+    system['env'].add_sub_constants('obj', 'tea')
+    system['env'].add_sub_constants('obj', 'milk')
+    system['env'].add_sub_constants('obj', 'chocolate')
+    system['env'].add_sub_constants('obj', 'flour')
+    system['env'].add_sub_constants('obj', 'sugar')
+
 
     #relationship added
     system['env'].add_common_knowledge(" after morning lunch " )
@@ -127,7 +124,7 @@ def create_world_state(system):
     #related to the state description -> it could have chage later
     system['env'].add_state_change("(current_weather sunshine)")
     system['env'].add_state_change("(current_time morning)")
-    system['env'].add_state_change("(breakfast user)")
+#    system['env'].add_state_change("(breakfast user)")
 
     #ALSO add what is undesired situations to define which state will be undesired!
     system['emq'].des.add_situation('get_wet', ['(current_weather rainy)' , '(outside ?u - agent)'], 0.7)
@@ -190,7 +187,7 @@ def updateSituation(system):
     #############################
     # 2)
     #cut off brances
-    evolve_map = system['emq'].des.cut_off_branches(evolve_map, hashmap_state, intent_map, defined_action, cur_state_name)
+    #evolve_map = system['emq'].des.cut_off_branches(evolve_map, hashmap_state, intent_map, defined_action, cur_state_name)
 
     #limitate with K
     #evolve_map = system['des'].limitate(evolve_map, hashmap_state, cur_state_name, dynamic_k)
@@ -200,8 +197,8 @@ def updateSituation(system):
     #######################################
     # 3 ) Changes desireability function
     des = system['emq'].des.desirabilityFunction(evolve_map, hashmap_state)
-    print('______________________')
-    print('Desirabilily Calculation \n {}'.format(des))
+    #print('______________________')
+    #print('Desirabilily Calculation \n {}'.format(des))
 
     #Change Desirability Value
     #system['des'].update_desirability_Function(intent_map, i)
@@ -223,12 +220,17 @@ def updateSituation(system):
 
     opp_eqm = system['emq'].oop.findOpportunity(evolve_map, des, cur_state_name, act_robot, K)
 
-    return opp_eqm, oop_intent, evolve_map, react
+    return opp_eqm, oop_intent, evolve_map, react, des, intent_map
+
+def executor(opp_emq):
+    maxy = max(node.opportunity for node in opp_emq)
+    return maxy
 
 
 if __name__ =='__main__':
     print("Hello World!")
     setClasses()
+
     '''
        Please update the path name with your path name of fast_downward library
     '''
@@ -241,17 +243,107 @@ if __name__ =='__main__':
     system['pla'].set_search_method("astar(add())")
 
     domain_name, problem_name = create_world_state(system)
+
+    # S0
+
+    system['env'].add_state_change("(breakfast user)")
     #for every change in Situation
     react = time.time()
-    opp_emq, opp_hir, state_evolvation, reaction_time = updateSituation(system)
+    opp_emq, opp_hir, state_evolvation, reaction_time, des, intent_map_res = updateSituation(system)
     react = time.time() - react
 
+    max_value = executor(opp_emq)
 
-    print_evolve_map(state_evolvation)
-    print('Length = {}'.format(len(state_evolvation)))
-    print('Final Map --------')
+#    print_evolve_map(state_evolvation)
+#    print('Final Map --------')
     print_all(react, opp_emq, opp_hir, system)
+    print("MAximised value {}".format(max_value))
+
+    cur_state = system['env'].return_current_state()
+    cur_state_name = system['emq'].return_name_of_state(cur_state)
+
+    print("Intent Map: {}".format(intent_map_res))
 
     print("Calculation Time -> {}".format(reaction_time))
-    print('Length = {}'.format(len(state_evolvation)))
-    graph(state_evolvation)
+    print('Length = {}, {}'.format(len(state_evolvation[cur_state_name]),len(state_evolvation)))
+    #graph(state_evolvation, copy.deepcopy(des), cur_state_name)
+
+#     #s1.0
+#
+#     #add change in the world
+#
+# #    system['env'].add_state_change("(not (breakfast user))")
+#     system['env'].add_state_change("(dishes_dirty)")
+#     system['env'].add_state_change("(collected water_bottle)")
+#
+#     react = time.time()
+#     opp_emq, opp_hir, state_evolvation, reaction_time, des, intent_map_res = updateSituation(system)
+#     react = time.time() - react
+#
+#     max_value = executor(opp_emq)
+#
+# #    print_evolve_map(state_evolvation)
+# #    print('Final Map --------')
+#     print_all(react, opp_emq, opp_hir, system)
+#     print("MAximised value {}".format(max_value))
+#
+#     cur_state = system['env'].return_current_state()
+#     cur_state_name = system['emq'].return_name_of_state(cur_state)
+#
+#     print("Intent Map: {}".format(intent_map_res))
+#
+#     print("Calculation Time -> {}".format(reaction_time))
+#     print('Length = {}, {}'.format(len(state_evolvation[cur_state_name]),len(state_evolvation)))
+#     #graph(state_evolvation, copy.deepcopy(des), cur_state_name)
+
+#     #s2.0
+#
+#     #add change in the world
+#
+#     system['env'].add_state_change("(collected backpack)")
+#
+#     react = time.time()
+#     opp_emq, opp_hir, state_evolvation, reaction_time, des, intent_map_res = updateSituation(system)
+#     react = time.time() - react
+#
+#     max_value = executor(opp_emq)
+#
+# #    print_evolve_map(state_evolvation)
+# #    print('Final Map --------')
+#     print_all(react, opp_emq, opp_hir, system)
+#     print("MAximised value {}".format(max_value))
+#
+#     cur_state = system['env'].return_current_state()
+#     cur_state_name = system['emq'].return_name_of_state(cur_state)
+#
+#     print("Intent Map: {}".format(intent_map_res))
+#
+#     print("Calculation Time -> {}".format(reaction_time))
+#     print('Length = {}, {}'.format(len(state_evolvation[cur_state_name]),len(state_evolvation)))
+#     #graph(state_evolvation, copy.deepcopy(des), cur_state_name)
+
+#     #s3.0
+#
+#     #add change in the world
+#
+#     system['env'].add_state_change("(collected compass)")
+#
+#     react = time.time()
+#     opp_emq, opp_hir, state_evolvation, reaction_time, des, intent_map_res = updateSituation(system)
+#     react = time.time() - react
+#
+#     max_value = executor(opp_emq)
+#
+# #    print_evolve_map(state_evolvation)
+# #    print('Final Map --------')
+#     print_all(react, opp_emq, opp_hir, system)
+#     print("MAximised value {}".format(max_value))
+#
+#     cur_state = system['env'].return_current_state()
+#     cur_state_name = system['emq'].return_name_of_state(cur_state)
+#
+#     print("Intent Map: {}".format(intent_map_res))
+#
+#     print("Calculation Time -> {}".format(reaction_time))
+#     print('Length = {}, {}'.format(len(state_evolvation[cur_state_name]),len(state_evolvation)))
+#     #graph(state_evolvation, copy.deepcopy(des), cur_state_name)
