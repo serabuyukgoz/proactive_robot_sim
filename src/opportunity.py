@@ -15,6 +15,12 @@ class OpportunityDetection():
         self.sys = system
 
     def look_ahead(self, state_adj_map, cur_state, K):
+
+        def remove_dublicates(seq):
+            seen = set()
+            seen_add = seen.add
+            return [x for x in seq if not (x in seen or seen_add(x))]
+
         map_look_aheads = {}
         map_look_aheads[0] = [cur_state]
         for k in range(K):
@@ -22,7 +28,11 @@ class OpportunityDetection():
             map_look_aheads[real_key] = []
             for each in map_look_aheads[k]:
                 linked_states = state_adj_map[each]
-                map_look_aheads[real_key] = [*map_look_aheads[real_key], *linked_states]
+                lists = [*map_look_aheads[real_key], *linked_states]
+                res_list = remove_dublicates(lists)
+                map_look_aheads[real_key] = res_list
+
+                print('Cur state : {} \n each {} \n linked states {} \n Look Ahead map {}'.format(cur_state, each, linked_states, map_look_aheads))
 
         return copy.deepcopy(map_look_aheads)
 
