@@ -11,6 +11,7 @@ class Equilibrium_Maintenance():
 
         self.name_state_hash_map = {}
         self.map_of_states = {} #free_run adjacency list
+        self.sys = system
 
     def return_state_hash_map(self):
         return copy.deepcopy(self.name_state_hash_map)
@@ -27,6 +28,8 @@ class Equilibrium_Maintenance():
                 state = undone_state[i].pop()
                 name_state = state['name']
                 current_state = state['state_array']
+                if (name_state not in self.map_of_states):
+                    self.map_of_states[name_state] = []
                 for action in action_list:
                     #new_state = self.add_action_to_state_plan(current_state, action_list[action], action_list)
                     new_state = self.add_action_to_state(current_state, action_list[action])
@@ -42,7 +45,7 @@ class Equilibrium_Maintenance():
                             self.map_of_states[name_state].append(new_name)
                             #self.create_evolve_map(new_state, action_list)
                             undone_state[i+1].append({ 'name' :  new_name, 'state_array' : new_state})
-
+        #print('Evolve calculation {}'.format(self.map_of_states))
         return copy.deepcopy(self.map_of_states)
 
     def add_naming(self, state):
@@ -52,9 +55,6 @@ class Equilibrium_Maintenance():
         else:
             name_state = '(Empty)'
         self.name_state_hash_map[name_state] = state
-
-        if (name_state not in self.map_of_states):
-            self.map_of_states[name_state] = []
 
         return name_state
 
@@ -69,18 +69,20 @@ class Equilibrium_Maintenance():
     def add_action_to_state(self, state, action):
         # add effect
         new_state = []
-
+        state_scheme = self.sys['env'].return_current_knowledge_list()
+        state_scheme = state_scheme + state
         wanted_precon, unwanted_precon = seperate_not_predicate(action['precondition'])
         # if all precondition is in and also consider not :( if there is not then if not part is not belong to list
-        satisfied_wanted = all([x in state for x in wanted_precon])
-        satisfied_unwanted = all([elem not in state for elem in unwanted_precon])
+        satisfied_wanted = all([x in state_scheme for x in wanted_precon])
+        satisfied_unwanted = all([elem not in state_scheme for elem in unwanted_precon])
         if (satisfied_wanted and satisfied_unwanted):
             #add effect to the state and return state
             w, u = seperate_not_predicate(action['effect'])
             new_state = copy.deepcopy(state)
-            new_state = new_state + w #add to element
+            #new_state = new_state + w #add to element
             new_state = [i for i in new_state if i not in u] #remove the elements which named as not
-
+            added_states = [i for i in w if i not in new_state]
+            new_state = new_state + added_states
 
         return copy.deepcopy(new_state)
 
