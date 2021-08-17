@@ -30,7 +30,7 @@ class Planner():
 
       try:
           subprocess.check_call(
-              'python3.6 %s/fast-downward.py --plan-file %s %s %s --search "%s"'
+              'python3 %s/fast-downward.py --plan-file %s %s %s --search "%s"'
                   % (self.path, tmp_path, domain, problem, self.search_method),
               stdout=f,
               stderr=subprocess.STDOUT,
