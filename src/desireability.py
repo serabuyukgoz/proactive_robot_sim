@@ -61,11 +61,15 @@ class CalculateDesireability():
             status.append(calculated_res)
 
         for key in self.desirable_situation:
-            high_light = self.isIntended(state, self.desirable_situation[key]['rule'])
-            if (insight):
-                calculated_res = 1.0 #Intented State
-            else:
-                calculated_res = self.desirable_situation[key]['value'] #which is value that set by user 0 for fatal, and 0.5 for half desire,
+            degree = self.degree_of_intetion_on_state(state, self.desirable_situation[key]['rule'])
+            calculated_res = degree * self.desirable_situation[key]['value']
+            if (degree == 0):
+                calculated_res = 1.0 #to prevent the make the desirable state undesirable
+            # high_light = self.isIntended(state, self.desirable_situation[key]['rule'])
+            # if (high_light):
+            #     calculated_res = 1.0 #Intented State
+            # else:
+            #     calculated_res = self.desirable_situation[key]['value'] #which is value that set by user 0 for fatal, and 0.5 for half desire,
             status.append(calculated_res)
 
         def multiplyList(myList) :
@@ -77,6 +81,22 @@ class CalculateDesireability():
 
         return multiplyList(status)
 
+    def degree_of_intetion_on_state(state, list_intent):
+        """
+            It calculates the degree of found in state
+            If there is only 1 element in state, the undesirability ratio will be higher
+            In this way, we could jump to the
+        """
+
+        value = 0
+
+        for each_element in list_intent:
+            if (each_element in state):
+                value += 1
+
+        value = value / len(list_intent)
+        value = (1 - value)
+        return value
 
     def isDesirable(self, state, rule):
         """
