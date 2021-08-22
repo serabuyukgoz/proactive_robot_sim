@@ -12,6 +12,10 @@ class Equilibrium_Maintenance():
         self.name_state_hash_map = {}
         self.map_of_states = {} #free_run adjacency list
 
+    def set_env(self, map_state, hashmap):
+        self.name_state_hash_map = copy.deepcopy(hashmap)
+        self.map_state = copy.deepcopy(map_state)
+
     def return_state_hash_map(self):
         return copy.deepcopy(self.name_state_hash_map)
 
