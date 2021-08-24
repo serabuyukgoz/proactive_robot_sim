@@ -12,6 +12,9 @@ class Equilibrium_Maintenance():
         self.name_state_hash_map = {}
         self.map_of_states = {} #free_run adjacency list
 
+    ## Function related to defining environment ##
+
+    # Set evolve_map by hand and set it to system
     def set_env(self, map_state, hashmap):
         self.name_state_hash_map = copy.deepcopy(hashmap)
         self.map_of_states = copy.deepcopy(map_state)
@@ -22,7 +25,7 @@ class Equilibrium_Maintenance():
     def return_evolve_map(self):
         return copy.deepcopy(self.map_of_states)
 
-        #iterative way to create all possibilities of states
+    # Probabilistic way to create evolve_map
     def create_evolve_map(self, current_state, action_list, K):
         #Function to check if state placed in hash map already
         name_state = self.add_naming(current_state)
@@ -52,6 +55,7 @@ class Equilibrium_Maintenance():
 
         return copy.deepcopy(self.map_of_states)
 
+
     def add_naming(self, state):
         #function for adding state to the hashmap and evoluation map
         if (len(state) > 0):
@@ -66,7 +70,7 @@ class Equilibrium_Maintenance():
         return name_state
 
     def add_action_to_state_name(self, state_name, action):
-        
+
         state = self.name_state_hash_map[state_name]
         new_state = self.add_action_to_state(state, action)
         new_state_name = self.return_name_of_state(new_state)
