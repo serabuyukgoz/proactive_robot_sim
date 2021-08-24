@@ -14,10 +14,13 @@ class Equilibrium_Maintenance():
 
     def set_env(self, map_state, hashmap):
         self.name_state_hash_map = copy.deepcopy(hashmap)
-        self.map_state = copy.deepcopy(map_state)
+        self.map_of_states = copy.deepcopy(map_state)
 
     def return_state_hash_map(self):
         return copy.deepcopy(self.name_state_hash_map)
+
+    def return_evolve_map(self):
+        return copy.deepcopy(self.map_of_states)
 
         #iterative way to create all possibilities of states
     def create_evolve_map(self, current_state, action_list, K):
@@ -63,7 +66,7 @@ class Equilibrium_Maintenance():
         return name_state
 
     def add_action_to_state_name(self, state_name, action):
-
+        
         state = self.name_state_hash_map[state_name]
         new_state = self.add_action_to_state(state, action)
         new_state_name = self.return_name_of_state(new_state)
@@ -94,4 +97,9 @@ class Equilibrium_Maintenance():
             if (len(key) == len(k)):
                 if (all([x in k for x in key])):
                     return i
+        return None
+
+    def return_state_from_name(self, name):
+        if name in self.name_state_hash_map:
+            return copy.deepcopy(self.name_state_hash_map[name])
         return None

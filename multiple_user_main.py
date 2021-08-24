@@ -52,12 +52,12 @@ def create_world_state(system):
     # system['env'].add_action("Human", "(?u - agent)", "(and (collected walking_stick) (collected dog) (outside ?u))", "(promenade ?u)", "go_promenade")
     # system['env'].add_action("Human", "(?u - agent)", "(and (not (outside ?u)) )", "(watching_tv ?u)", "watch_tv")
     # system['env'].add_action("Human", "(?u - agent)", "(and (not (outside ?u)) (collected book))", "(reading_book ?u)", "read_book")
-    system['env'].add_action("Human", "(?x - obj)", "(not(collected ?x))", "(collected ?x)", "collect")
-    system['env'].add_action("Human", "(?x - obj)", "(collected ?x)", "(not(collected ?x))", "leave")
+    system['env'].add_action("Human", "(?u - agent ?x - obj)", "(not(collected ?u ?x))", "(collected ?u ?x)", "collect")
+    system['env'].add_action("Human", "(?u - agent ?x - obj)", "(collected ?u ?x)", "(not(collected ?u ?x))", "leave")
     #added robot actions for equilibrium maintenance, all of robot's action is communicative
 
     system['env'].add_action("Robot", "( )", "(dishes_dirty)", "(not(dishes_dirty))", "tell_clean_dishes")
-    system['env'].add_action("Robot", "(?x - obj)", "(not(collected ?x))", "(collected ?x)", "tell_gather")
+    system['env'].add_action("Robot", "(?u - agent ?x - obj)", "(not(collected ?u ?x))", "(collected ?u ?x)", "tell_gather")
     system['env'].add_action("Robot", "(?u - agent)", "(current_weather hail)", "(not(outside ?u))", "warn_hail")
 #    system['env'].add_action("Robot", "( )", "(current_weather rain)", "(collected umbrella)", "warn_rain")
 
@@ -66,7 +66,7 @@ def create_world_state(system):
     system['env'].add_action("Free", "(?tp - time ?tn - time)", "(after ?tp ?tn)", "(and (not (current_time ?tp)) (current_time ?tn))", "time_change")
     system['env'].add_action("Free", "(?u - agent)", "(breakfast ?u)", "(and  (not (breakfast ?u)) (dishes_dirty))", "had_breakfast")
 
-    system['env'].add_predicate("collected ?x - objects")
+    system['env'].add_predicate("collected ?u - agent ?x - objects")
     system['env'].add_predicate("outside ?u - agent")
     system['env'].add_predicate("current_weather ?w - weather")
     system['env'].add_predicate("current_time ?t - time")
@@ -77,17 +77,30 @@ def create_world_state(system):
     system['env'].add_predicate("weather_dealt")
     system['env'].add_predicate("dishes_dirty")
 
+    #goals for veli
     #hiking
-    system['env'].add_goal('(and (collected backpack) (collected compass) (collected water_bottle) (outside user))')
+    system['env'].add_goal('(and (collected veli backpack) (collected veli compass) (collected veli water_bottle) (outside veli))')
     #promenade
-    system['env'].add_goal('(and (collected walking_stick) (collected dog) (collected water_bottle) (outside user))')
+    system['env'].add_goal('(and (collected veli walking_stick) (collected veli dog) (collected veli water_bottle) (outside veli))')
     #watching_tv
-    system['env'].add_goal('(and (not (outside user)) (collected water_bottle) (collected sugar) (collected tea) (collected milk))')
+    system['env'].add_goal('(and (not (outside veli)) (collected veli water_bottle) (collected veli sugar) (collected veli tea) (collected veli milk))')
     # Baking Cake
-    system['env'].add_goal('(and (not (outside user)) (collected sugar) (collected chocolate) (collected milk) (collected flour))')
+    system['env'].add_goal('(and (not (outside veli)) (collected veli sugar) (collected veli chocolate) (collected veli milk) (collected veli flour))')
+
+
+    #goals for ali
+    #hiking
+    system['env'].add_goal('(and (collected ali backpack) (collected ali compass) (collected ali water_bottle) (outside ali))')
+    #promenade
+    system['env'].add_goal('(and (collected ali walking_stick) (collected ali dog) (collected ali water_bottle) (outside ali))')
+    #watching_tv
+    system['env'].add_goal('(and (not (outside ali)) (collected ali water_bottle) (collected ali sugar) (collected ali tea) (collected ali milk))')
+    # Baking Cake
+    system['env'].add_goal('(and (not (outside ali)) (collected ali sugar) (collected ali chocolate) (collected ali milk) (collected ali flour))')
 
     system['env'].add_object('agent')
-    system['env'].add_sub_objects('agent', 'user')
+    system['env'].add_sub_objects('agent', 'ali')
+    system['env'].add_sub_objects('agent', 'veli')
 
     system['env'].add_constants('weather')
     system['env'].add_sub_constants('weather', 'sunshine')
@@ -156,7 +169,15 @@ def updateSituation(system):
     '''
         EQM
 
-        First create evolve_map - hypothetical map to forecast future
+        Create evolve_map - hypothetical map to forecast future
+        or
+        Set evolve_map - map written by hand
+
+        1) Modify K, Look-UP Degree
+        2) Cut-Off branches of the evolve map
+        3) Change Desitability map
+        4) HiR turn into opp0 to calculate the best way
+
     '''
 
     #Define intention recogniton as opportunity

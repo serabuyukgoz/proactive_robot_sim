@@ -47,17 +47,17 @@ def create_world_state(system):
     #adding agent's action for intention recognition
 
     system['env'].add_action("Human", "(?u - agent)", "(not(outside ?u))", "(outside ?u)", "leave_home")
-    system['env'].add_action("Human", " ( ) ", "(dishes_dirty)", "(not(dishes_dirty))", "clean_dishes")
+    system['env'].add_action("Human", "(?u - agent)", "(and (dishes_dirty) (not(outside ?u)) )", "(not(dishes_dirty))", "clean_dishes")
     # system['env'].add_action("Human", "(?u - agent)", "(and (collected backpack) (collected compass) (outside ?u))", "(hiking ?u)", "go_hiking")
     # system['env'].add_action("Human", "(?u - agent)", "(and (collected walking_stick) (collected dog) (outside ?u))", "(promenade ?u)", "go_promenade")
     # system['env'].add_action("Human", "(?u - agent)", "(and (not (outside ?u)) )", "(watching_tv ?u)", "watch_tv")
     # system['env'].add_action("Human", "(?u - agent)", "(and (not (outside ?u)) (collected book))", "(reading_book ?u)", "read_book")
-    system['env'].add_action("Human", "(?x - obj)", "(not(collected ?x))", "(collected ?x)", "collect")
-    system['env'].add_action("Human", "(?x - obj)", "(collected ?x)", "(not(collected ?x))", "leave")
+    system['env'].add_action("Human", "(?u - agent ?x - obj)", "(and (not(collected ?u ?x)) (not(outside ?u)) )", "(collected ?u ?x)", "collect")
+    system['env'].add_action("Human", "(?u - agent ?x - obj)", "(and (collected ?u ?x) (not(outside ?u)) )", "(not(collected ?u ?x))", "leave")
     #added robot actions for equilibrium maintenance, all of robot's action is communicative
 
-    system['env'].add_action("Robot", "( )", "(dishes_dirty)", "(not(dishes_dirty))", "tell_clean_dishes")
-    system['env'].add_action("Robot", "(?x - obj)", "(not(collected ?x))", "(collected ?x)", "tell_gather")
+    system['env'].add_action("Robot", "(?u - agent)", "(and (dishes_dirty) (not(outside ?u)) )", "(not(dishes_dirty))", "tell_clean_dishes")
+    system['env'].add_action("Robot", "(?u - agent ?x - obj)", "(not(collected ?u ?x))", "(collected ?u ?x)", "tell_gather")
     system['env'].add_action("Robot", "(?u - agent)", "(current_weather hail)", "(not(outside ?u))", "warn_hail")
 #    system['env'].add_action("Robot", "( )", "(current_weather rain)", "(collected umbrella)", "warn_rain")
 
@@ -66,7 +66,7 @@ def create_world_state(system):
     system['env'].add_action("Free", "(?tp - time ?tn - time)", "(after ?tp ?tn)", "(and (not (current_time ?tp)) (current_time ?tn))", "time_change")
     system['env'].add_action("Free", "(?u - agent)", "(breakfast ?u)", "(and  (not (breakfast ?u)) (dishes_dirty))", "had_breakfast")
 
-    system['env'].add_predicate("collected ?x - objects")
+    system['env'].add_predicate("collected ?u - agent ?x - objects")
     system['env'].add_predicate("outside ?u - agent")
     system['env'].add_predicate("current_weather ?w - weather")
     system['env'].add_predicate("current_time ?t - time")
@@ -78,13 +78,13 @@ def create_world_state(system):
     system['env'].add_predicate("dishes_dirty")
 
     #hiking
-    system['env'].add_goal('(and (collected backpack) (collected compass) (collected water_bottle) (outside user))')
+    system['env'].add_goal('(and (collected user backpack) (collected user compass) (collected user water_bottle) (outside user))')
     #promenade
-    system['env'].add_goal('(and (collected walking_stick) (collected dog) (collected water_bottle) (outside user))')
+    system['env'].add_goal('(and (collected user walking_stick) (collected user dog) (collected user water_bottle) (outside user))')
     #watching_tv
-    system['env'].add_goal('(and (not (outside user)) (collected water_bottle) (collected sugar) (collected tea) (collected milk))')
+    system['env'].add_goal('(and (not (outside user)) (collected user water_bottle) (collected user sugar) (collected user tea) (collected user milk))')
     # Baking Cake
-    system['env'].add_goal('(and (not (outside user)) (collected sugar) (collected chocolate) (collected milk) (collected flour))')
+    system['env'].add_goal('(and (not (outside user)) (collected user sugar) (collected user chocolate) (collected user milk) (collected user flour))')
 
     system['env'].add_object('agent')
     system['env'].add_sub_objects('agent', 'user')
@@ -172,11 +172,8 @@ def updateSituation(system):
     ########################
 
     react = time.time()
-    #evolve_map = system['emq'].create_evolve_map(cur_state, defined_action, K)
+    evolve_map = system['emq'].create_evolve_map(cur_state, defined_action, K)
     react = time.time() - react
-
-    evolve_map, hashmap_state = evolve_map_creation()
-    system['emq'].set_env(evolve_map, hashmap_state)
 
     hashmap_state = system['emq'].return_state_hash_map()
     #print_evolve_map(evolve_map)
@@ -205,7 +202,7 @@ def updateSituation(system):
 
     des = system['emq'].des.desirabilityFunction(evolve_map, hashmap_state)
     # print('______________________')
-    # print('Desirabilily Calculation Modifed Intention\n {}'.format(des))
+    print('Desirabilily Calculation Modifed Intention\n {}'.format(des))
     #############################################
 
     #####
@@ -225,70 +222,6 @@ def updateSituation(system):
 def executor(opp_emq):
     maxy = max(node.opportunity for node in opp_emq)
     return maxy
-
-def evolve_map_creation():
-
-    evolve_map = {}
-
-
-    hash_map = {}
-
-    #S0
-    hash_map['(current_weather sunshine);(current_time morning);(breakfast user)'] =  ['(current_weather sunshine)',
-    '(current_time morning)', '(breakfast user)']
-    evolve_map['(current_weather sunshine);(current_time morning);(breakfast user)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(dishes_dirty)',
-    '(current_weather sunshine);(current_time morning);(collected water_bottle)']
-
-    #S1.0
-    hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(dishes_dirty)'] =  ['(current_weather sunshine)',
-    '(current_time morning)',  '(collected water_bottle)', '(dishes_dirty)']
-    evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(dishes_dirty)'] = [ #'(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(dishes_dirty)',
-    '(current_weather sunshine);(current_time morning);(collected water_bottle)',
-    '(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack)']
-
-    #S1.1
-    hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle)'] =  ['(current_weather sunshine)',
-    '(current_time morning)', '(collected water_bottle)']
-    evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack)']
-
-
-    #S2.0
-    # hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(dishes_dirty)'] =  ['(current_weather sunshine)',
-    # '(current_time morning)', '(dishes_dirty)', '(collected water_bottle)', '(collected backpack)']
-    # evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(dishes_dirty)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass);(dishes_dirty)',
-    # '(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)']
-
-    #S2.1
-    hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack)'] =  ['(current_weather sunshine)',
-    '(current_time morning)', '(collected water_bottle)', '(collected backpack)']
-    evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)']
-
-
-    #S3.0
-    # hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass);(dishes_dirty)'] =  ['(current_weather sunshine)',
-    # '(current_time morning)', '(dishes_dirty)', '(collected water_bottle)', '(collected backpack)', '(collected compass)']
-    # evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass);(dishes_dirty)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)',
-    # '(current_weather hail);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)',
-    # '(current_weather rainy);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)']
-
-    #S3.1
-    hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)'] =  ['(current_weather sunshine)',
-    '(current_time morning)', '(collected water_bottle)', '(collected backpack)', '(collected compass)']
-    evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)'] = ['(current_weather hail);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)',
-    '(current_weather rainy);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)']
-
-
-    #S4.0
-    # hash_map['(current_weather hail);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)'] =  ['(current_weather hail)',
-    # '(current_time noon)', '(collected water_bottle)', '(collected backpack)', '(collected compass)', '(outside user)']
-    # evolve_map['(current_weather hail);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)'] = []
-
-    #S4.1
-    hash_map['(current_weather rainy);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)'] =  ['(current_weather rainy)',
-    '(current_time noon)', '(collected water_bottle)', '(collected backpack)', '(collected compass)', '(outside user)']
-    evolve_map['(current_weather rainy);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)'] = []
-
-    return evolve_map, hash_map
 
 if __name__ =='__main__':
     print("Hello World!")

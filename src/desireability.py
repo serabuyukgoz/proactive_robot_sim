@@ -79,6 +79,7 @@ class CalculateDesireability():
                 result = result * x
             return result
 
+        print("DES: State {} \n Desirability : {}".format(state, multiplyList(status)))
         return multiplyList(status)
 
     def degree_of_intetion_on_state(state, list_intent):
