@@ -89,17 +89,9 @@ class Environment():
 
     #Till here it was all about creating PDDL file
 
-    def findNegate(self, strs):
-        if ("(not(" in strs):
-            strs = strs.replace("(not(", "(")
-            strs = strs.replace("))", ")")
-            return strs
-        else:
-            return 0
-
     def add_state_change(self, state_change):
         #Instead of incrementing negates delete them from state description
-        neg = self.findNegate(state_change)
+        neg = findNegate(state_change)
         if (neg):
             self.init_state.remove(neg)
         else:
@@ -201,7 +193,7 @@ class Environment():
         '''
 
         # defined_action = self.create_action_list_map()
-        # self.create_evolve_map(list_init, defined_action)
+        # self.create_evolve_map_define_by_K(list_init, defined_action)
 
         #Retruned PDDL Files as whole; domain and all goals
         self.domain_name = domain_name
@@ -350,17 +342,3 @@ class Environment():
                 }
 
         return copy.deepcopy(listed_action)
-
-
-    def add_naming(self, state):
-        #function for adding state to the hashmap and evoluation map
-        if (len(state) > 0):
-            name_state = ';'.join(state)
-        else:
-            name_state = '(Empty)'
-        self.name_state_hash_map[name_state] = state
-
-        if (name_state not in self.map_of_states):
-            self.map_of_states[name_state] = []
-
-        return name_state

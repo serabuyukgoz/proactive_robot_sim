@@ -62,6 +62,14 @@ def turn_precondition(each_parameter, list_precon):
         new_list.append(precon)
     return copy.deepcopy(new_list)
 
+def findNegate(strs):
+    if (re.findall(r'\(\s*not\s*\(', strs)):
+        strs = re.sub(r'\(\s*not\s*', '', strs)
+        strs = re.sub(r'\s*\)\s*\)\s*', ')', strs)
+        return strs
+    else:
+        return None
+
 def seperate_not_predicate(each_predicate):
     unwanted = []
     wanted = []
