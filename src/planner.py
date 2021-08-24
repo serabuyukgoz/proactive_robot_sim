@@ -30,8 +30,16 @@ class Planner():
 
     def error_codes(self, code):
 
-        if (code == 30):
-            return ""
+        if (code == 1):
+            return "SEARCH_PLAN_FOUND_AND_OUT_OF_MEMORY  : component ran out of memory. "
+        elif (code == 2):
+            return "SEARCH_PLAN_FOUND_AND_OUT_OF_TIME : component ran out of time. "
+        elif (code == 3):
+            return "SEARCH_PLAN_FOUND_AND_OUT_OF_MEMORY_AND_TIME : could not find a solution"
+        elif (code == 12):
+            return "SEARCH_UNSOLVED_INCOMPLETE : Search ended without finding a solution"
+        elif (code == 30):
+            return "TRANSLATE_CRITICAL_ERROR : Critical error: something went wrong (e.g. translator bug, but also malformed PDDL input) "
         else:
             error = str(code)
             return error
@@ -55,9 +63,9 @@ class Planner():
       except subprocess.CalledProcessError as e:
           error = self.error_codes(e.returncode)
           logs = str()
-          with open("shell.txt", 'r') as logs:
-              a = logs.read()
-          raise Exception("Planner error log: %s \n Error code: %s" %(logs, error))
+          with open("shell.txt", 'r') as logs_file:
+              logs = logs_file.read()
+          raise Exception("Planner error \n %s \n Error code: %s" %(logs, error))
 
       finally:
           os.close(fd)
