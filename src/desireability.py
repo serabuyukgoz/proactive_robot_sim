@@ -4,8 +4,6 @@ class CalculateDesireability():
         self.map_of_desirability = {}
         self.desirable_situation = {}
 
-        self.original_desirability_values = {}
-
     def add_situation(self, situ, rule, value):
         """
             To set desirability of each situation
@@ -25,19 +23,19 @@ class CalculateDesireability():
             }
         return copy.deepcopy(self.desirable_situation)
 
-    def desirabilityFunction(self, map_of_states, hashmap):
-        desirability = {}
-
-        for key in hashmap:
-            desirability[key] = {}
-            state = hashmap[key]
-            res = self.isStateDesiable(state)
-            desirability[key] = {
-                #'state' : state,
-                'value' : res
-            }
-
-        return desirability
+    # def desirabilityFunction(self, map_of_states, hashmap):
+    #     desirability = {}
+    #
+    #     for key in hashmap:
+    #         desirability[key] = {}
+    #         state = hashmap[key]
+    #         res = self.isStateDesiable(state)
+    #         desirability[key] = {
+    #             #'state' : state,
+    #             'value' : res
+    #         }
+    #
+    #     return desirability
 
 
     def isStateDesiable(self, state):
@@ -49,7 +47,12 @@ class CalculateDesireability():
             decreases according to desireability of undesreable situations.
         """
 
+        # if state is empty, then there is no desirability
+        if (state == []):
+            return None
+
         status = []
+        #set desirability values
         for key in self.map_of_desirability:
             insight = self.isDesirable(state, self.map_of_desirability[key]['rule'])
 

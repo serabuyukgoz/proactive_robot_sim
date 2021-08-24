@@ -133,16 +133,16 @@ class OpportunityDetection():
     def return_desirability_list(self, states, des_map):
         list_states_desirability = []
         for sts in states:
-            list_states_desirability.append(des_map[sts]['value'])
+            value = self.sys['emq'].des.isStateDesiable(sts)
+            list_states_desirability.append(value)
 
         return copy.deepcopy(list_states_desirability)
 
 
-    def findOpportunity(self, state_adj, state_des, cur_state_name, action_scheme, K):
+    def findOpportunity(self, state_adj, cur_state_name, action_scheme, K):
         map_look_aheads = self.look_ahead(state_adj, cur_state_name, K)
-        print(state_des)
-        print(cur_state_name)
-        des = state_des[cur_state_name]
+        cur_state = self.sys['emq'].return_state_from_name(cur_state_name)
+        cur_state_des = self.sys['emq'].des.isStateDesiable(cur_state)
         list_oop = []
 
         for k in map_look_aheads:
@@ -151,7 +151,7 @@ class OpportunityDetection():
 
                 if (k == 0):
                     bnf = self.bnf(action_scheme[action], cur_state_name)
-                    oop0_alpha = self.oop_0(des['value'], bnf)
+                    oop0_alpha = self.oop_0(cur_state_des, bnf)
                     list_oop.append(Opportunity('oop0', action, cur_state_name, k, oop0_alpha))
                 else:
 
@@ -162,10 +162,10 @@ class OpportunityDetection():
                         list_bnf_state_prime.append(bnf_s)
                         map_bnf_state_prime[each_state_prime] = bnf_s
 
-                    oop1_alpha = self.oop_1(des['value'], list_bnf_state_prime)
+                    oop1_alpha = self.oop_1(cur_state_des, list_bnf_state_prime)
                     list_oop.append(Opportunity('oop1', action, cur_state_name, k, oop1_alpha))
 
-                    oop2_alpha = self.oop_2(des['value'], list_bnf_state_prime)
+                    oop2_alpha = self.oop_2(cur_state_des, list_bnf_state_prime)
                     list_oop.append(Opportunity('oop2', action, cur_state_name, k, oop2_alpha))
 
                     oop3_alpha = self.oop_3(map_bnf_state_prime)
@@ -175,7 +175,7 @@ class OpportunityDetection():
                     list_oop.append(Opportunity('oop4', action, cur_state_name, k, oop4_alpha))
 
                     bnf_state_prime_k = self.bnf_k(action_scheme[action], cur_state_name, k)
-                    des_latest_states = self.return_desirability_list(map_look_aheads[k], state_des)
+                    des_latest_states = self.return_desirability_list(map_look_aheads[k])
 
                     oop5_alpha = self.oop_5(des_latest_states, bnf_state_prime_k)
                     list_oop.append(Opportunity('oop5', action, cur_state_name, k, oop5_alpha))
@@ -244,19 +244,21 @@ class OpportunityDetection():
         #print('OOP_6 Undes : {}, Bnf : {} , Oop : {}'.format(undes, bnf, oop))
         return oop
 
-    def set_as_oop(self, intent_list, cur_state_name, cur_state, des_map, action_list,  i):
+    # single fuction to change HiR results to opportuniti type 0
+    def set_as_oop(self, intent_list, cur_state_name, cur_state, action_list,  i):
         list_oop = []
         for each_intent in intent_list:
             for each_action in intent_list[each_intent]:
-                action_format = action_list[each_action]
+
                 des = self.sys['emq'].des.isStateDesiable(cur_state)
                 des = des - i #decreasing the desirability of the
-                cur_state_name = self.sys['emq'].return_name_of_state(cur_state)
-                if(cur_state_name):
-                    res = self.bnf(action_format, cur_state_name)
-                else:
-                    res = self.bnf_state(action_format, cur_state)
-                bnf = res + i #increading the desirability of action effecting state_des
-                oop_deg = self.oop_0(des, bnf)
-                list_oop.append(Opportunity('oop0', each_action, cur_state_name, 0, oop_deg))
+
+                action_format = action_list[each_action]
+                bnf_res = self.bnf_state(action_format, cur_state)
+                if (bnf_res):
+                    bnf = bnf_res + i #increading the desirability of action effecting state_des
+
+                    oop_deg = self.oop_0(des, bnf)
+                    list_oop.append(Opportunity('oop0', each_action, cur_state_name, 0, oop_deg))
+
         return copy.deepcopy(list_oop)

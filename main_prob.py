@@ -142,7 +142,7 @@ def updateSituation(system):
         - intent_map = Map of intent and plan to reach
         - dynamic_k = length of plan
     '''
-    intent, intent_map, dynamic_k = system['recogniser'].create_recogniser(list_of_goals, domain_name, problem_name)
+    intent, intent_map, dynamic_k = system['recogniser'].recognize_intentions(list_of_goals, domain_name, problem_name)
 
 
     act_robot = system['env'].return_robot_action_list()
