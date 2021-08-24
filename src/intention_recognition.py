@@ -9,7 +9,7 @@ class Intention():
 
         self.planner = planner
 
-    def create_recogniser(self, list_of_goals, domain, problem):
+    def recognize_intentions(self, list_of_goals, domain, problem):
     #Create map of all plan and goal
 
         for e in list_of_goals:
