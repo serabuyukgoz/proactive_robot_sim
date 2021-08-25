@@ -100,6 +100,8 @@ class Environment():
         #add change into the history
         self.history_of_state_change[time.time()] = self.return_current_state()
 
+        return copy.deepcopy(self.init_state)
+
     def return_predicates(self):
         return copy.deepcopy(self.predicates_list)#.deepCopy()
 
