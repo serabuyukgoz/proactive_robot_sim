@@ -47,9 +47,9 @@ class CalculateDesireability():
             decreases according to desireability of undesreable situations.
         """
 
-        # if state is empty, then there is no desirability
+        # if state is empty, then there is no desirability, Which is 0
         if (state == []):
-            return None
+            return 0
 
         status = []
         #set desirability values
@@ -82,7 +82,7 @@ class CalculateDesireability():
                 result = result * x
             return result
 
-        print("DES: State {} \n Desirability : {}".format(state, multiplyList(status)))
+        #print("DES: State {} \n Desirability : {}".format(state, multiplyList(status)))
         return multiplyList(status)
 
     def degree_of_intetion_on_state(state, list_intent):
@@ -113,14 +113,6 @@ class CalculateDesireability():
     def isIntended(self, state, rule):
         return any([x in state for x in rule])
 
-    # def return_name_of_state(self, key, maps):
-    #     for i in maps:
-    #         k = maps[i]
-    #         if (len(key) == len(k)):
-    #             if (all([x in k for x in key])):
-    #                 return i
-    #     return None
-
     def cut_off_branches(self, evolve_map, hashmap_state, intention_map, action_list, cur_state_name):
 
         list_intention = []
@@ -128,8 +120,6 @@ class CalculateDesireability():
             for action in intention_map[each_intention]:
                 act = action_list[action]
                 list_intention = list_intention + act['effect']
-
-        #cur_state_name = self.return_name_of_state(cur_state, hashmap_state)
 
         print(evolve_map[cur_state_name])
         for each_branch in evolve_map[cur_state_name]:
