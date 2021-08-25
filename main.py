@@ -172,14 +172,14 @@ def updateSituation(system):
     ########################
 
     ##########################################################
-    #evolve_map = system['emq'].create_evolve_map_define_by_K(cur_state, defined_action, K)
-
-    #hashmap_state = system['emq'].return_state_hash_map()
+    evolve_map = system['emq'].create_evolve_map_define_by_K(cur_state, defined_action, K)
+    hashmap_state = system['emq'].return_state_hash_map()
+    
     #print_evolve_map(evolve_map)
 
     # create and set environement
-    evolve_map, hashmap_state = evolve_map_creation()
-    system['emq'].set_env(evolve_map, hashmap_state)
+    # evolve_map, hashmap_state = evolve_map_creation()
+    # system['emq'].set_env(evolve_map, hashmap_state)
     ##############################################################
 
     cur_state_name = system['emq'].return_name_of_state(cur_state)
