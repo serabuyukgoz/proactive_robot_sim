@@ -105,6 +105,11 @@ class OpportunityDetection():
         Y_state_name, Y_state = self.sys['emq'].add_action_to_state_name(state, alpha)
         print("\t Y_state: %s - %s " %(Y_state_name, Y_state))
 
+        if(Y_state == []):
+            print(" \t bnf : 0 (action not applicable - no further state) ")
+            print("-------------------------------------")
+            return 0
+
         # F^k of Y
         state_adj_map = self.sys['emq'].return_evolve_map()
         list_f_k = self.fuction_of_K(K, Y_state_name, state_adj_map)
@@ -185,7 +190,7 @@ class OpportunityDetection():
                     # #More detail for calculate other opportunuties
                     bnf_state_prime_k = self.bnf_k(action_scheme[action], cur_state_name, k)
                     des_latest_states = self.return_desirability_list(map_look_aheads[k])
-                    
+
                     oop5_alpha = self.oop_5(des_latest_states, bnf_state_prime_k)
                     list_oop.append(Opportunity('oop5', action, cur_state_name, k, oop5_alpha))
 
