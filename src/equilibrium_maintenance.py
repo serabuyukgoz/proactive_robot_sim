@@ -26,7 +26,7 @@ class Equilibrium_Maintenance():
         return copy.deepcopy(self.map_of_states)
 
     # Probabilistic way to create evolve_map
-    def create_evolve_map_define_by_K(self, current_state, action_list, K):
+    def create_evolve_map_define(self, current_state, action_list):
         maps = {}
         hash_map = {}
         undone_state = []
