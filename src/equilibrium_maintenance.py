@@ -25,73 +25,60 @@ class Equilibrium_Maintenance():
     def return_evolve_map(self):
         return copy.deepcopy(self.map_of_states)
 
-    # Probabilistic way to create evolve_map for definite K
+    # Probabilistic way to create evolve_map
     def create_evolve_map_define_by_K(self, current_state, action_list, K):
-        #Function to check if state placed in hash map already
-        name_state = self.add_naming(current_state)
-        undone_state = {0 : [{'name' : name_state, 'state_array' : current_state}] }
-        #undone_state.append(current_state)
-        for i in range(K+1):
-            undone_state[i+1] = []
-            while(undone_state[i]):
-                state = undone_state[i].pop()
-                name_state = state['name']
-                current_state = state['state_array']
-                for action in action_list:
-                    #new_state = self.add_action_to_state_plan(current_state, action_list[action], action_list)
-                    new_state = self.add_action_to_state(current_state, action_list[action])
-                    if (len(new_state) > 0):
-                        name = self.return_name_of_state(new_state)
-                        if (name):
-                            #self.map_of_states[name_state].append([action, name])
-                            if (name not in self.map_of_states[name_state]):
-                                self.map_of_states[name_state].append(name)
-                        else:
-                            new_name = self.add_naming(new_state)
-                            #self.map_of_states[name_state].append([action, new_name])
-                            self.map_of_states[name_state].append(new_name)
-                            #self.create_evolve_map_define_by_K(new_state, action_list)
-                            undone_state[i+1].append({ 'name' :  new_name, 'state_array' : new_state})
+        maps = {}
+        hash_map = {}
+        undone_state = []
 
-        return copy.deepcopy(self.map_of_states)
+        name, hash_map = self.create_naming(current_state, hash_map)
+        maps[name] = []
+        undone_state.append(name)
 
-    # Probabilistic way to create evolve_map for all possibilities
-    def create_evolve_map(self, current_state, action_list):
-        #Function to check if state placed in hash map already
-        name_state = self.add_naming(current_state)
-        undone_state = {0 : [{'name' : name_state, 'state_array' : current_state}] }
-        #undone_state.append(current_state)
-        for i in range(K+1):
-            undone_state[i+1] = []
-            while(undone_state[i]):
-                state = undone_state[i].pop()
-                name_state = state['name']
-                current_state = state['state_array']
-                for action in action_list:
-                    #new_state = self.add_action_to_state_plan(current_state, action_list[action], action_list)
-                    new_state = self.add_action_to_state(current_state, action_list[action])
-                    if (len(new_state) > 0):
-                        name = self.return_name_of_state(new_state)
-                        if (name):
-                            #self.map_of_states[name_state].append([action, name])
-                            if (name not in self.map_of_states[name_state]):
-                                self.map_of_states[name_state].append(name)
-                        else:
-                            new_name = self.add_naming(new_state)
-                            #self.map_of_states[name_state].append([action, new_name])
-                            self.map_of_states[name_state].append(new_name)
-                            #self.create_evolve_map_define_by_K(new_state, action_list)
-                            undone_state[i+1].append({ 'name' :  new_name, 'state_array' : new_state})
+        while(undone_state):
+            state = undone_state.pop()
+            #creating a sloth for new defined state
+            if (state not in maps):
+                maps[state] = []
+            # Go through each action to be probable
+            for each_act in action_list:
+                new_state = self.add_action_to_state(current_state, action_list[each_act])
+                # Empty state means action is not applicable to state
+                if (new_state != []):
+                    name, hash_map = self.create_naming(new_state, hash_map)
+                    # to prevent repetation in the look-up table
+                    if (name not in maps[state]):
+                        maps[state].append(name)
+                        undone_state.append(name)
 
-        return copy.deepcopy(self.map_of_states)
+        self.set_env(maps, hash_map)
+        return copy.deepcopy(maps)
 
+    def create_naming(self, key_list, hashmap):
+
+        def find_name(key):
+            for i in hashmap:
+                k = hashmap[i]
+                if (len(key) == len(k)):
+                    if (all([x in k for x in key])):
+                        return i
+            return None
+
+        name = find_name(key_list)
+        if (name):
+            return name, hashmap
+        else:
+            name = ';'.join(key_list)
+            hashmap[name] = key_list
+            return name, hashmap
 
     def add_naming(self, state):
         #function for adding state to the hashmap and evoluation map
 
         #first check if the state already exist
         name = self.return_name_of_state(state)
-        if (name):
+        print("Returned name {}".format(name))
+        if (name != None):
             name_state = name
         else:
             #No : Set name to a state
@@ -116,8 +103,11 @@ class Equilibrium_Maintenance():
             new_state_name = self.return_name_of_state(new_state)
 
             return new_state_name, new_state
+        elif (state == []):
+            return '', state
+
         else:
-            raise Exception("ERR: State name is not found in hashmap, cannot add action to state")
+            raise Exception("ERR: State name is not found in hashmap, cannot add action to state, state name: %s , %s " %(state, state_name))
 
     def add_action_to_state(self, state, action):
         # add effect
