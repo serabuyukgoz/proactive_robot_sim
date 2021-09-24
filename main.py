@@ -2,6 +2,7 @@ import os
 import tempfile
 import subprocess
 import copy
+import sys
 
 import time
 
@@ -16,8 +17,6 @@ from src.naive_proactivity import Naive
 
 from print_strategy import print_all, print_des, print_evolve_map
 from extract_graph import graph
-
-import numpy as np
 
 # My game start from here
 system = { }
@@ -146,14 +145,11 @@ def updateSituation(system):
     '''
     intent, intent_map, dynamic_k = system['recogniser'].recognize_intentions(list_of_goals, domain_name, problem_name)
 
-
     act_robot = system['env'].return_robot_action_list()
     unvoluntary_action_list = system['env'].return_unvoluntary_action_list()
     cur_state = system['env'].return_current_state()
 
     defined_action = system['env'].create_action_list_map(unvoluntary_action_list)
-
-
 
     '''
         EQM
@@ -198,14 +194,8 @@ def updateSituation(system):
 
     #######################################
     # 3 ) Changes desireability function
-    #des = system['emq'].des.desirabilityFunction(evolve_map, hashmap_state)
-    #print('______________________')
-    #print('Desirabilily Calculation \n {}'.format(des))
-
     #Change Desirability Value
-    #system['emq'].des.update_desirability_Function(intent_map, i)
-
-    #des = system['emq'].des.desirabilityFunction(evolve_map, hashmap_state)
+    # system['emq'].des.update_desirability_Function(intent_map, i)
     #############################################
 
     #####
@@ -219,69 +209,69 @@ def updateSituation(system):
 
     return opp_eqm, oop_intent, evolve_map, react, intent_map, K
 
-def evolve_map_creation():
-
-    evolve_map = {}
-
-
-    hash_map = {}
-
-    #S0
-    hash_map['(current_weather sunshine);(current_time morning);(breakfast user)'] =  ['(current_weather sunshine)',
-    '(current_time morning)', '(breakfast user)']
-    evolve_map['(current_weather sunshine);(current_time morning);(breakfast user)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(dishes_dirty)',
-    '(current_weather sunshine);(current_time morning);(collected water_bottle)']
-
-    #S1.0
-    hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(dishes_dirty)'] =  ['(current_weather sunshine)',
-    '(current_time morning)',  '(collected water_bottle)', '(dishes_dirty)']
-    evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(dishes_dirty)'] = [ #'(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(dishes_dirty)',
-    '(current_weather sunshine);(current_time morning);(collected water_bottle)',
-    '(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack)']
-
-    #S1.1
-    hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle)'] =  ['(current_weather sunshine)',
-    '(current_time morning)', '(collected water_bottle)']
-    evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack)']
-
-
-    #S2.0
-    # hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(dishes_dirty)'] =  ['(current_weather sunshine)',
-    # '(current_time morning)', '(dishes_dirty)', '(collected water_bottle)', '(collected backpack)']
-    # evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(dishes_dirty)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass);(dishes_dirty)',
-    # '(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)']
-
-    #S2.1
-    hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack)'] =  ['(current_weather sunshine)',
-    '(current_time morning)', '(collected water_bottle)', '(collected backpack)']
-    evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)']
-
-
-    #S3.0
-    # hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass);(dishes_dirty)'] =  ['(current_weather sunshine)',
-    # '(current_time morning)', '(dishes_dirty)', '(collected water_bottle)', '(collected backpack)', '(collected compass)']
-    # evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass);(dishes_dirty)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)',
-    # '(current_weather hail);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)',
-    # '(current_weather rainy);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)']
-
-    #S3.1
-    hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)'] =  ['(current_weather sunshine)',
-    '(current_time morning)', '(collected water_bottle)', '(collected backpack)', '(collected compass)']
-    evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)'] = ['(current_weather hail);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)',
-    '(current_weather rainy);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)']
-
-
-    #S4.0
-    # hash_map['(current_weather hail);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)'] =  ['(current_weather hail)',
-    # '(current_time noon)', '(collected water_bottle)', '(collected backpack)', '(collected compass)', '(outside user)']
-    # evolve_map['(current_weather hail);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)'] = []
-
-    #S4.1
-    hash_map['(current_weather rainy);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)'] =  ['(current_weather rainy)',
-    '(current_time noon)', '(collected water_bottle)', '(collected backpack)', '(collected compass)', '(outside user)']
-    evolve_map['(current_weather rainy);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)'] = []
-
-    return evolve_map, hash_map
+# def evolve_map_creation():
+#
+#     evolve_map = {}
+#
+#
+#     hash_map = {}
+#
+#     #S0
+#     hash_map['(current_weather sunshine);(current_time morning);(breakfast user)'] =  ['(current_weather sunshine)',
+#     '(current_time morning)', '(breakfast user)']
+#     evolve_map['(current_weather sunshine);(current_time morning);(breakfast user)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(dishes_dirty)',
+#     '(current_weather sunshine);(current_time morning);(collected water_bottle)']
+#
+#     #S1.0
+#     hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(dishes_dirty)'] =  ['(current_weather sunshine)',
+#     '(current_time morning)',  '(collected water_bottle)', '(dishes_dirty)']
+#     evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(dishes_dirty)'] = [ #'(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(dishes_dirty)',
+#     '(current_weather sunshine);(current_time morning);(collected water_bottle)',
+#     '(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack)']
+#
+#     #S1.1
+#     hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle)'] =  ['(current_weather sunshine)',
+#     '(current_time morning)', '(collected water_bottle)']
+#     evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack)']
+#
+#
+#     #S2.0
+#     # hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(dishes_dirty)'] =  ['(current_weather sunshine)',
+#     # '(current_time morning)', '(dishes_dirty)', '(collected water_bottle)', '(collected backpack)']
+#     # evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(dishes_dirty)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass);(dishes_dirty)',
+#     # '(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)']
+#
+#     #S2.1
+#     hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack)'] =  ['(current_weather sunshine)',
+#     '(current_time morning)', '(collected water_bottle)', '(collected backpack)']
+#     evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)']
+#
+#
+#     #S3.0
+#     # hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass);(dishes_dirty)'] =  ['(current_weather sunshine)',
+#     # '(current_time morning)', '(dishes_dirty)', '(collected water_bottle)', '(collected backpack)', '(collected compass)']
+#     # evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass);(dishes_dirty)'] = ['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)',
+#     # '(current_weather hail);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)',
+#     # '(current_weather rainy);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)']
+#
+#     #S3.1
+#     hash_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)'] =  ['(current_weather sunshine)',
+#     '(current_time morning)', '(collected water_bottle)', '(collected backpack)', '(collected compass)']
+#     evolve_map['(current_weather sunshine);(current_time morning);(collected water_bottle);(collected backpack);(collected compass)'] = ['(current_weather hail);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)',
+#     '(current_weather rainy);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)']
+#
+#
+#     #S4.0
+#     # hash_map['(current_weather hail);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)'] =  ['(current_weather hail)',
+#     # '(current_time noon)', '(collected water_bottle)', '(collected backpack)', '(collected compass)', '(outside user)']
+#     # evolve_map['(current_weather hail);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)'] = []
+#
+#     #S4.1
+#     hash_map['(current_weather rainy);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)'] =  ['(current_weather rainy)',
+#     '(current_time noon)', '(collected water_bottle)', '(collected backpack)', '(collected compass)', '(outside user)']
+#     evolve_map['(current_weather rainy);(current_time noon);(collected water_bottle);(collected backpack);(collected compass);(outside user)'] = []
+#
+#     return evolve_map, hash_map
 
 
 def executor(opp_emq):
@@ -292,6 +282,7 @@ def executor(opp_emq):
 if __name__ =='__main__':
     print("Hello World!")
 
+    sys.stdout = open("/home/sara.buyukgoz/Desktop/proactive_robot_sim/results/23_09/eqm_s0.txt", "w")
     # try:
     setClasses()
 
@@ -322,53 +313,52 @@ if __name__ =='__main__':
     opp_emq, opp_hir, state_evolvation, reaction_time, intent_map_res, K = updateSituation(system)
     react = time.time() - react
 
-    max_value, max_arg = executor(opp_emq)
-
-    #s1.0
-
-    #add change in the world
-
-    system['env'].add_state_change("(not (breakfast user))")
-    system['env'].add_state_change("(dishes_dirty)")
-    system['env'].add_state_change("(collected water_bottle)")
-
-    react = time.time()
-    opp_emq, opp_hir, state_evolvation, reaction_time, intent_map_res, K = updateSituation(system)
-    react = time.time() - react
-
-    max_value, max_arg = executor(opp_emq)
-
-#     #
-    #s2.0
-
-    #add change in the world
-
-    system['env'].add_state_change("(collected backpack)")
-
-    react = time.time()
-    opp_emq, opp_hir, state_evolvation, reaction_time, intent_map_res, K = updateSituation(system)
-    react = time.time() - react
-
-    max_value = executor(opp_emq)
+    # #s1.0
     #
-    #s3.0
+    # #add change in the world
+    #
+    # system['env'].add_state_change("(not (breakfast user))")
+    # system['env'].add_state_change("(dishes_dirty)")
+    # system['env'].add_state_change("(collected user water_bottle)")
+    #
+    # react = time.time()
+    # opp_emq, opp_hir, state_evolvation, reaction_time, intent_map_res, K = updateSituation(system)
+    # react = time.time() - react
 
-    #add change in the world
+    # #s2.0
+    #
+    # #add change in the world
+    #
+    # system['env'].add_state_change("(collected user backpack)")
+    #
+    # react = time.time()
+    # opp_emq, opp_hir, state_evolvation, reaction_time, intent_map_res, K = updateSituation(system)
+    # react = time.time() - react
 
-    system['env'].add_state_change("(collected compass)")
+    # #s3.0
+    #
+    # #add change in the world
+    #
+    # system['env'].add_state_change("(collected user compass)")
+    #
+    # react = time.time()
+    # opp_emq, opp_hir, state_evolvation, reaction_time, intent_map_res, K = updateSituation(system)
+    # react = time.time() - react
 
-    react = time.time()
-    opp_emq, opp_hir, state_evolvation, reaction_time, intent_map_res, K = updateSituation(system)
-    react = time.time() - react
 
-    max_value = executor(opp_emq)
-#
+    eqm_max_value, eqm_max_arg = executor(opp_emq)
+    oop = [*opp_emq, *opp_hir]
+    hir_eqm_max_value, hir_eqm_max_arg = executor(oop)
+
+
     ############################################################################
 
 #    print_evolve_map(state_evolvation)
 #    print('Final Map --------')
     print_all(react, opp_emq, opp_hir, system)
-    print("MAximised value {} {}".format(max_value, max_arg.action))
+    print("MAximised value {} : EQM Opportunity {} {} in {} ".format(eqm_max_value, eqm_max_arg.action, eqm_max_arg.opportunity_type, eqm_max_arg.k))
+    print("MAximised value {} :  EQM + Intent Opportunity {} {} in {} ".format(hir_eqm_max_value, hir_eqm_max_arg.action, hir_eqm_max_arg.opportunity_type, hir_eqm_max_arg.k))
+
 
     cur_state = system['env'].return_current_state()
     cur_state_name = system['emq'].return_name_of_state(cur_state)
