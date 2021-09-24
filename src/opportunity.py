@@ -34,9 +34,9 @@ class OpportunityDetection():
                     for each_state in linked_states:
                         des_map_each = self.sys['emq'].des.undesirableRepetation(each_state, each.desirability_coeff)
                         map_look_ahead[real_key].append(FurtherState(each_state, des_map_each))
-                else:
-                    print("termination state: {}".format(map_look_ahead[k]))
-        print("MAP LOOK AHEAD {}".format(map_look_ahead))
+        #         else:
+        #             print("termination state: {}".format(map_look_ahead[k]))
+        # #print("MAP LOOK AHEAD {}".format(map_look_ahead))
         return copy.deepcopy(map_look_ahead)
 
     def fuction_of_K(self, K, cur_state, state_adj_map):
@@ -57,22 +57,22 @@ class OpportunityDetection():
             des_map = self.sys['emq'].des.setUndesirabilityMap()
             des_map = self.sys['emq'].des.undesirableRepetation(cur_state, des_map)
             map_look_aheads[0] = [FurtherState(cur_state, des_map)]
-            print(". {}".format(cur_state))
+            #print(". {}".format(cur_state))
             for s in range(K):
-                print(".. {} / {} ".format(s, K))
+                #print(".. {} / {} ".format(s, K))
                 s_prime = s+1
                 map_look_aheads[s_prime] = []
                 for each_s in map_look_aheads[s]:
-                    print("... {}".format(each_s))
+                    #print("... {}".format(each_s))
                     if (each_s):
                         linked_states = state_adj_map[each_s.state]
                         for each_state in linked_states:
                             des_map_each = self.sys['emq'].des.undesirableRepetation(each_state, each_s.desirability_coeff)
                             map_look_aheads[s_prime].append(FurtherState(each_state, des_map_each))
 
-                    else:
-                        print("termination state function K: {}".format(map_look_aheads[K]))
-            print("MAP LOOK AHEAD of K {} : {}".format(K, map_look_aheads[K]))
+                    # else:
+                    #     print("termination state function K: {}".format(map_look_aheads[K]))
+            #print("MAP LOOK AHEAD of K {} : {}".format(K, map_look_aheads[K]))
             return copy.deepcopy(map_look_aheads[K])
 
 
@@ -161,7 +161,6 @@ class OpportunityDetection():
 
     def return_desirability_list(self, states):
         list_states_desirability = []
-        print(states)
         for sts in states:
             value = self.sys['emq'].des.stateDesirabilityValue(sts.state, sts.desirability_coeff)
             list_states_desirability.append(value)
