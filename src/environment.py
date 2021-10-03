@@ -1,11 +1,6 @@
-import os
-import tempfile
-import time
-from collections import OrderedDict
 import copy
 import re
 from src.string_modification import *
-
 
 class ActionType():
     def __init__(self, types, parameter, precondition, effect, name):
@@ -35,10 +30,6 @@ class Environment():
 
         self.common_knowledge_dictionary = [] #which represents the general knowledge
         self.init_state = [] #which represents the current state
-
-        self.history_of_state_change = {}
-        self.history_of_state_evolution = {}
-        self.state_evolve_map_history = OrderedDict()
 
     def add_action(self, types, parameter, precondition, effect, name):
         action_name = name + "_action"
@@ -95,10 +86,9 @@ class Environment():
         if (neg):
             self.init_state.remove(neg)
         else:
-            self.init_state.append(state_change)
-
-        #add change into the history
-        self.history_of_state_change[time.time()] = self.return_current_state()
+            #To not to add dublicate
+            if not (state_change in self.init_state):
+                self.init_state.append(state_change)
 
         return copy.deepcopy(self.init_state)
 
@@ -193,9 +183,6 @@ class Environment():
             Specifiy action_list could be done
             Create the environment state graph from the initial state that robot in
         '''
-
-        # defined_action = self.create_action_list_map()
-        # self.create_evolve_map_define_by_K(list_init, defined_action)
 
         #Retruned PDDL Files as whole; domain and all goals
         self.domain_name = domain_name
