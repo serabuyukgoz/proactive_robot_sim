@@ -23,7 +23,7 @@ class CalculateDesireability():
             }
         return copy.deepcopy(self.desirable_situation)
 
-    def stateDesirabilityValue(self, state, repeat_map):
+    def stateDesirabilityValue(self, state):
         """
             If state is desirable for all rules, then state is undesirable == FALSE,
             otherwise state is desirable == TRUE
@@ -41,15 +41,7 @@ class CalculateDesireability():
         for key in self.map_of_undesirable_situations:
             insight = self.isDesirable(state, self.map_of_undesirable_situations[key]['rule'])
 
-            # #No levelisation on desirability function, but we could check that shoul we want half desirability like considered as fatal or not
-            # if (insight):
-            #     #insight = 1
-            #     calculated_res = 1.0 #Desirable State
-            # else:
-            #     #insight = 0
-            #     calculated_res = self.map_of_undesirable_situations[key]['value'] #which is value that set by user 0 for fatal, and 0.5 for half desire,
-
-            calculated_res = int(insight) + ((1 - int(insight))*(self.map_of_undesirable_situations[key]['value']+(repeat_map[key]/100)))
+            calculated_res = int(insight) + ((1 - int(insight))*(self.map_of_undesirable_situations[key]['value']))
             status.append(calculated_res)
 
         for key in self.desirable_situation:
@@ -129,12 +121,3 @@ class CalculateDesireability():
             map[each_elem] = 0
 
         return copy.deepcopy(map)
-
-    def undesirableRepetation(self, cur_state, des_map):
-
-        for each_elem in self.map_of_undesirable_situations:
-            res = self.isDesirable(cur_state, self.map_of_undesirable_situations[each_elem]['rule'])
-            if (res == False):
-                des_map[each_elem] = des_map[each_elem] + 1
-
-        return copy.deepcopy(des_map)
