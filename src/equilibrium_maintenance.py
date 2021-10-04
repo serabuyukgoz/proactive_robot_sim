@@ -4,6 +4,21 @@ from src.opportunity import OpportunityDetection
 
 import copy
 
+class StateDefinition():
+    def __init__(self, name, state, des):
+        self.name = name
+        self.state = state
+        self.desirability = des
+
+    def setStateDescription(self, state_des):
+        self.state = state_des
+
+    def setStateDesirability(self, des):
+        self.desirability = des
+
+    def setStataName(self, name):
+        self.name = name
+
 class Equilibrium_Maintenance():
     def __init__(self, system):
         self.des = CalculateDesireability()
@@ -11,13 +26,17 @@ class Equilibrium_Maintenance():
 
         self.name_state_hash_map = {}
         self.map_of_states = {} #free_run adjacency list
-
+        #
     ## Function related to defining environment ##
 
     # Set evolve_map by hand and set it to system
     def set_env(self, map_state, hashmap):
-        self.name_state_hash_map = copy.deepcopy(hashmap)
         self.map_of_states = copy.deepcopy(map_state)
+
+        #For each state in hashmap turn into a state object - TO DO
+        self.name_state_hash_map = copy.deepcopy(hashmap)
+        for each_state in hashmap:
+            self.name_state_hash_map[each_state] = StateDefinition(each_state, hashmap[each_state], -1)
 
     def return_state_hash_map(self):
         return copy.deepcopy(self.name_state_hash_map)
@@ -72,28 +91,6 @@ class Equilibrium_Maintenance():
             hashmap[name] = key_list
             return name, hashmap
 
-    def add_naming(self, state):
-        #function for adding state to the hashmap and evoluation map
-
-        #first check if the state already exist
-        name = self.return_name_of_state(state)
-        print("Returned name {}".format(name))
-        if (name != None):
-            name_state = name
-        else:
-            #No : Set name to a state
-            if (len(state) > 0):
-                name_state = ';'.join(state)
-            else:
-                name_state = '(Empty)'
-                self.name_state_hash_map[name_state] = state
-
-        # this is to define new sloths
-        if (name_state not in self.map_of_states):
-            self.map_of_states[name_state] = []
-
-        return name_state
-
     def add_action_to_state_name(self, state_name, action):
 
         #search state describtion from name
@@ -130,12 +127,13 @@ class Equilibrium_Maintenance():
     def return_name_of_state(self, key):
         for i in self.name_state_hash_map:
             k = self.name_state_hash_map[i]
-            if (len(key) == len(k)):
-                if (all([x in k for x in key])):
-                    return i
+            if (len(key) == len(k.state)):
+                if (all([x in k.state for x in key])):
+                    return k.name
         return None
 
     def return_state_from_name(self, name):
-        if name in self.name_state_hash_map:
-            return copy.deepcopy(self.name_state_hash_map[name])
+        for i in self.name_state_hash_map:
+         if (name == self.name_state_hash_map[i].name):
+            return copy.deepcopy(self.name_state_hash_map[i].state)
         return None
