@@ -41,6 +41,8 @@ class Equilibrium_Maintenance():
                 state = self.return_state_object_from_name(each_name)
                 self.map_of_states[each_state].append(state)
 
+        return self.map_of_states, self.name_state_hash_map
+
     def return_state_hash_map(self):
         return copy.deepcopy(self.name_state_hash_map)
 
@@ -73,8 +75,8 @@ class Equilibrium_Maintenance():
                         maps[state_name].append(name)
                         undone_state.append(name)
 
-        self.set_env(maps, hash_map)
-        return copy.deepcopy(maps)
+        set_map, set_hashmap = self.set_env(maps, hash_map)
+        return copy.deepcopy(set_map)
 
     def create_naming(self, key_list, hashmap):
 
