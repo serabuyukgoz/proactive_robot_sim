@@ -31,12 +31,15 @@ class Equilibrium_Maintenance():
 
     # Set evolve_map by hand and set it to system
     def set_env(self, map_state, hashmap):
-        self.map_of_states = copy.deepcopy(map_state)
-
         #For each state in hashmap turn into a state object - TO DO
-        self.name_state_hash_map = copy.deepcopy(hashmap)
         for each_state in hashmap:
             self.name_state_hash_map[each_state] = StateDefinition(each_state, hashmap[each_state], -1)
+
+        for each_state in map_state:
+            self.map_of_states[each_state] = []
+            for each_name in map_state[each_state]:
+                state = self.return_state_object_from_name(each_name)
+                self.map_of_states[each_state].append(state)
 
     def return_state_hash_map(self):
         return copy.deepcopy(self.name_state_hash_map)
@@ -55,10 +58,10 @@ class Equilibrium_Maintenance():
         undone_state.append(name)
 
         while(undone_state):
-            state = undone_state.pop()
+            state_name = undone_state.pop()
             #creating a sloth for new defined state
-            if (state not in maps):
-                maps[state] = []
+            if (state_name not in maps):
+                maps[state_name] = []
             # Go through each action to be probable
             for each_act in action_list:
                 new_state = self.add_action_to_state(current_state, action_list[each_act])
@@ -66,8 +69,8 @@ class Equilibrium_Maintenance():
                 if (new_state != []):
                     name, hash_map = self.create_naming(new_state, hash_map)
                     # to prevent repetation in the look-up table
-                    if (name not in maps[state]):
-                        maps[state].append(name)
+                    if (name not in maps[state_name]):
+                        maps[state_name].append(name)
                         undone_state.append(name)
 
         self.set_env(maps, hash_map)
@@ -136,4 +139,10 @@ class Equilibrium_Maintenance():
         for i in self.name_state_hash_map:
          if (name == self.name_state_hash_map[i].name):
             return copy.deepcopy(self.name_state_hash_map[i].state)
+        return None
+
+    def return_state_object_from_name(self, name):
+        for i in self.name_state_hash_map:
+         if (name == self.name_state_hash_map[i].name):
+            return self.name_state_hash_map[i]
         return None
