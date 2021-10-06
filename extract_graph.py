@@ -31,24 +31,27 @@ from itertools import count
 # nx.draw(my_G, with_labels=1, node_color=desirability, cmap = cmap)
 # plt.show()
 
-def graph(adjacency_list, des_map, current_name):
+def setColor(key):
+    if key == 1.0:
+        return 'green'
+    elif key == 0:
+        return 'red'
+    elif key == -1:
+        return 'white'
+    else:
+        return 'pink'
+
+def graph(adjacency_list, hashmap, current_name):
     my_G = nx.DiGraph()
 
-    # for keys in adjacency_list:
-    #     #my_G.add_node(keys)
+    color_map = {}
+    color_map[current_name] = setColor(hashmap[current_name].desirability)
     for each in adjacency_list[current_name]:
-        my_G.add_edge(current_name, each)
+        my_G.add_edge(current_name, each.name)
+        color_map[each.name] = setColor(each.desirability)
+
 
     k = my_G.nodes()
-
-    color_map = {}
-    for keys in des_map:
-        if des_map[keys]['value'] == 1.0:
-            color_map[keys] = 'green'
-        elif des_map[keys]['value'] == 0:
-            color_map[keys] = 'red'
-        else:
-            color_map[keys] = 'pink'
 
     map_color = [color_map.get(node) for node in my_G.nodes()]
 

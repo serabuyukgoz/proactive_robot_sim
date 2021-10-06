@@ -65,4 +65,9 @@ def print_evolve_map(dct):
     for item, amount in dct.items():
         print(" -- {} :".format(item))
         for a in amount:
-            print(" \t -> {} ".format(a))
+            print(" \t -> {} = {} ".format(a.name, a.desirability))
+
+def print_hash_map(dct):
+    for item, a in dct.items():
+        print(" ++ {} :".format(item))
+        print(" \t Name = {} \n \t State = {} \n \t Des = {} ".format(a.name, a.state, a.desirability))
