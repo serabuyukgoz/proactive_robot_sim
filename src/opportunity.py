@@ -58,23 +58,6 @@ class OpportunityDetection():
             return copy.deepcopy(map_look_aheads[K])
 
 
-    # def bnf(self, alpha, state):
-    #     '''
-    #         Hypotetically adding action to state
-    #         Then find the desirability of the action
-    #     '''
-    #     # Y = alpha(X)
-    #     Y_state_name, Y_state = self.sys['emq'].add_action_to_state_name(state.name, alpha)
-    #
-    #
-    #     des_y = self.sys['emq'].des.stateDesirabilityValue(Y_state)
-    #
-    #
-    #     #To_debug
-    #     state_des = self.sys['emq'].return_state_from_name(state)
-    #     des = self.sys['emq'].des.stateDesirabilityValue(state_des)
-    #     return copy.deepcopy(des_y), des, Y_state
-
     def bnf_calculation(self, alpha, state_obj):
         '''
             Hypotetically adding action to state
@@ -86,27 +69,11 @@ class OpportunityDetection():
         Y_state_obj = self.sys['emq'].return_object_of_state(Y_state)
         des_y = self.sys['emq'].des.stateDesirabilityValue(Y_state_obj)
 
-        #To_debug
-        des = self.sys['emq'].des.stateDesirabilityValue(state_obj)
-        return copy.deepcopy(des_y), des, Y_state
-
-    def bnf_state(self, alpha, state_obj):
-        '''
-            Hypotetically adding action to state
-            Then find the desirability of the action
-        '''
-        # Y = alpha(X)
-        print('BNF_state state: {}'.format(state_obj.name))
-        Y_state = self.sys['emq'].add_action_to_state(state_obj.state, alpha)
-        Y_state_obj = self.sys['emq'].return_object_of_state(Y_state)
-        des_y = self.sys['emq'].des.stateDesirabilityValue(Y_state_obj)
-
-        return copy.deepcopy(des_y)
+        #return copy.deepcopy(des_y)
 
         #To_debug
         des = self.sys['emq'].des.stateDesirabilityValue(state_obj)
         return copy.deepcopy(des_y), des, Y_state
-
 
     def bnf_k(self, alpha, state_obj, K):
 
@@ -156,13 +123,12 @@ class OpportunityDetection():
         return copy.deepcopy(list_states_desirability)
 
 
-    def findOpportunity(self, state_adj, cur_state_name, action_scheme, K):
+    def findOpportunity(self, state_adj, cur_state, action_scheme, K):
 
-        if (cur_state_name == "(Empty)"):
+        if (cur_state == []):
             raise Exception("Current State is Empty = []")
 
-        #cur_state = self.sys['emq'].return_state_from_name(cur_state_name)
-        cur_state_object = self.sys['emq'].return_state_object_from_name(cur_state_name)
+        cur_state_object = self.sys['emq'].return_object_of_state(cur_state)
 
         # cur_state_des = self.sys['emq'].des.stateDesirabilityValue(cur_state)
         map_look_aheads = self.look_ahead_fuction(state_adj, cur_state_object, K)
@@ -176,42 +142,42 @@ class OpportunityDetection():
                 if (k == 0):
                     bnf, dy, sy = self.bnf_calculation(action_scheme[action], future_states[0])
                     cur_state_des = self.sys['emq'].des.stateDesirabilityValue(future_states[0])
-                    print("How to set BNF(a,s): \n \t BNF (DES_of_y) : %s \n \t DES : %s \n \t DES_of_prime : %s \n \tAction : %s \n \t State Y : %s \n \t State Prime : %s \n \t State : %s \n \t K : %s " %(str(bnf), str(cur_state_des), dy, action_scheme[action]['name'], sy, cur_state_name, cur_state_name, str(k)))
+                    print("How to set BNF(a,s): \n \t BNF (DES_of_y) : %s \n \t DES : %s \n \t DES_of_prime : %s \n \tAction : %s \n \t State Y : %s \n \t State Prime : %s \n \t State : %s \n \t K : %s " %(str(bnf), str(cur_state_des), dy, action_scheme[action]['name'], sy, cur_state_object.name, cur_state_object.name, str(k)))
                     print("-------------------------------------")
                     oop0_alpha = self.oop_0(cur_state_des, bnf)
-                    list_oop.append(Opportunity('oop0', action, cur_state_name, k, oop0_alpha))
+                    list_oop.append(Opportunity('oop0', action, cur_state_object.name, k, oop0_alpha))
 
                 else:
                     list_bnf_state_prime = []
                     map_bnf_state_prime = {}
                     for each_state_prime in future_states:
                         bnf_s, dy, sy = self.bnf_calculation(action_scheme[action], each_state_prime)
-                        print("How to set BNF(a,s): \n \t BNF (DES_of_y) : %s \n \t DES : %s \n \t DES_of_prime : %s \n \tAction : %s \n \t State Y : %s \n \t State Prime : %s \n \t State : %s \n \t K : %s " %(str(bnf_s), str(cur_state_des), dy, action_scheme[action]['name'], sy, each_state_prime, cur_state_name, str(k)))
+                        print("How to set BNF(a,s): \n \t BNF (DES_of_y) : %s \n \t DES : %s \n \t DES_of_prime : %s \n \tAction : %s \n \t State Y : %s \n \t State Prime : %s \n \t State : %s \n \t K : %s " %(str(bnf_s), str(cur_state_des), dy, action_scheme[action]['name'], sy, each_state_prime, cur_state_object.name, str(k)))
                         print("-------------------------------------")
                         list_bnf_state_prime.append(bnf_s)
                         map_bnf_state_prime[each_state_prime.name] = bnf_s
 
                     oop1_alpha = self.oop_1(cur_state_des, list_bnf_state_prime)
-                    list_oop.append(Opportunity('oop1', action, cur_state_name, k, oop1_alpha))
+                    list_oop.append(Opportunity('oop1', action, cur_state_object.name, k, oop1_alpha))
 
                     oop2_alpha = self.oop_2(cur_state_des, list_bnf_state_prime)
-                    list_oop.append(Opportunity('oop2', action, cur_state_name, k, oop2_alpha))
+                    list_oop.append(Opportunity('oop2', action, cur_state_object.name, k, oop2_alpha))
 
                     oop3_alpha = self.oop_3(map_bnf_state_prime)
-                    list_oop.append(Opportunity('oop3', action, cur_state_name, k, oop3_alpha))
+                    list_oop.append(Opportunity('oop3', action, cur_state_object.name, k, oop3_alpha))
 
                     oop4_alpha = self.oop_4(map_bnf_state_prime)
-                    list_oop.append(Opportunity('oop4', action, cur_state_name, k, oop4_alpha))
+                    list_oop.append(Opportunity('oop4', action, cur_state_object.name, k, oop4_alpha))
 
                     # #More detail for calculate other opportunuties
                     bnf_state_prime_k = self.bnf_k(action_scheme[action], cur_state_object, k)
                     des_latest_states = self.return_desirability_list(map_look_aheads[k])
 
                     oop5_alpha = self.oop_5(des_latest_states, bnf_state_prime_k)
-                    list_oop.append(Opportunity('oop5', action, cur_state_name, k, oop5_alpha))
+                    list_oop.append(Opportunity('oop5', action, cur_state_object.name, k, oop5_alpha))
 
                     oop6_alpha = self.oop_6(des_latest_states, bnf_state_prime_k)
-                    list_oop.append(Opportunity('oop6', action, cur_state_name, k, oop6_alpha))
+                    list_oop.append(Opportunity('oop6', action, cur_state_object.name, k, oop6_alpha))
 
         return list_oop
 
@@ -278,7 +244,7 @@ class OpportunityDetection():
         return oop
 
     # single fuction to change HiR results to opportuniti type 0
-    def set_as_oop(self, intent_list, cur_state_name, cur_state, action_list,  i):
+    def set_as_oop(self, intent_list, cur_state, action_list,  i):
         if (cur_state == []):
             raise Exception("Current State is Empty = []")
 
@@ -293,13 +259,13 @@ class OpportunityDetection():
             des = des - i #decreasing the desirability of the
 
             action_format = action_list[each_action]
-            bnf_res = self.bnf_state(action_format, cur_state_obj)
+            bnf_res, d, y  = self.bnf_calculation(action_format, cur_state_obj)
             if (bnf_res):
                 bnf = bnf_res + i #increading the desirability of action effecting state_des
 
                 oop_deg = self.oop_0(des, bnf)
-                list_oop.append(Opportunity('oop0', each_action, cur_state_name, 0, oop_deg))
+                list_oop.append(Opportunity('oop0', each_action, cur_state_obj.name, 0, oop_deg))
             else:
-                raise Exception("BNF None in set opportunity for HiR \n More detail -> \n cur_state_name %s \n cur_state %s \n action %s \n des of state %s \n bnf %s" %(cur_state_name, cur_state, each_action, des, bnf_res))
+                raise Exception("BNF None in set opportunity for HiR \n More detail -> \n cur_state_name %s \n cur_state %s \n action %s \n des of state %s \n bnf %s" %(cur_state_obj.name, cur_state, each_action, des, bnf_res))
 
         return copy.deepcopy(list_oop)
