@@ -162,60 +162,20 @@ def updateSituation(system):
     #Define intention recogniton as opportunity
     effect_size_of_hir = 0.2 #desirability value
 
-
-    ########################
-    # 1)
-    #Change K
-    K = 2 #look up strategy
-    #K = dynamic_k
-    #K = 0
-    ########################
+    K = 2
 
     ##########################################################
     evolve_map = system['emq'].create_evolve_map_define(cur_state, defined_action)
     hashmap_state = system['emq'].return_state_hash_map()
+
+    oop_intent = system['emq'].oop.set_as_oop(intent_map, cur_state, defined_action, effect_size_of_hir)
+    ###########
+    opp_eqm = system['emq'].oop.findOpportunity(evolve_map, cur_state, act_robot, K)
+
+    hashmap_state = system['emq'].return_state_hash_map()
     evolve_map = system['emq'].return_evolve_map()
 
-    print_evolve_map(evolve_map)
-    print_hashmap(hashmap_state)
-
-    raise Exception('STOP HERE')
-
-    #print_evolve_map(evolve_map)
-
-    # create and set environement
-    # evolve_map, hashmap_state = evolve_map_creation()
-    # system['emq'].set_env(evolve_map, hashmap_state)
-    ##############################################################
-
-    cur_state_name = system['emq'].return_name_of_state(cur_state)
-
-    #############################
-    # 2)
-    #cut off brances
-    #evolve_map = system['emq'].des.cut_off_branches(evolve_map, hashmap_state, intent_map, defined_action, cur_state_name)
-
-    #limitate with K
-    #evolve_map = system['des'].limitate(evolve_map, hashmap_state, cur_state_name, dynamic_k)
-    print_evolve_map(evolve_map)
-    ###############################
-
-    #######################################
-    # 3 ) Changes desireability function
-    #Change Desirability Value
-    # system['emq'].des.update_desirability_Function(intent_map, i)
-    #############################################
-
-    #####
-    # 4)
-    #
-    #turn HiR actions into opportunity to match with EqM's oppotunities
-
-    oop_intent = system['emq'].oop.set_as_oop(intent_map, cur_state_name, cur_state, defined_action, effect_size_of_hir)
-    ###########
-    opp_eqm = system['emq'].oop.findOpportunity(evolve_map, cur_state_name, act_robot, K)
-
-    return opp_eqm, oop_intent, evolve_map, react, intent_map, K
+    return opp_eqm, oop_intent, evolve_map, hashmap_state, react, intent_map, K
 
 # def evolve_map_creation():
 #
@@ -291,91 +251,82 @@ if __name__ =='__main__':
     print("Hello World!")
 
     # sys.stdout = open("/home/sara.buyukgoz/Desktop/proactive_robot_sim/results/23_09/eqm_s0.txt", "w")
-    try:
-        setClasses()
+    # try:
+    setClasses()
 
-        '''
-           Please update the path name with your path name of fast_downward library
-        '''
-        #path = '~/Desktop/simulation_trial/DIRNAME'
-        system['pla'].set_path('/Users/serabuyukgoz/Code/humanAi/planner')
-        system['pla'].set_python_version('3')
-        #system['pla'].set_path('/Users/serabuyukgoz/Code/humanAi/planner')
+    '''
+       Please update the path name with your path name of fast_downward library
+    '''
 
-        # system['pla'].set_python_version('3.6')
-        '''
-          Other search methods also could be use depend on the complexity of problem
-          Such as; "astar(lmcut())" , "astar(ipdb())" ...
-        '''
-        system['pla'].set_search_method("astar(add())")
+    # system['pla'].set_path('/Users/serabuyukgoz/Code/humanAi/planner')
+    # system['pla'].set_python_version('3')
 
-        domain_name, problem_name = create_world_state(system)
+    system['pla'].set_path('~/planner/fast_downward/downward')
+    system['pla'].set_python_version('3.6')
+    '''
+      Other search methods also could be use depend on the complexity of problem
+      Such as; "astar(lmcut())" , "astar(ipdb())" ...
+    '''
+    system['pla'].set_search_method("astar(add())")
 
-        # S0
-        system['env'].add_state_change("(current_weather sunshine)")
-        system['env'].add_state_change("(breakfast user)")
+    domain_name, problem_name = create_world_state(system)
 
-        #for every change in Situation
-        react = time.time()
-        opp_emq, opp_hir, state_evolvation, reaction_time, intent_map_res, K = updateSituation(system)
-        react = time.time() - react
+    # S0
+    system['env'].add_state_change("(current_weather sunshine)")
+    system['env'].add_state_change("(breakfast user)")
 
-        # #s1.0
-        #
-        # #add change in the world
-        #
-        # system['env'].add_state_change("(not (breakfast user))")
-        # system['env'].add_state_change("(dishes_dirty)")
-        # system['env'].add_state_change("(collected user water_bottle)")
-        #
-        # react = time.time()
-        # opp_emq, opp_hir, state_evolvation, reaction_time, intent_map_res, K = updateSituation(system)
-        # react = time.time() - react
+    #s1.0
 
-        # #s2.0
-        #
-        # #add change in the world
-        #
-        # system['env'].add_state_change("(collected user backpack)")
-        #
-        # react = time.time()
-        # opp_emq, opp_hir, state_evolvation, reaction_time, intent_map_res, K = updateSituation(system)
-        # react = time.time() - react
+    #add change in the world
 
-        # #s3.0
-        #
-        # #add change in the world
-        #
-        # system['env'].add_state_change("(collected user compass)")
-        #
-        # react = time.time()
-        # opp_emq, opp_hir, state_evolvation, reaction_time, intent_map_res, K = updateSituation(system)
-        # react = time.time() - react
+    system['env'].add_state_change("(not (breakfast user))")
+    system['env'].add_state_change("(dishes_dirty)")
+    system['env'].add_state_change("(collected user water_bottle)")
+
+    #s2.0
+
+    #add change in the world
+
+    system['env'].add_state_change("(collected user backpack)")
 
 
-        eqm_max_value, eqm_max_arg = executor(opp_emq)
-        oop = [*opp_emq, *opp_hir]
-        hir_eqm_max_value, hir_eqm_max_arg = executor(oop)
+    # #s3.0
+    #
+    # #add change in the world
+    #
+    # system['env'].add_state_change("(collected user compass)")
 
 
-        ############################################################################
-
-    #    print_evolve_map(state_evolvation)
-    #    print('Final Map --------')
-        print_all(react, opp_emq, opp_hir, system)
-        print("MAximised value {} : EQM Opportunity {} {} in {} ".format(eqm_max_value, eqm_max_arg.action, eqm_max_arg.opportunity_type, eqm_max_arg.k))
-        print("MAximised value {} :  EQM + Intent Opportunity {} {} in {} ".format(hir_eqm_max_value, hir_eqm_max_arg.action, hir_eqm_max_arg.opportunity_type, hir_eqm_max_arg.k))
+    react = time.time()
+    opp_emq, opp_hir, state_evolvation, hashmap, reaction_time, intent_map_res, K = updateSituation(system)
+    react = time.time() - react
 
 
-        cur_state = system['env'].return_current_state()
-        cur_state_name = system['emq'].return_name_of_state(cur_state)
+    eqm_max_value, eqm_max_arg = executor(opp_emq)
+    oop = [*opp_emq, *opp_hir]
+    hir_eqm_max_value, hir_eqm_max_arg = executor(oop)
 
-        print("Intent Map: {}".format(intent_map_res))
 
-        print("Calculation Time -> {}".format(reaction_time))
-        print('Length = {}, {}'.format(len(state_evolvation[cur_state_name]),len(state_evolvation)))
-        print('K = {}'.format(K))
-            #graph(state_evolvation, copy.deepcopy(des), cur_state_name)
-    except Exception as e:
-        print("Main Exception")
-        print(e)
+    ############################################################################
+
+#    print('Final Map --------')
+    print_all(react, opp_emq, opp_hir, system)
+    print("MAximised value {} : EQM Opportunity {} {} in {} ".format(eqm_max_value, eqm_max_arg.action, eqm_max_arg.opportunity_type, eqm_max_arg.k))
+    print("MAximised value {} :  EQM + Intent Opportunity {} {} in {} ".format(hir_eqm_max_value, hir_eqm_max_arg.action, hir_eqm_max_arg.opportunity_type, hir_eqm_max_arg.k))
+
+    print("Evolve Map")
+    print_evolve_map(state_evolvation)
+    # print_hash_map(hashmap)
+
+    cur_state = system['env'].return_current_state()
+    cur_state_object = system['emq'].return_object_of_state(cur_state)
+
+    print("Intent Map: {}".format(intent_map_res))
+
+    print("Calculation Time -> {}".format(reaction_time))
+    print('Length = {}, {}'.format(len(state_evolvation[cur_state_object.name]),len(state_evolvation)))
+    print('K = {}'.format(K))
+    graph(state_evolvation, hashmap, cur_state_object.name)
+    # except Exception as e:
+    #     print("Main Exception")
+    #     print(e)
