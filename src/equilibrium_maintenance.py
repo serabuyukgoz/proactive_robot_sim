@@ -96,21 +96,6 @@ class Equilibrium_Maintenance():
             hashmap[name] = key_list
             return name, hashmap
 
-    def add_action_to_state_name(self, state_name, action):
-
-        #search state describtion from name
-        state = self.return_state_from_name(state_name)
-        if (state):
-            new_state = self.add_action_to_state(state, action)
-            new_state_name = self.return_name_of_state(new_state)
-
-            return new_state_name, new_state
-        elif (state == []):
-            return '', state
-
-        else:
-            raise Exception("ERR: State name is not found in hashmap, cannot add action to state, state name: %s , %s " %(state, state_name))
-
     def add_action_to_state(self, state, action):
         # add effect
         new_state = []
@@ -127,20 +112,6 @@ class Equilibrium_Maintenance():
             new_state = [i for i in new_state if i not in u] #remove the elements which named as not
 
         return copy.deepcopy(new_state)
-
-    def return_name_of_state(self, key):
-        for i in self.name_state_hash_map:
-            k = self.name_state_hash_map[i]
-            if (len(key) == len(k.state)):
-                if (all([x in k.state for x in key])):
-                    return k.name
-        return None
-
-    def return_state_from_name(self, name):
-        for i in self.name_state_hash_map:
-         if (name == self.name_state_hash_map[i].name):
-            return copy.deepcopy(self.name_state_hash_map[i].state)
-        return None
 
     def return_state_object_from_name(self, name):
         for i in self.name_state_hash_map:
