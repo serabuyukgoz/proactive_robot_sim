@@ -51,10 +51,12 @@ class OpportunityDetection():
                 map_look_aheads[s_prime] = []
                 for each_s in map_look_aheads[s]:
                     #print("... {}".format(each_s))
-                    if (each_s):
-                        linked_states = state_adj_map[each_s.name]
-                        for each_state in linked_states:
-                            map_look_aheads[s_prime].append(each_state)
+                    if (each_s): # if it is exist
+                        if(each_s.name in state_adj_map): #if it is part of the map
+                            linked_states = state_adj_map[each_s.name]
+                            for each_state in linked_states:
+                                map_look_aheads[s_prime].append(each_state)
+
             return copy.deepcopy(map_look_aheads[K])
 
 
