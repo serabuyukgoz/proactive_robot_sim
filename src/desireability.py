@@ -57,7 +57,6 @@ class CalculateDesireability():
             #     calculated_res = 1.0 #Intented State
             # else:
             #     calculated_res = self.desirable_situation[key]['value'] #which is value that set by user 0 for fatal, and 0.5 for half desire,
-            state_obj.setStateDesirability(calculated_res)
             status.append(calculated_res)
 
         def multiplyList(myList) :
@@ -68,6 +67,7 @@ class CalculateDesireability():
             return result
 
         #print("DES: State {} \n Desirability : {}".format(state, multiplyList(status)))
+        state_obj.setStateDesirability(calculated_res)
         return multiplyList(status)
 
     def degree_of_intetion_on_state(self, state, list_intent):
