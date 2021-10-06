@@ -126,7 +126,6 @@ class Equilibrium_Maintenance():
             new_state = new_state + w #add to element
             new_state = [i for i in new_state if i not in u] #remove the elements which named as not
 
-
         return copy.deepcopy(new_state)
 
     def return_name_of_state(self, key):
@@ -148,3 +147,18 @@ class Equilibrium_Maintenance():
          if (name == self.name_state_hash_map[i].name):
             return self.name_state_hash_map[i]
         return None
+
+    def return_object_of_state(self, key):
+        for i in self.name_state_hash_map:
+            k = self.name_state_hash_map[i]
+            if (len(key) == len(k.state)):
+                if (all([x in k.state for x in key])):
+                    return k
+
+        if (key == []):
+            return StateDefinition(None, [], -1)
+
+        name = ';'.join(key)
+        state_obj = StateDefinition(name, key, -1)
+        self.name_state_hash_map[name] = state_obj
+        return state_obj

@@ -14,33 +14,37 @@ class OpportunityDetection():
     def __init__(self, system):
         self.sys = system
 
-    def look_ahead_fuction(self, state_adj_map, cur_state, K):
+    def look_ahead_fuction(self, state_adj_map, cur_state_object, K):
+        '''
+            The function gather all the futher states from each other.
+        '''
         map_look_ahead = {}
-        map_look_ahead[0] = [cur_state]
+        map_look_ahead[0] = [cur_state_object]
 
         for k in range(K):
             real_key = k+1
             map_look_ahead[real_key] = []
-            for each in map_look_ahead[k]:
-                if (each):
-                    linked_states = state_adj_map[each.state]
+            for each_obj in map_look_ahead[k]:
+                if (each_obj):
+                    linked_states = state_adj_map[each_obj.name]
                     for each_state in linked_states:
+                        # Each_state is the state Object
                         map_look_ahead[real_key].append(each_state)
         return copy.deepcopy(map_look_ahead)
 
-    def fuction_of_K(self, K, cur_state, state_adj_map):
+    def fuction_of_K(self, K, cur_state_obj, state_adj_map):
 
         next_states = []
 
-        if (cur_state == None):
+        if (cur_state_obj.name == None):
             return next_states #retrun empty states
 
         if(K == 0):
-            next_states.append(cur_state)
+            next_states.append(cur_state_obj)
             return copy.deepcopy(next_states)
         else:
             map_look_aheads = {}
-            map_look_aheads[0] = [cur_state]
+            map_look_aheads[0] = [cur_state_obj]
 
             for s in range(K):
                 s_prime = s+1
@@ -48,75 +52,88 @@ class OpportunityDetection():
                 for each_s in map_look_aheads[s]:
                     #print("... {}".format(each_s))
                     if (each_s):
-                        linked_states = state_adj_map[each_s.state]
+                        linked_states = state_adj_map[each_s.name]
                         for each_state in linked_states:
                             map_look_aheads[s_prime].append(each_state)
             return copy.deepcopy(map_look_aheads[K])
 
 
-    def bnf(self, alpha, state):
+    # def bnf(self, alpha, state):
+    #     '''
+    #         Hypotetically adding action to state
+    #         Then find the desirability of the action
+    #     '''
+    #     # Y = alpha(X)
+    #     Y_state_name, Y_state = self.sys['emq'].add_action_to_state_name(state.name, alpha)
+    #
+    #
+    #     des_y = self.sys['emq'].des.stateDesirabilityValue(Y_state)
+    #
+    #
+    #     #To_debug
+    #     state_des = self.sys['emq'].return_state_from_name(state)
+    #     des = self.sys['emq'].des.stateDesirabilityValue(state_des)
+    #     return copy.deepcopy(des_y), des, Y_state
+
+    def bnf_calculation(self, alpha, state_obj):
         '''
             Hypotetically adding action to state
             Then find the desirability of the action
         '''
+        print('bnf_calculation state: {}'.format(state_obj))
         # Y = alpha(X)
-        Y_state_name, Y_state = self.sys['emq'].add_action_to_state_name(state, alpha)
-
-
-        des_y = self.sys['emq'].des.stateDesirabilityValue(Y_state)
-
+        Y_state = self.sys['emq'].add_action_to_state(state_obj.state, alpha)
+        Y_state_obj = self.sys['emq'].return_object_of_state(Y_state)
+        des_y = self.sys['emq'].des.stateDesirabilityValue(Y_state_obj)
 
         #To_debug
-        state_des = self.sys['emq'].return_state_from_name(state)
-        des = self.sys['emq'].des.stateDesirabilityValue(state_des)
+        des = self.sys['emq'].des.stateDesirabilityValue(state_obj)
         return copy.deepcopy(des_y), des, Y_state
 
-    def bnf_state(self, alpha, state_des):
+    def bnf_state(self, alpha, state_obj):
         '''
             Hypotetically adding action to state
             Then find the desirability of the action
         '''
-
-        des_map = self.sys['emq'].des.setUndesirabilityMap()
-
         # Y = alpha(X)
-        Y_state = self.sys['emq'].add_action_to_state(state_des, alpha)
-        des_y = self.sys['emq'].des.stateDesirabilityValue(Y_state)
+        print('BNF_state state: {}'.format(state_obj.name))
+        Y_state = self.sys['emq'].add_action_to_state(state_obj.state, alpha)
+        Y_state_obj = self.sys['emq'].return_object_of_state(Y_state)
+        des_y = self.sys['emq'].des.stateDesirabilityValue(Y_state_obj)
 
         return copy.deepcopy(des_y)
 
         #To_debug
-        state_des = self.sys['emq'].return_state_from_name(state)
-        des = self.sys['emq'].des.stateDesirabilityValue(state_des)
+        des = self.sys['emq'].des.stateDesirabilityValue(state_obj)
         return copy.deepcopy(des_y), des, Y_state
 
 
-    def bnf_k(self, alpha, state, K):
+    def bnf_k(self, alpha, state_obj, K):
 
         #To_debug
-        state_name = self.sys['emq'].return_state_from_name(state)
-        des = self.sys['emq'].des.stateDesirabilityValue(state_name)
-        print("How to set BNF(a,s,k): \n \t Action : %s  \n \t state : %s \n \t State Des: %s \n \t K : %s" %(alpha['name'], state_name, des, K))
+        print('BNF_k state: {}'.format(state_obj.name))
+        des = self.sys['emq'].des.stateDesirabilityValue(state_obj)
+        print("How to set BNF(a,s,k): \n \t Action : %s  \n \t state : %s \n \t State Des: %s \n \t K : %s" %(alpha['name'], state_obj.name, des, K))
 
         # Y = alpha(X)
-        Y_state_name, Y_state = self.sys['emq'].add_action_to_state_name(state, alpha)
-        print("\t Y_state: %s - %s " %(Y_state_name, Y_state))
+        Y_state = self.sys['emq'].add_action_to_state(state_obj.state, alpha)
+        Y_state_obj = self.sys['emq'].return_object_of_state(Y_state)
+        print("\t Y_state: %s - %s " %(Y_state_obj.name, Y_state_obj.state))
 
-        if(Y_state == []):
+        if(Y_state_obj.state == []):
             print(" \t bnf : 0 (action not applicable - no further state) ")
             print("-------------------------------------")
             return 0
 
         # F^k of Y
         state_adj_map = self.sys['emq'].return_evolve_map()
-        list_f_k = self.fuction_of_K(K, Y_state_name, state_adj_map)
+        list_f_k = self.fuction_of_K(K, Y_state_obj, state_adj_map)
         print("\t Prime States of Y -> %s" %list_f_k)
         des_y = []
-        for each_state in list_f_k:
-            each_state_name = self.sys['emq'].return_state_from_name(each_state.state)
-            res_y = self.sys['emq'].des.stateDesirabilityValue(each_state_name)
+        for each_state_obj in list_f_k:
+            res_y = self.sys['emq'].des.stateDesirabilityValue(each_state_obj)
             des_y.append(res_y)
-            print(" \t state_prime : %s \n \t s_prime des : %s " %(each_state_name, res_y))
+            print(" \t state_prime : %s \n \t s_prime des : %s " %(each_state_obj.name, res_y))
 
         # inf X elem dom(alpha, s)
 
@@ -133,7 +150,7 @@ class OpportunityDetection():
     def return_desirability_list(self, states):
         list_states_desirability = []
         for sts in states:
-            value = self.sys['emq'].des.stateDesirabilityValue(sts.state)
+            value = self.sys['emq'].des.stateDesirabilityValue(sts)
             list_states_desirability.append(value)
 
         return copy.deepcopy(list_states_desirability)
@@ -144,10 +161,11 @@ class OpportunityDetection():
         if (cur_state_name == "(Empty)"):
             raise Exception("Current State is Empty = []")
 
-        cur_state = self.sys['emq'].return_state_from_name(cur_state_name)
+        #cur_state = self.sys['emq'].return_state_from_name(cur_state_name)
+        cur_state_object = self.sys['emq'].return_state_object_from_name(cur_state_name)
 
         # cur_state_des = self.sys['emq'].des.stateDesirabilityValue(cur_state)
-        map_look_aheads = self.look_ahead_fuction(state_adj, cur_state_name, K)
+        map_look_aheads = self.look_ahead_fuction(state_adj, cur_state_object, K)
 
         list_oop = []
 
@@ -156,8 +174,8 @@ class OpportunityDetection():
                 future_states = map_look_aheads[k]
 
                 if (k == 0):
-                    bnf, dy, sy = self.bnf(action_scheme[action], future_states[0].state)
-                    cur_state_des = self.sys['emq'].des.stateDesirabilityValue(future_states[0].state)
+                    bnf, dy, sy = self.bnf_calculation(action_scheme[action], future_states[0])
+                    cur_state_des = self.sys['emq'].des.stateDesirabilityValue(future_states[0])
                     print("How to set BNF(a,s): \n \t BNF (DES_of_y) : %s \n \t DES : %s \n \t DES_of_prime : %s \n \tAction : %s \n \t State Y : %s \n \t State Prime : %s \n \t State : %s \n \t K : %s " %(str(bnf), str(cur_state_des), dy, action_scheme[action]['name'], sy, cur_state_name, cur_state_name, str(k)))
                     print("-------------------------------------")
                     oop0_alpha = self.oop_0(cur_state_des, bnf)
@@ -167,11 +185,11 @@ class OpportunityDetection():
                     list_bnf_state_prime = []
                     map_bnf_state_prime = {}
                     for each_state_prime in future_states:
-                        bnf_s, dy, sy = self.bnf(action_scheme[action], each_state_prime.state)
-                        print("How to set BNF(a,s): \n \t BNF (DES_of_y) : %s \n \t DES : %s \n \t DES_of_prime : %s \n \tAction : %s \n \t State Y : %s \n \t State Prime : %s \n \t State : %s \n \t K : %s " %(str(bnf_s), str(cur_state_des), dy, action_scheme[action]['name'], sy, each_state_prime.state, cur_state_name, str(k)))
+                        bnf_s, dy, sy = self.bnf_calculation(action_scheme[action], each_state_prime)
+                        print("How to set BNF(a,s): \n \t BNF (DES_of_y) : %s \n \t DES : %s \n \t DES_of_prime : %s \n \tAction : %s \n \t State Y : %s \n \t State Prime : %s \n \t State : %s \n \t K : %s " %(str(bnf_s), str(cur_state_des), dy, action_scheme[action]['name'], sy, each_state_prime, cur_state_name, str(k)))
                         print("-------------------------------------")
                         list_bnf_state_prime.append(bnf_s)
-                        map_bnf_state_prime[each_state_prime] = bnf_s
+                        map_bnf_state_prime[each_state_prime.name] = bnf_s
 
                     oop1_alpha = self.oop_1(cur_state_des, list_bnf_state_prime)
                     list_oop.append(Opportunity('oop1', action, cur_state_name, k, oop1_alpha))
@@ -186,7 +204,7 @@ class OpportunityDetection():
                     list_oop.append(Opportunity('oop4', action, cur_state_name, k, oop4_alpha))
 
                     # #More detail for calculate other opportunuties
-                    bnf_state_prime_k = self.bnf_k(action_scheme[action], cur_state_name, k)
+                    bnf_state_prime_k = self.bnf_k(action_scheme[action], cur_state_object, k)
                     des_latest_states = self.return_desirability_list(map_look_aheads[k])
 
                     oop5_alpha = self.oop_5(des_latest_states, bnf_state_prime_k)
@@ -223,8 +241,8 @@ class OpportunityDetection():
     def oop_3 (self, future_states):
         list_oop = []
         for each_state in future_states:
-            state_des = self.sys['emq'].return_state_from_name(each_state.state)
-            des = self.sys['emq'].des.stateDesirabilityValue(state_des)
+            state_obj = self.sys['emq'].return_state_object_from_name(each_state)
+            des = self.sys['emq'].des.stateDesirabilityValue(state_obj)
             undes = 1 - des
             bnf = future_states[each_state]
             #print('OOP_3 Details: \n state {} \n undes {} \n bnf {}'.format(each_state, undes, bnf) )
@@ -236,8 +254,8 @@ class OpportunityDetection():
     def oop_4 (self, future_states):
         list_oop = []
         for each_state in future_states:
-            state_des = self.sys['emq'].return_state_from_name(each_state.state)
-            des = self.sys['emq'].des.stateDesirabilityValue(state_des)
+            state_obj = self.sys['emq'].return_state_object_from_name(each_state)
+            des = self.sys['emq'].des.stateDesirabilityValue(state_obj)
             undes = 1 - des
             bnf = future_states[each_state]
             list_oop.append(min(undes, bnf))
@@ -264,15 +282,18 @@ class OpportunityDetection():
         if (cur_state == []):
             raise Exception("Current State is Empty = []")
 
+        cur_state_obj = self.sys['emq'].return_object_of_state(cur_state)
+
+        print('Cur State on {}'.format(cur_state_obj))
         list_oop = []
         for each_intent in intent_list:
             #for each_action in intent_list[each_intent]:
             each_action = intent_list[each_intent][0]
-            des = self.sys['emq'].des.stateDesirabilityValue(cur_state)
+            des = self.sys['emq'].des.stateDesirabilityValue(cur_state_obj)
             des = des - i #decreasing the desirability of the
 
             action_format = action_list[each_action]
-            bnf_res = self.bnf_state(action_format, cur_state)
+            bnf_res = self.bnf_state(action_format, cur_state_obj)
             if (bnf_res):
                 bnf = bnf_res + i #increading the desirability of action effecting state_des
 

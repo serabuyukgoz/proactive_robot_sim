@@ -23,7 +23,7 @@ class CalculateDesireability():
             }
         return copy.deepcopy(self.desirable_situation)
 
-    def stateDesirabilityValue(self, state):
+    def stateDesirabilityValue(self, state_obj):
         """
             If state is desirable for all rules, then state is undesirable == FALSE,
             otherwise state is desirable == TRUE
@@ -33,19 +33,22 @@ class CalculateDesireability():
         """
 
         # if state is empty, then there is no desirability, Which is 0
-        if (state == []):
+        if (state_obj.state == []):
             return 0
+
+        if (state_obj.desirability != -1):
+            return state_obj.desirability
 
         status = []
         #set desirability values
         for key in self.map_of_undesirable_situations:
-            insight = self.isDesirable(state, self.map_of_undesirable_situations[key]['rule'])
+            insight = self.isDesirable(state_obj.state, self.map_of_undesirable_situations[key]['rule'])
 
             calculated_res = int(insight) + ((1 - int(insight))*(self.map_of_undesirable_situations[key]['value']))
             status.append(calculated_res)
 
         for key in self.desirable_situation:
-            degree = self.degree_of_intetion_on_state(state, self.desirable_situation[key]['rule'])
+            degree = self.degree_of_intetion_on_state(state_obj.state, self.desirable_situation[key]['rule'])
             calculated_res = degree * self.desirable_situation[key]['value']
             if (degree == 0):
                 calculated_res = 1.0 #to prevent the make the desirable state undesirable
@@ -54,6 +57,7 @@ class CalculateDesireability():
             #     calculated_res = 1.0 #Intented State
             # else:
             #     calculated_res = self.desirable_situation[key]['value'] #which is value that set by user 0 for fatal, and 0.5 for half desire,
+            state_obj.setStateDesirability(calculated_res)
             status.append(calculated_res)
 
         def multiplyList(myList) :
