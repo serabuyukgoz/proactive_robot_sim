@@ -44,10 +44,12 @@ class Equilibrium_Maintenance():
         return self.map_of_states, self.name_state_hash_map
 
     def return_state_hash_map(self):
-        return copy.deepcopy(self.name_state_hash_map)
+        # return copy.deepcopy(self.name_state_hash_map)
+        return self.name_state_hash_map
 
     def return_evolve_map(self):
-        return copy.deepcopy(self.map_of_states)
+        # return copy.deepcopy(self.map_of_states)
+        return self.map_of_states
 
     # Probabilistic way to create evolve_map
     def create_evolve_map_define(self, current_state, action_list):
@@ -112,6 +114,45 @@ class Equilibrium_Maintenance():
             new_state = [i for i in new_state if i not in u] #remove the elements which named as not
 
         return copy.deepcopy(new_state)
+
+    def check_precondition(self, state, action):
+
+        wanted_precon, unwanted_precon = seperate_not_predicate(action['precondition'])
+        # if all precondition is in and also consider not :( if there is not then if not part is not belong to list
+        satisfied_wanted = all([x in state for x in wanted_precon])
+        satisfied_unwanted = all([elem not in state for elem in unwanted_precon])
+
+        return (satisfied_wanted and satisfied_unwanted)
+
+    def add_action(self, state, action):
+        new_state = []
+
+        #add effect to the state and return state
+        w, u = seperate_not_predicate(action['effect'])
+        new_state = copy.deepcopy(state)
+        new_state = new_state + w #add to element
+        new_state = [i for i in new_state if i not in u] #remove the elements whic
+
+        return copy.deepcopy(new_state)
+
+
+    # def add_action_now_effect_later(self, cur_state, future_state, action):
+    #     # add effect
+    #     new_state = []
+    #
+    #     wanted_precon, unwanted_precon = seperate_not_predicate(action['precondition'])
+    #     # if all precondition is in and also consider not :( if there is not then if not part is not belong to list
+    #     satisfied_wanted = all([x in cur_state for x in wanted_precon])
+    #     satisfied_unwanted = all([elem not in cur_state for elem in unwanted_precon])
+    #     if (satisfied_wanted and satisfied_unwanted):
+    #         #add effect to the state and return state
+    #         w, u = seperate_not_predicate(action['effect'])
+    #         new_state = copy.deepcopy(future_state)
+    #         new_state = new_state + w #add to element
+    #         new_state = [i for i in new_state if i not in u] #remove the elements which named as not
+    #
+    #     return copy.deepcopy(new_state)
+
 
     def return_state_object_from_name(self, name):
         for i in self.name_state_hash_map:

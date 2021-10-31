@@ -3,6 +3,12 @@ class CalculateDesireability():
     def __init__(self):
         self.map_of_undesirable_situations = {}
         self.desirable_situation = {}
+        self.des_map = {}
+        self.des_map_flag = False
+
+    def add_des_map(self, map):
+        self.des_map = map
+        self.des_map_flag = True
 
     def add_situation(self, situ, rule, value):
         """
@@ -32,43 +38,51 @@ class CalculateDesireability():
             decreases according to desireability of undesreable situations.
         """
 
-        # if state is empty, then there is no desirability, Which is 0
-        if (state_obj.state == []):
-            return 0
+        if(self.des_map_flag):
+            # print("Des Value of {} = {}".format(state_obj.name, self.des_map[state_obj.name]))
+            if (state_obj.name in self.des_map):
+                return self.des_map[state_obj.name]
+            else:
+                return 0
 
-        if (state_obj.desirability != -1):
-            return state_obj.desirability
+        else:
+            # if state is empty, then there is no desirability, Which is 0
+            if (state_obj.state == []):
+                return 0
 
-        status = []
-        #set desirability values
-        for key in self.map_of_undesirable_situations:
-            insight = self.isDesirable(state_obj.state, self.map_of_undesirable_situations[key]['rule'])
+            # if (state_obj.desirability != -1):
+            #     return state_obj.desirability
 
-            calculated_res = int(insight) + ((1 - int(insight))*(self.map_of_undesirable_situations[key]['value']))
-            status.append(calculated_res)
+            status = []
+            #set desirability values
+            for key in self.map_of_undesirable_situations:
+                insight = self.isDesirable(state_obj.state, self.map_of_undesirable_situations[key]['rule'])
 
-        for key in self.desirable_situation:
-            degree = self.degree_of_intetion_on_state(state_obj.state, self.desirable_situation[key]['rule'])
-            calculated_res = degree * self.desirable_situation[key]['value']
-            if (degree == 0):
-                calculated_res = 1.0 #to prevent the make the desirable state undesirable
-            # high_light = self.isIntended(state, self.desirable_situation[key]['rule'])
-            # if (high_light):
-            #     calculated_res = 1.0 #Intented State
-            # else:
-            #     calculated_res = self.desirable_situation[key]['value'] #which is value that set by user 0 for fatal, and 0.5 for half desire,
-            status.append(calculated_res)
+                calculated_res = int(insight) + ((1 - int(insight))*(self.map_of_undesirable_situations[key]['value']))
+                status.append(calculated_res)
 
-        def multiplyList(myList) :
-            # Multiply elements one by one
-            result = 1
-            for x in myList:
-                result = result * x
-            return result
+            for key in self.desirable_situation:
+                degree = self.degree_of_intetion_on_state(state_obj.state, self.desirable_situation[key]['rule'])
+                calculated_res = degree * self.desirable_situation[key]['value']
+                if (degree == 0):
+                    calculated_res = 1.0 #to prevent the make the desirable state undesirable
+                # high_light = self.isIntended(state, self.desirable_situation[key]['rule'])
+                # if (high_light):
+                #     calculated_res = 1.0 #Intented State
+                # else:
+                #     calculated_res = self.desirable_situation[key]['value'] #which is value that set by user 0 for fatal, and 0.5 for half desire,
+                status.append(calculated_res)
 
-        #print("DES: State {} \n Desirability : {}".format(state, multiplyList(status)))
-        state_obj.setStateDesirability(calculated_res)
-        return multiplyList(status)
+            def multiplyList(myList) :
+                # Multiply elements one by one
+                result = 1
+                for x in myList:
+                    result = result * x
+                return result
+
+            #print("DES: State {} \n Desirability : {}".format(state, multiplyList(status)))
+            state_obj.setStateDesirability(calculated_res)
+            return multiplyList(status)
 
     def degree_of_intetion_on_state(self, state, list_intent):
         """
