@@ -150,10 +150,9 @@ def updateSituation(system):
 
     K = 2
 
-    evolve_map, hashmap_state, des_map, bnf_map = evolve_map_creation()
+    evolve_map, hashmap_state, des_map = evolve_map_creation()
     system['emq'].set_env(evolve_map, hashmap_state)
     system['emq'].des.add_des_map(des_map)
-    system['emq'].des.add_bnf_map(bnf_map)
 
     hashmap_state = system['emq'].return_state_hash_map()
     evolve_map = system['emq'].return_evolve_map()
@@ -347,39 +346,39 @@ def evolve_map_creation():
     des_map['S4.0'] = 0
     des_map['S4.1'] = 0.4
 
-    des_map['S0.cb'] = 0.5
-    des_map['S0.cbp'] = 0.5
-    des_map['S0.cr'] = 0.5
-    des_map['S0.cwb'] = 0.5
-    des_map['S0.ct'] = 0.5
-    des_map['S0.cc'] = 0.5
-    des_map['S0.cs'] = 0.5
-    des_map['S0.ch'] = 0.5
-    des_map['S0.cd'] = 0.5
-    des_map['S0.o'] = 1.0
+    des_map['S0.cb'] = 0.01
+    des_map['S0.cbp'] = 0.01
+    des_map['S0.cr'] = 0.01
+    des_map['S0.cwb'] = 0.01
+    des_map['S0.ct'] = 0.01
+    des_map['S0.cc'] = 0.01
+    des_map['S0.cs'] = 0.01
+    des_map['S0.ch'] = 0.01
+    des_map['S0.cd'] = 0.01
+    des_map['S0.o'] = 0.01
 
-    des_map['S1.0.cwb'] = 0.5
-    des_map['S1.0.cb'] = 0.5
-    des_map['S1.0.cr'] = 0.5
-    des_map['S1.0.ct'] = 0.5
-    des_map['S1.0.cc'] = 0.5
-    des_map['S1.0.cs'] = 0.5
-    des_map['S1.0.ch'] = 0.5
-    des_map['S1.0.cd'] = 0.5
+    des_map['S1.0.cwb'] = 0.01
+    des_map['S1.0.cb'] = 0.01
+    des_map['S1.0.cr'] = 0.01
+    des_map['S1.0.ct'] = 0.01
+    des_map['S1.0.cc'] = 0.01
+    des_map['S1.0.cs'] = 0.01
+    des_map['S1.0.ch'] = 0.01
+    des_map['S1.0.cd'] = 0.01
     des_map['S1.0.dc'] = 1.0
-    des_map['S1.0.o'] = 0.4
+    des_map['S1.0.o'] = 0.01
 
-    des_map['S1.1.cbp'] =  0.6
-    des_map['S1.1.cb'] =  0.6
-    des_map['S1.1.cr'] =  0.6
-    des_map['S1.1.cwb'] =  0.6
-    des_map['S1.1.ct'] =  0.6
-    des_map['S1.1.cc'] =  0.6
-    des_map['S1.1.cs'] =  0.6
-    des_map['S1.1.ch'] =  0.6
-    des_map['S1.1.cd'] =  0.6
+    des_map['S1.1.cbp'] =  0.01
+    des_map['S1.1.cb'] =  0.01
+    des_map['S1.1.cr'] =  0.01
+    des_map['S1.1.cwb'] =  0.01
+    des_map['S1.1.ct'] =  0.01
+    des_map['S1.1.cc'] =  0.01
+    des_map['S1.1.cs'] =  0.01
+    des_map['S1.1.ch'] =  0.01
+    des_map['S1.1.cd'] =  0.01
     des_map['S1.1.dc'] = 1.0
-    des_map['S1.1.o'] =  0.6
+    des_map['S1.1.o'] =  0.01
 
     des_map['S2.0.cwb'] = 0.01
     des_map['S2.0.cb'] = 0.01
@@ -408,33 +407,33 @@ def evolve_map_creation():
     # des_map['S2.y.cs'] = 0.5
     # des_map['S2.y.o'] = 0.5
 
-    des_map['S2.1.cb'] = 0.5
-    des_map['S2.1.cr'] = 0.5
-    des_map['S2.1.cbp'] = 0.5
-    des_map['S2.1.cwb'] = 0.5
-    des_map['S2.1.ct'] = 0.5
-    des_map['S2.1.cc'] = 0.5
-    des_map['S2.1.ch'] = 0.5
-    des_map['S2.1.cd'] = 0.5
-    des_map['S2.1.o'] = 0.5
+    des_map['S2.1.cb'] = 0.01
+    des_map['S2.1.cr'] = 0.01
+    des_map['S2.1.cbp'] = 0.01
+    des_map['S2.1.cwb'] = 0.01
+    des_map['S2.1.ct'] = 0.01
+    des_map['S2.1.cc'] = 0.01
+    des_map['S2.1.ch'] = 0.01
+    des_map['S2.1.cd'] = 0.01
+    des_map['S2.1.o'] = 0.01
 
-    des_map['S3.0.ct'] = 0.5
-    des_map['S3.0.cr'] = 0.5
-    des_map['S3.0.cb'] = 0.5
-    des_map['S3.0.cs'] = 0.5
-    des_map['S3.0.ch'] = 0.5
-    des_map['S3.0.cd'] = 0.5
-    des_map['S3.0.o'] = 0.5
+    des_map['S3.0.ct'] = 0.01
+    des_map['S3.0.cr'] = 0.01
+    des_map['S3.0.cb'] = 0.01
+    des_map['S3.0.cs'] = 0.01
+    des_map['S3.0.ch'] = 0.01
+    des_map['S3.0.cd'] = 0.01
+    des_map['S3.0.o'] = 0.01
 
-    des_map['S3.1.cb'] = 0.5
-    des_map['S3.1.cbp'] = 0.5
-    des_map['S3.1.r'] = 0.5
-    des_map['S3.1.cwb'] = 0.5
-    des_map['S3.1.cc'] = 0.5
-    des_map['S3.1.o'] = 0.5
-    des_map['S3.1.cr'] = 0.5
-    des_map['S3.1.ch'] = 0.5
-    des_map['S3.1.cd'] = 0.5
+    des_map['S3.1.cb'] = 0.01
+    des_map['S3.1.cbp'] = 0.01
+    des_map['S3.1.r'] = 0.01
+    des_map['S3.1.cwb'] = 0.01
+    des_map['S3.1.cc'] = 0.01
+    des_map['S3.1.o'] = 0.01
+    des_map['S3.1.cr'] = 0.01
+    des_map['S3.1.ch'] = 0.01
+    des_map['S3.1.cd'] = 0.01
 
     des_map['S4.0.safe'] = 1.0
     des_map['S4.0.cbp'] = 0.01
@@ -448,153 +447,27 @@ def evolve_map_creation():
     des_map['S4.0.cd'] = 0.1
 
     des_map['S4.1.safe'] = 1.0
-    des_map['S4.1.cb'] = 0.1
-    des_map['S4.1.cbp'] = 0.1
-    des_map['S4.1.cr'] = 0.1
-    des_map['S4.1.cwb'] = 0.1
-    des_map['S4.1.ct'] = 0.1
-    des_map['S4.1.cc'] = 0.1
-    des_map['S4.1.cs'] = 0.1
-    des_map['S4.1.ch'] = 0.1
-    des_map['S4.1.cd'] = 0.1
+    des_map['S4.1.cb'] = 0.01
+    des_map['S4.1.cbp'] = 0.01
+    des_map['S4.1.cr'] = 0.01
+    des_map['S4.1.cwb'] = 0.01
+    des_map['S4.1.ct'] = 0.01
+    des_map['S4.1.cc'] = 0.01
+    des_map['S4.1.cs'] = 0.01
+    des_map['S4.1.ch'] = 0.01
+    des_map['S4.1.cd'] = 0.01
 
-    des_map['S0.safe'] = 1.0
-    des_map['S1.0.safe'] = 0.6
-    des_map['S1.1.safe'] = 0.6
-    des_map['S2.0.safe'] = 1.0
-    des_map['S2.x.safe'] = 1.0
-    des_map['S2.y.safe'] = 1.0
-    des_map['S2.1.safe'] = 1.0
-    des_map['S3.0.safe'] = 1.0
-    des_map['S3.1.safe'] = 1.0
-    des_map['S4.0.safe'] = 1.0
-    des_map['S4.1.safe'] = 1.0
+    des_map['S0.safe'] = 0
+    des_map['S1.0.safe'] = 0
+    des_map['S1.1.safe'] = 0
+    des_map['S2.0.safe'] = 0
+    des_map['S2.x.safe'] = 0
+    des_map['S2.y.safe'] = 0
+    des_map['S2.1.safe'] = 0
+    des_map['S3.0.safe'] = 0
+    des_map['S3.1.safe'] = 0
 
-    ############################
-    bnf_map['S0.cb'] = 0.01
-    bnf_map['S0.cbp'] = 0.01
-    bnf_map['S0.cr'] = 0.01
-    bnf_map['S0.cwb'] = 0.01
-    bnf_map['S0.ct'] = 0.01
-    bnf_map['S0.cc'] = 0.01
-    bnf_map['S0.cs'] = 0.01
-    bnf_map['S0.ch'] = 0.01
-    bnf_map['S0.cd'] = 0.01
-    bnf_map['S0.o'] = 1.0
-
-    bnf_map['S1.0.cwb'] = 0.01
-    bnf_map['S1.0.cb'] = 0.01
-    bnf_map['S1.0.cr'] = 0.01
-    bnf_map['S1.0.ct'] = 0.01
-    bnf_map['S1.0.cc'] = 0.01
-    bnf_map['S1.0.cs'] = 0.01
-    bnf_map['S1.0.ch'] = 0.01
-    bnf_map['S1.0.cd'] = 0.01
-    bnf_map['S1.0.dc'] = 1.0
-    bnf_map['S1.0.o'] = 0.4
-
-    bnf_map['S1.1.cbp'] =  0.01
-    bnf_map['S1.1.cb'] =  0.01
-    bnf_map['S1.1.cr'] =  0.01
-    bnf_map['S1.1.cwb'] =  0.01
-    bnf_map['S1.1.ct'] =  0.01
-    bnf_map['S1.1.cc'] =  0.01
-    bnf_map['S1.1.cs'] =  0.01
-    bnf_map['S1.1.ch'] =  0.01
-    bnf_map['S1.1.cd'] =  0.01
-    bnf_map['S1.1.dc'] = 1.0
-    bnf_map['S1.1.o'] =  0.6
-
-    bnf_map['S2.0.cwb'] = 0.01
-    bnf_map['S2.0.cb'] = 0.01
-    bnf_map['S2.0.cr'] = 0.01
-    bnf_map['S2.0.ct'] = 0.01
-    bnf_map['S2.0.cs'] = 0.01
-    bnf_map['S2.0.o'] = 0.01
-    bnf_map['S2.0.ch'] = 0.01
-    bnf_map['S2.0.cd'] = 0.01
-
-    # des_map['S2.x.cb'] = 0.5
-    # des_map['S2.x.cbp'] = 0.5
-    # des_map['S2.x.cr'] = 0.5
-    # des_map['S2.x.cwb'] = 0.5
-    # des_map['S2.x.ct'] = 0.5
-    # des_map['S2.x.cc'] = 0.5
-    # des_map['S2.x.cs'] = 0.5
-    # des_map['S2.x.o'] = 0.5
-    #
-    # des_map['S2.y.cb'] = 0.5
-    # des_map['S2.y.cbp'] = 0.5
-    # des_map['S2.y.cr'] = 0.5
-    # des_map['S2.y.cwb'] = 0.5
-    # des_map['S2.y.ct'] = 0.5
-    # des_map['S2.y.cc'] = 0.5
-    # des_map['S2.y.cs'] = 0.5
-    # des_map['S2.y.o'] = 0.5
-
-    bnf_map['S2.1.cb'] = 0.01
-    bnf_map['S2.1.cr'] = 0.01
-    bnf_map['S2.1.cbp'] = 0.01
-    bnf_map['S2.1.cwb'] = 0.01
-    bnf_map['S2.1.ct'] = 0.01
-    bnf_map['S2.1.cc'] = 0.01
-    bnf_map['S2.1.ch'] = 0.01
-    bnf_map['S2.1.cd'] = 0.01
-    bnf_map['S2.1.o'] = 0.01
-
-    bnf_map['S3.0.ct'] = 0.01
-    bnf_map['S3.0.cr'] = 0.01
-    bnf_map['S3.0.cb'] = 0.01
-    bnf_map['S3.0.cs'] = 0.01
-    bnf_map['S3.0.ch'] = 0.01
-    bnf_map['S3.0.cd'] = 0.01
-    bnf_map['S3.0.o'] = 0.01
-
-    bnf_map['S3.1.cb'] = 0.01
-    bnf_map['S3.1.cbp'] = 0.01
-    bnf_map['S3.1.r'] = 0.01
-    bnf_map['S3.1.cwb'] = 0.01
-    bnf_map['S3.1.cc'] = 0.01
-    bnf_map['S3.1.o'] = 0.01
-    bnf_map['S3.1.cr'] = 0.01
-    bnf_map['S3.1.ch'] = 0.01
-    bnf_map['S3.1.cd'] = 0.01
-
-    bnf_map['S4.0.safe'] = 1.0
-    bnf_map['S4.0.cbp'] = 0.01
-    bnf_map['S4.0.cr'] = 0.01
-    bnf_map['S4.0.cb'] = 0.01
-    bnf_map['S4.0.cwb'] = 0.01
-    bnf_map['S4.0.ct'] = 0.01
-    bnf_map['S4.0.cc'] = 0.01
-    bnf_map['S4.0.cs'] = 0.01
-    bnf_map['S4.0.ch'] = 0.01
-    bnf_map['S4.0.cd'] = 0.01
-
-    bnf_map['S4.1.safe'] = 1.0
-    bnf_map['S4.1.cb'] = 0.01
-    bnf_map['S4.1.cbp'] = 0.01
-    bnf_map['S4.1.cr'] = 0.01
-    bnf_map['S4.1.cwb'] = 0.01
-    bnf_map['S4.1.ct'] = 0.01
-    bnf_map['S4.1.cc'] = 0.01
-    bnf_map['S4.1.cs'] = 0.01
-    bnf_map['S4.1.ch'] = 0.01
-    bnf_map['S4.1.cd'] = 0.01
-
-    bnf_map['S0.safe'] = 0
-    bnf_map['S1.0.safe'] = 0
-    bnf_map['S1.1.safe'] = 0
-    bnf_map['S2.0.safe'] = 0
-    bnf_map['S2.x.safe'] = 0
-    bnf_map['S2.y.safe'] = 0
-    bnf_map['S2.1.safe'] = 0
-    bnf_map['S3.0.safe'] = 0
-    bnf_map['S3.1.safe'] = 0
-    bnf_map['S4.0.safe'] = 1.0
-    bnf_map['S4.1.safe'] = 1.0
-
-    return evolve_map, hash_map, des_map, bnf_map
+    return evolve_map, hash_map, des_map
 
 def executor(opp_emq):
     maxy = max(node.opportunity for node in opp_emq)
@@ -632,22 +505,22 @@ if __name__ =='__main__':
 
     #s1.0
 
-    # # # add change in the world
+    # # add change in the world
+    # # # # #
+    # system['env'].add_state_change("(not (breakfast user))")
+    # system['env'].add_state_change("(dishes_dirty)")
+    # system['env'].add_state_change("(gathered user backpack)")
     # #
-    system['env'].add_state_change("(not (breakfast user))")
-    system['env'].add_state_change("(dishes_dirty)")
-    system['env'].add_state_change("(gathered user backpack)")
-    # # #
     # # #s2.0
-    # #
-    # #add change in the world
-    system['env'].add_state_change("(not (dishes_dirty))")
-    system['env'].add_state_change("(gathered user compass)")
     # # #
+    # # #add change in the world
+    # system['env'].add_state_change("(not (dishes_dirty))")
+    # system['env'].add_state_change("(gathered user compass)")
+    # # # #
     # # # # S3.0
-    # system['env'].add_state_change("(not (current_weather sunshine))")
-    # system['env'].add_state_change("(current_weather cloudy)")
-    system['env'].add_state_change("(gathered user water_bottle)")
+    # # system['env'].add_state_change("(not (current_weather sunshine))")
+    # # system['env'].add_state_change("(current_weather cloudy)")
+    # system['env'].add_state_change("(gathered user water_bottle)")
 
 
     react = time.time()

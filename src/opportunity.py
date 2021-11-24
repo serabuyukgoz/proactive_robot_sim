@@ -69,7 +69,7 @@ class OpportunityDetection():
         # Y = alpha(X)
         Y_state = self.sys['emq'].add_action_to_state(state_obj.state, alpha)
         Y_state_obj = self.sys['emq'].return_object_of_state(Y_state)
-        des_y = self.sys['emq'].des.stateBenefitValue(Y_state_obj)
+        des_y = self.sys['emq'].des.stateDesirabilityValue(Y_state_obj)
 
         #return copy.deepcopy(des_y)
 
@@ -95,7 +95,7 @@ class OpportunityDetection():
                 des_prime = self.sys['emq'].des.stateDesirabilityValue(each_state_obj)
                 Y_state = self.sys['emq'].add_action(each_state_obj.state, alpha)
                 Y_state_obj = self.sys['emq'].return_object_of_state(Y_state)
-                Y_des = self.sys['emq'].des.stateBenefitValue(Y_state_obj)
+                Y_des = self.sys['emq'].des.stateDesirabilityValue(Y_state_obj)
                 # des = Y_des - des_prime
                 des = Y_des
                 des_y.append(des)
@@ -110,7 +110,7 @@ class OpportunityDetection():
         else:
             print(" \t min_bnf : %s " %(min(des_y)))
             print("-------------------------------------")
-            return max(des_y)
+            return min(des_y)
 
     def return_desirability_list(self, states):
         list_states_desirability = []
@@ -211,30 +211,6 @@ class OpportunityDetection():
         #print('OOP_2 Undes : {}, Bnf : {} , Oop : {}'.format(undes, bnf, oop))
         return oop
 
-    # def oop_3 (self, future_states):
-    #     list_oop = []
-    #     for each_state in future_states:
-    #         state_obj = self.sys['emq'].return_state_object_from_name(each_state)
-    #         des = self.sys['emq'].des.stateDesirabilityValue(state_obj)
-    #         undes = 1 - des
-    #         bnf = future_states[each_state]
-    #         #print('OOP_3 Details: \n state {} \n undes {} \n bnf {}'.format(each_state, undes, bnf) )
-    #         list_oop.append(min(undes, bnf))
-    #     oop = max(list_oop)
-    #     #print('OOP_3 List: {} , Oop : {}'.format(list_oop, oop))
-    #     return oop
-    #
-    # def oop_4 (self, future_states):
-    #     list_oop = []
-    #     for each_state in future_states:
-    #         state_obj = self.sys['emq'].return_state_object_from_name(each_state)
-    #         des = self.sys['emq'].des.stateDesirabilityValue(state_obj)
-    #         undes = 1 - des
-    #         bnf = future_states[each_state]
-    #         list_oop.append(min(undes, bnf))
-    #     oop = min(list_oop)
-    #     #print('OOP_4 List: {} , Oop : {}'.format(list_oop, oop))
-    #     return oop
 
     def oop_3 (self, future_states, action):
         list_oop = []

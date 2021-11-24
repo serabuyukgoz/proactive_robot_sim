@@ -5,14 +5,10 @@ class CalculateDesireability():
         self.desirable_situation = {}
         self.des_map = {}
         self.des_map_flag = False
-        self.bnf_map = {}
 
     def add_des_map(self, map):
         self.des_map = map
         self.des_map_flag = True
-
-    def add_bnf_map(self, map):
-        self.bnf_map = map
 
     def add_situation(self, situ, rule, value):
         """
@@ -32,21 +28,6 @@ class CalculateDesireability():
                 'value' : set_value
             }
         return copy.deepcopy(self.desirable_situation)
-
-    def stateBenefitValue(self, state_obj):
-        """
-            If state is desirable for all rules, then state is undesirable == FALSE,
-            otherwise state is desirable == TRUE
-
-            It is a fuzzy (probabilistic) description of desirability. State desirability
-            decreases according to desireability of undesreable situations.
-        """
-
-            # print("Des Value of {} = {}".format(state_obj.name, self.des_map[state_obj.name]))
-        if (state_obj.name in self.bnf_map):
-            return self.bnf_map[state_obj.name]
-        else:
-            return 0
 
 
     def stateDesirabilityValue(self, state_obj):
