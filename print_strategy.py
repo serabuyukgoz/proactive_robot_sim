@@ -61,9 +61,9 @@ def print_des(dct):
             print(" \t \t State : {} ".format(a['state']))
             print(" \t \t Desireability Value : {} ".format(a['value']))
 
-def print_evolve_map(dct):
+def print_evolve_map(dct, des):
     for item, amount in dct.items():
-        print(" -- {} :".format(item))
+        print(" -- {} : = {} ".format(item, des[item].desirability))
         for a in amount:
             print(" \t -> {} = {} ".format(a.name, a.desirability))
 
