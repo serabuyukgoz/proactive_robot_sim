@@ -69,13 +69,14 @@ class OpportunityDetection():
         # Y = alpha(X)
         Y_state = self.sys['emq'].add_action_to_state(state_obj.state, alpha)
         Y_state_obj = self.sys['emq'].return_object_of_state(Y_state)
-        des_y = self.sys['emq'].des.stateDesirabilityValue(Y_state_obj)
+        des_y = self.sys['emq'].des.stateBenefitValue(Y_state_obj)
 
         #return copy.deepcopy(des_y)
 
         #To_debug
         des = self.sys['emq'].des.stateDesirabilityValue(state_obj)
-        des_r = des_y - des
+        # des_r = des_y - des
+        des_r = des_y
         return copy.deepcopy(des_r), des, Y_state
 
     def bnf_k(self, alpha, state_obj, future_states):
@@ -94,8 +95,9 @@ class OpportunityDetection():
                 des_prime = self.sys['emq'].des.stateDesirabilityValue(each_state_obj)
                 Y_state = self.sys['emq'].add_action(each_state_obj.state, alpha)
                 Y_state_obj = self.sys['emq'].return_object_of_state(Y_state)
-                Y_des = self.sys['emq'].des.stateDesirabilityValue(Y_state_obj)
-                des = Y_des - des_prime
+                Y_des = self.sys['emq'].des.stateBenefitValue(Y_state_obj)
+                # des = Y_des - des_prime
+                des = Y_des
                 des_y.append(des)
                 print(" \t state_prime : %s \n \t s_prime des : %s = %s - %s" %(each_state_obj.name, des, Y_des, des_prime))
 
@@ -108,7 +110,7 @@ class OpportunityDetection():
         else:
             print(" \t min_bnf : %s " %(min(des_y)))
             print("-------------------------------------")
-            return min(des_y)
+            return max(des_y)
 
     def return_desirability_list(self, states):
         list_states_desirability = []
