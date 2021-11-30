@@ -53,3 +53,10 @@ class Intention():
                 intent_map[i].append(temp)
 
         return intent_list, intent_map, minval
+
+    #Action Selection
+    def select_action_to_play(self, plan):
+        els = list(plan)
+        strs = "Robot said : You should " + str(plan[els[0]][0])
+
+        return strs
