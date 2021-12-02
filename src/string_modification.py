@@ -37,8 +37,7 @@ def list_of_precondition(precon):
 
 # to link reach each variable as a parameter
 def specify_parameters(parameter_map):
-
-    print("Parameter Map =: {}".format(parameter_map))
+    
     list_map = []
     for key in parameter_map:
         temp = []
