@@ -30,6 +30,38 @@ class CalculateDesireability():
         return copy.deepcopy(self.desirable_situation)
 
 
+    def stateDesirabilityValueActionApplied(self, state_obj, alpha_state_obj):
+
+        if (state_obj.desirability == -1):
+            state_des = self.stateDesirabilityValue(state_obj)
+
+        if (alpha_state_obj.desirability == -1):
+            alpha_state_des = self.stateDesirabilityValue(alpha_state_obj)
+
+        print("Des alpha(x) CHECK -> \n \t State: {} \n {} \n \t State a applied: {} \n {}  ".format(state_obj.desirability, state_obj.name, alpha_state_obj.desirability, alpha_state_obj.name))
+
+        if (state_obj.desirability == alpha_state_obj.desirability):
+            #BNF, applied alpha has no effect
+            print("Des alpha(x) CHECK: 0")
+            return 0
+        #
+        # if (alpha_state_obj.desirability > state_obj.desirability):
+        #     #BNF, applied alpha has positive effect
+        #     print("Des alpha(x) CHECK: {}".format(alpha_state_obj.desirability - state_obj.desirability))
+        #     return alpha_state_obj.desirability - state_obj.desirability
+
+        elif (alpha_state_obj.desirability == -1):
+            print("Des alpha(x) CHECK: 0")
+            return 0 #no state to apply
+
+        else:
+            #BNF, applied alpha has negative effect
+            print("Des alpha(x) CHECK: {}".format(alpha_state_obj.desirability))
+            return alpha_state_obj.desirability
+
+
+
+
     def stateDesirabilityValue(self, state_obj):
         """
             If state is desirable for all rules, then state is undesirable == FALSE,
@@ -40,6 +72,7 @@ class CalculateDesireability():
         """
 
         if(self.des_map_flag):
+            print('IN DES MAP')
             # print("Des Value of {} = {}".format(state_obj.name, self.des_map[state_obj.name]))
             if (state_obj.name in self.des_map):
                 return self.des_map[state_obj.name]
@@ -82,8 +115,9 @@ class CalculateDesireability():
                 return result
 
             #print("DES: State {} \n Desirability : {}".format(state, multiplyList(status)))
-            state_obj.setStateDesirability(calculated_res)
-            return multiplyList(status)
+            des = multiplyList(status)
+            state_obj.setStateDesirability(des)
+            return des
 
     def degree_of_intetion_on_state(self, state, list_intent):
         """

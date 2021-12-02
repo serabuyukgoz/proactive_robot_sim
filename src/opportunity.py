@@ -1,4 +1,5 @@
 from src.string_modification import *
+from print_strategy import *
 
 class Opportunity():
     def __init__(self, opportunity_type, action, state, k, oop_deg):
@@ -65,11 +66,11 @@ class OpportunityDetection():
             Hypotetically adding action to state
             Then find the desirability of the action
         '''
-        print('bnf_calculation state: {}'.format(state_obj))
+        # print('bnf_calculation state: {}'.format(state_obj.name))
         # Y = alpha(X)
         Y_state = self.sys['emq'].add_action_to_state(state_obj.state, alpha)
         Y_state_obj = self.sys['emq'].return_object_of_state(Y_state)
-        des_y = self.sys['emq'].des.stateDesirabilityValue(Y_state_obj)
+        des_y = self.sys['emq'].des.stateDesirabilityValueActionApplied(state_obj, Y_state_obj)
 
         #return copy.deepcopy(des_y)
 
@@ -83,7 +84,7 @@ class OpportunityDetection():
 
         des_y = []
 
-        print("How to set BNF(a,s,k): \n \t Action : %s  \n \t state : %s" %(alpha['name'], state_obj.name))
+        # print("How to set BNF(a,s,k): \n \t Action : %s  \n \t state : %s" %(alpha.name, state_obj.name))
 
         #check precondirion
         check_flag = self.sys['emq'].check_precondition(state_obj.state, alpha)
@@ -95,21 +96,21 @@ class OpportunityDetection():
                 des_prime = self.sys['emq'].des.stateDesirabilityValue(each_state_obj)
                 Y_state = self.sys['emq'].add_action(each_state_obj.state, alpha)
                 Y_state_obj = self.sys['emq'].return_object_of_state(Y_state)
-                Y_des = self.sys['emq'].des.stateDesirabilityValue(Y_state_obj)
+                Y_des = self.sys['emq'].des.stateDesirabilityValueActionApplied(each_state_obj, Y_state_obj)
                 # des = Y_des - des_prime
                 des = Y_des
                 des_y.append(des)
-                print(" \t state_prime : %s \n \t s_prime des : %s = %s - %s" %(each_state_obj.name, des, Y_des, des_prime))
+                # print(" \t state_prime : %s \n \t s_prime des : %s = %s - %s" %(each_state_obj.name, des, Y_des, des_prime))
 
         # inf X elem dom(alpha, s)
 
         if (des_y == []):
-            print(" \t min_bnf zero : 0 ")
-            print("-------------------------------------")
+            # print(" \t min_bnf zero : 0 ")
+            # print("-------------------------------------")
             return 0
         else:
-            print(" \t min_bnf : %s " %(min(des_y)))
-            print("-------------------------------------")
+            # print(" \t min_bnf : %s " %(min(des_y)))
+            # print("-------------------------------------")
             return min(des_y)
 
     def return_desirability_list(self, states):
@@ -140,8 +141,8 @@ class OpportunityDetection():
                 if (k == 0):
                     bnf, dy, sy = self.bnf_calculation(action_scheme[action], future_states[0])
                     cur_state_des = self.sys['emq'].des.stateDesirabilityValue(future_states[0])
-                    print("How to set BNF(a,s): \n \t BNF (DES_of_y) : %s \n \t DES : %s \n \t DES_of_prime : %s \n \tAction : %s \n \t State Y : %s \n \t State Prime : %s \n \t State : %s \n \t K : %s " %(str(bnf), str(cur_state_des), dy, action_scheme[action]['name'], sy, cur_state_object.name, cur_state_object.name, str(k)))
-                    print("-------------------------------------")
+                    # print("How to set BNF(a,s): \n \t BNF (DES_of_y) : %s \n \t DES : %s \n \t DES_of_prime : %s \n \tAction : %s \n \t State Y : %s \n \t State Prime : %s \n \t State : %s \n \t K : %s " %(str(bnf), str(cur_state_des), dy, action_scheme[action]['name'], sy, cur_state_object.name, cur_state_object.name, str(k)))
+                    # print("-------------------------------------")
                     oop0_alpha = self.oop_0(cur_state_des, bnf)
                     list_oop.append(Opportunity('oop0', action, cur_state_object.name, k, oop0_alpha))
 
@@ -150,8 +151,8 @@ class OpportunityDetection():
                     list_bnf_state_prime = []
                     for each_state_prime in future_states:
                         bnf_s, dy, sy = self.bnf_calculation(action_scheme[action], each_state_prime)
-                        print("How to set BNF(a,s): \n \t BNF (DES_of_y) : %s \n \t DES : %s \n \t DES_of_prime : %s \n \tAction : %s \n \t State Y : %s \n \t State Prime : %s \n \t State : %s \n \t K : %s " %(str(bnf_s), str(cur_state_des), dy, action_scheme[action]['name'], sy, each_state_prime.name, cur_state_object.name, str(k)))
-                        print("-------------------------------------")
+                        # print("How to set BNF(a,s): \n \t BNF (DES_of_y) : %s \n \t DES : %s \n \t DES_of_prime : %s \n \tAction : %s \n \t State Y : %s \n \t State Prime : %s \n \t State : %s \n \t K : %s " %(str(bnf_s), str(cur_state_des), dy, action_scheme[action]['name'], sy, each_state_prime.name, cur_state_object.name, str(k)))
+                        # print("-------------------------------------")
                         list_bnf_state_prime.append(bnf_s)
 
 
@@ -268,8 +269,8 @@ class OpportunityDetection():
 
         cur_state_obj = self.sys['emq'].return_object_of_state(cur_state)
 
-        print('Cur State on {}'.format(cur_state_obj))
         list_oop = []
+
         for each_intent in intent_list:
             #for each_action in intent_list[each_intent]:
             each_action = intent_list[each_intent][0]
