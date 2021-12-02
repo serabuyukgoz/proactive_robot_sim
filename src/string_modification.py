@@ -9,16 +9,18 @@ def return_parameter(param):
     param = param.replace(" -", "")
     pp = param.split(" ")
     parameter = {}
-
     #Clear empty parameters
+
+    order = []
     for all in pp:
         all = re.sub(r"\s+", "", all)
         if (all != ""):
             name = pp.pop(0)
             value = pp.pop(0)
             parameter[name] = value
+            order.append(name)
 
-    return copy.deepcopy(parameter)
+    return copy.deepcopy(parameter), order
 
 # precondition satisfied
 def list_of_precondition(precon):
@@ -36,6 +38,7 @@ def list_of_precondition(precon):
 # to link reach each variable as a parameter
 def specify_parameters(parameter_map):
 
+    print("Parameter Map =: {}".format(parameter_map))
     list_map = []
     for key in parameter_map:
         temp = []

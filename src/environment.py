@@ -300,10 +300,9 @@ class Environment():
         listed_action = {}
 
         for key in action_list:
-            #print(key, "->" ,action_list[key])
             action = action_list[key]
             #action part
-            list_parameter = return_parameter(action.parameter)
+            list_parameter, order = return_parameter(action.parameter)
             map_parameters = {**self.constant_dictionary, **self.objects_dictionary} #merge two dictionary
 
             for x in list_parameter:
@@ -317,17 +316,20 @@ class Environment():
 
             for each_parameter in ll_parameters:
                 #check scenario for each parameter
-                lists = [each_parameter[x] for x in each_parameter]
+                #lists = [each_parameter[x] for x in each_parameter]
+                lists = [each_parameter[x] for x in order]
+                # print('Lists -> {}'.format(lists))
                 parameter = ' '.join(lists)
                 name_of_action = '(' + action.name + ' ' + parameter + ')'
                 #print('======== {} ======'.format(name_of_action))
                 #but first turn update precondition
                 each_precon = turn_precondition(each_parameter, ll_precon)
                 each_effect = turn_precondition(each_parameter, ll_effect)
-                listed_action[name_of_action] = {
-                    'name' : name_of_action,
-                    'precondition' : each_precon,
-                    'effect' : each_effect
-                }
+                # listed_action[name_of_action] = {
+                #     'name' : name_of_action,
+                #     'precondition' : each_precon,
+                #     'effect' : each_effect
+                # }
+                listed_action[name_of_action] = ActionType("", parameter, each_precon, each_effect, name_of_action)
 
         return copy.deepcopy(listed_action)
