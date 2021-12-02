@@ -1,6 +1,6 @@
-def print_all(react, opp, opp_int, system):
+def print_all(opp, opp_int, system):
     print("-----------------------------------------------")
-    print("Reaction time in millisec %s" %react )
+    # print("Reaction time in millisec %s" %react )
     print("--- For Equilibrium Maintenance ----")
     #return desirability Function
     #print("Desirability Function -> %s " %(system['recogniser'].return_desirability_value()))
@@ -45,7 +45,7 @@ def print_act(dct):
 def print_robot_act(dct):
     for item, amount in dct.items():
         print(" + {}".format(item))
-        print(" \t Precondition : {} \n \t Effect : {}".format(amount['precondition'], amount['effect']))
+        print(" \t Precondition : {} \n \t Effect : {}".format(amount.precondition, amount.effect))
 
 def print_oop(dct):
     for item in dct:
@@ -61,11 +61,16 @@ def print_des(dct):
             print(" \t \t State : {} ".format(a['state']))
             print(" \t \t Desireability Value : {} ".format(a['value']))
 
-def print_evolve_map(dct, des):
+def print_evolve_map(dct):
     for item, amount in dct.items():
-        print(" -- {} : = {} ".format(item, des[item].desirability))
+        print(" -- {} : ".format(item))
         for a in amount:
             print(" \t -> {} = {} ".format(a.name, a.desirability))
+# def print_evolve_map(dct, des):
+#     for item, amount in dct.items():
+#         print(" -- {} : = {} ".format(item, des[item].desirability))
+#         for a in amount:
+#             print(" \t -> {} = {} ".format(a.name, a.desirability))
 
 def print_hash_map(dct):
     for item, a in dct.items():
