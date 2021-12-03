@@ -276,10 +276,14 @@ class OpportunityDetection():
             each_action = intent_list[each_intent][0]
             des = self.sys['emq'].des.stateDesirabilityValue(cur_state_obj)
             des = des - i #decreasing the desirability of the
+            if (des < 0):
+                des = 0
 
             action_format = action_list[each_action]
             bnf_res, d, y  = self.bnf_calculation(action_format, cur_state_obj)
             bnf = bnf_res + i #increading the desirability of action effecting state_des
+            if (bnf > 1.0):
+                bnf = 1.0
 
             oop_deg = self.oop_0(des, bnf)
             list_oop.append(Opportunity('oop0', each_action, cur_state_obj.name, 0, oop_deg))
