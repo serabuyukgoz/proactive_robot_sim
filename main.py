@@ -222,11 +222,11 @@ def free_map():
                                '(not (gathered user book))',
                                '(not (gathered user remote))',
                                '(not (gathered user hat))',
-                               '(not (gathered user dog))'],['(gathered user sugar)'])]]
+                               '(not (gathered user dog))'],['(gathered user hat)'])]]
     rules[3] = [[Situation(['(temp 2)'], ['(not (temp 2))', '(temp 3)']) ,
                 Situation(['(current_weather sunshine)'], ['(not (current_weather sunshine))', '(current_weather cloudy)']),
                 Situation(['(gathered user backpack)', '(gathered user compass)'], ['(gathered user water_bottle)']),
-                Situation(['(gathered user sugar)'], ['(gathered user tea)'])
+                Situation(['(gathered user hat)'], ['(gathered user dog)'])
                 ]]
     rules[4] = [[Situation(['(temp 3)'], ['(not (temp 3))', '(temp 4)']) ,
                 Situation(['(and (not ((warned user))) (not (outside user)))'], ['(outside user)']),
@@ -298,18 +298,18 @@ if __name__ =='__main__':
     #
     # #s2.0
     # #
-    # #add change in the world
-    system['env'].add_state_change("(not (temp 1))")
-    system['env'].add_state_change("(temp 2)")
-    system['env'].add_state_change("(not (dishes_dirty))")
-    system['env'].add_state_change("(gathered user compass)")
-    # # #
-    # # # S3.0
-    system['env'].add_state_change("(not (temp 2))")
-    system['env'].add_state_change("(temp 3)")
-    system['env'].add_state_change("(not (current_weather sunshine))")
-    system['env'].add_state_change("(current_weather cloudy)")
-    system['env'].add_state_change("(gathered user water_bottle)")
+    # # #add change in the world
+    # system['env'].add_state_change("(not (temp 1))")
+    # system['env'].add_state_change("(temp 2)")
+    # system['env'].add_state_change("(not (dishes_dirty))")
+    # system['env'].add_state_change("(gathered user compass)")
+    # # # #
+    # # # # S3.0
+    # system['env'].add_state_change("(not (temp 2))")
+    # system['env'].add_state_change("(temp 3)")
+    # system['env'].add_state_change("(not (current_weather sunshine))")
+    # system['env'].add_state_change("(current_weather cloudy)")
+    # system['env'].add_state_change("(gathered user water_bottle)")
 
     opp_emq, opp_hir, state_evolvation, hashmap, intent_map_res, K = updateSituation(system)
 

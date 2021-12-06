@@ -70,7 +70,8 @@ class OpportunityDetection():
         # Y = alpha(X)
         Y_state = self.sys['emq'].add_action_to_state(state_obj.state, alpha)
         Y_state_obj = self.sys['emq'].return_object_of_state(Y_state)
-        des_y = self.sys['emq'].des.stateDesirabilityValueActionApplied(state_obj, Y_state_obj)
+        # des_y = self.sys['emq'].des.stateDesirabilityValueActionApplied(state_obj, Y_state_obj)
+        des_y = self.sys['emq'].des.stateDesirabilityValue(Y_state_obj)
 
         #return copy.deepcopy(des_y)
 
@@ -96,7 +97,9 @@ class OpportunityDetection():
                 des_prime = self.sys['emq'].des.stateDesirabilityValue(each_state_obj)
                 Y_state = self.sys['emq'].add_action(each_state_obj.state, alpha)
                 Y_state_obj = self.sys['emq'].return_object_of_state(Y_state)
-                Y_des = self.sys['emq'].des.stateDesirabilityValueActionApplied(each_state_obj, Y_state_obj)
+                # Y_des = self.sys['emq'].des.stateDesirabilityValueActionApplied(each_state_obj, Y_state_obj)
+                Y_des = self.sys['emq'].des.stateDesirabilityValue(Y_state_obj)
+
                 # des = Y_des - des_prime
                 des = Y_des
                 des_y.append(des)
