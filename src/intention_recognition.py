@@ -10,12 +10,13 @@ class Intention():
         self.planner = planner
 
     def recognize_intentions(self, list_of_goals, domain, problem):
-    #Create map of all plan and goal
 
+        #Create map of all plan and goal
         for e in list_of_goals:
             plan = self.planner.run_planning(domain, problem[e])
             self.plan_map[e] = plan
 
+        #find intent
         intent_list = self.intention_selection(self.plan_map)
         return intent_list
 
@@ -55,8 +56,9 @@ class Intention():
         return intent_list, intent_map, minval
 
     #Action Selection
-    def select_action_to_play(self, plan):
-        els = list(plan)
-        strs = "Robot said : You should " + str(plan[els[0]][0])
-
-        return strs
+    def hir(self, G):
+        if (len(G) == 1 ):
+            for each in G:
+                return G[each][0], each, G[each] #first element of the plans
+        else:
+            return '', '', [] #return empty string
