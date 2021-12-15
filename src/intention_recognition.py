@@ -61,4 +61,4 @@ class Intention():
             for each in G:
                 return G[each][0], each, G[each] #first element of the plans
         else:
-            return '', '', [] #return empty string
+            return None, None, None #return empty string

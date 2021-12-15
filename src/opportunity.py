@@ -241,6 +241,9 @@ class OpportunityDetection():
         if (cur_state == []):
             raise Exception("Current State is Empty = []")
 
+        if (intented_action == None):
+            return []
+
         cur_state_obj = self.sys['emq'].return_object_of_state(cur_state)
 
         des = self.sys['emq'].des.stateDesirabilityValue(cur_state_obj)
