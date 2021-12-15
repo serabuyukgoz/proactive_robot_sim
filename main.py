@@ -121,7 +121,7 @@ def create_world_state(system):
 
     #ALSO add what is undesired situations to define which state will be undesired!
     system['emq'].des.add_situation('get_wet', ['(current_weather rainy)' , '(outside user)'], 0.4)
-    system['emq'].des.add_situation('get_hurt', ['(current_weather hail)' , '(outside user)'], 0.0)
+    system['emq'].des.add_situation('get_hurt', ['(current_weather hail)' , '(outside user)'], 0.001)
     system['emq'].des.add_situation('dirt_dishes', ['(dishes_dirty)'], 0.6)
     # system['emq'].des.add_situation('collect_backpack', ['(gathered pepper backpack)'], 0.01)
     # system['emq'].des.add_situation('collect_compass', ['(gathered pepper compass)'], 0.01)
@@ -149,7 +149,8 @@ def updateSituation(system):
         - intent_map = Map of intent and plan to reach
         - dynamic_k = length of plan
     '''
-    intent, intent_map, dynamic_k = system['recogniser'].recognize_intentions(list_of_goals, domain_name, problem_name)
+    intent_list, intent_map, dynamic_k = system['recogniser'].recognize_intentions(list_of_goals, domain_name, problem_name)
+    intended_action, intention, intention_plan = system['recogniser'].hir(intent_map)
 
     act_robot = system['env'].return_robot_action_list()
     unvoluntary_action_list = system['env'].return_unvoluntary_action_list()
@@ -164,17 +165,15 @@ def updateSituation(system):
     '''
 
     #Define intention recogniton as opportunity
-    effect_size_of_hir = 0.5 #desirability value
+    effect_size_of_hir = 0.2 #desirability value
 
     K = 2
     #
-    # evolve_map, hashmap_state, des_map = evolve_map_creation()
-    # system['emq'].set_env(evolve_map, hashmap_state)
-    # system['emq'].des.add_des_map(des_map)
-    #
-    # hashmap_state = system['emq'].return_state_hash_map()
-    # evolve_map = system['emq'].return_evolve_map()
-    # setDesirability(hashmap_state, des_map)
+    hashmap_state, des_map = set_des_map()
+    system['emq'].set_hashmap(hashmap_state, des_map)
+    system['emq'].des.add_des_map(des_map)
+
+    hashmap_state = system['emq'].return_state_hash_map()
 
     free_map_data = free_map()
     evolve_map = system['emq'].fuction_F_k(free_map_data, cur_state)
@@ -187,7 +186,7 @@ def updateSituation(system):
     print("--------------------------------")
     print_evolve_map(evolve_map)
 
-    oop_intent = system['emq'].oop.set_as_oop(intent_map, cur_state, defined_action, effect_size_of_hir)
+    oop_intent = system['emq'].oop.set_as_oop(intended_action, cur_state, defined_action, effect_size_of_hir)
 
     ###########
 
@@ -198,10 +197,289 @@ def updateSituation(system):
 
     return opp_eqm, oop_intent, evolve_map, hashmap_state, intent_map, K
 
-def setDesirability(hashmap_state, des):
-    for each_state in hashmap_state:
-        each_state_object = hashmap_state[each_state]
-        each_state_object.setStateDesirability(des[each_state_object.name])
+def set_des_map():
+
+    hash_map = {}
+    des_map ={}
+
+
+    hash_map['S0'] = ['(temp 0)', '(current_weather sunshine)', '(current_time morning)', '(breakfast user)']
+    hash_map['S1.0'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(dishes_dirty)']
+    hash_map['S1.1'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(dishes_dirty)']
+    hash_map['S2.0'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)']
+
+    hash_map['S2.x'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(book_reading user)']
+    hash_map['S2.y'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(watch_tv user)']
+    hash_map['S2.1'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user hat)']
+    hash_map['S3.0'] = ['(temp 3)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered user water_bottle)']
+    hash_map['S3.1'] = ['(temp 3)', '(current_weather sunshine)', '(current_time morning)', '(gathered user sugar)', '(gathered user tea)']
+
+    hash_map['S4.0'] = ['(current_weather hail)', '(current_time noon)', '(outside user)']
+
+    hash_map['S4.1'] = ['(current_weather rainy)', '(current_time noon)', '(outside user)']
+
+
+    hash_map['S0.safe'] = ['(temp 0)','(current_weather sunshine)', '(current_time morning)', '(breakfast user)', '(warned user)']
+    hash_map['S1.0.safe'] = ['(temp 1)','(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(dishes_dirty)', '(warned user)']
+    hash_map['S1.1.safe'] = ['(temp 1)','(current_weather sunshine)', '(current_time morning)', '(dishes_dirty)', '(warned user)']
+    hash_map['S2.0.safe'] = ['(temp 2)','(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(warned user)']
+
+    hash_map['S2.x.safe'] = ['(temp 2)','(current_weather sunshine)', '(current_time morning)', '(book_reading user)', '(warned user)']
+    hash_map['S2.y.safe'] = ['(temp 2)','(current_weather sunshine)', '(current_time morning)', '(watch_tv user)', '(warned user)']
+    hash_map['S2.1.safe'] = ['(temp 2)','(current_weather sunshine)', '(current_time morning)', '(gathered user sugar)', '(warned user)']
+    hash_map['S3.0.safe'] = ['(temp 2)','(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered user water_bottle)', '(warned user)']
+    hash_map['S3.1.safe'] = ['(temp 2)','(current_weather sunshine)', '(current_time morning)', '(gathered user sugar)', '(gathered user tea)', '(warned user)']
+
+    hash_map['S0.cbp'] = ['(temp 0)','(current_weather sunshine)', '(current_time morning)', '(breakfast user)' , '(gathered robot backpack)']
+    hash_map['S0.cb'] = ['(temp 0)','(current_weather sunshine)', '(current_time morning)', '(breakfast user)' , '(gathered robot book)']
+    hash_map['S0.cr'] = ['(temp 0)','(current_weather sunshine)', '(current_time morning)', '(breakfast user)' , '(gathered robot remote)']
+    hash_map['S0.cwb'] = ['(temp 0)','(current_weather sunshine)', '(current_time morning)', '(breakfast user)' , '(gathered robot water_bottle)']
+    hash_map['S0.ct'] = ['(temp 0)','(current_weather sunshine)', '(current_time morning)', '(breakfast user)' , '(gathered robot tea)']
+    hash_map['S0.cc'] = ['(temp 0)','(current_weather sunshine)', '(current_time morning)', '(breakfast user)' , '(gathered robot compass)']
+    hash_map['S0.cs'] = ['(temp 0)','(current_weather sunshine)', '(current_time morning)', '(breakfast user)' , '(gathered robot sugar)']
+    hash_map['S0.ch'] = ['(temp 0)','(current_weather sunshine)', '(current_time morning)', '(breakfast user)' , '(gathered robot hat)']
+    hash_map['S0.cd'] = ['(temp 0)','(current_weather sunshine)', '(current_time morning)', '(breakfast user)' , '(gathered robot dog)']
+    hash_map['S0.o'] = ['(temp 0)','(current_weather sunshine)', '(current_time morning)', '(breakfast user)' , '(outside user)']
+
+    hash_map['S1.0.cwb'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(dishes_dirty)', '(gathered robot water_bottle)']
+    hash_map['S1.0.ct'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(dishes_dirty)', '(gathered robot tea)']
+    hash_map['S1.0.cc'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(dishes_dirty)', '(gathered robot compass)']
+    hash_map['S1.0.cs'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(dishes_dirty)', '(gathered robot sugar)']
+    hash_map['S1.0.dc'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)']
+    hash_map['S1.0.cb'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(dishes_dirty)', '(gathered robot book)']
+    hash_map['S1.0.cr'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(dishes_dirty)', '(gathered robot remote)']
+    hash_map['S1.0.ch'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(dishes_dirty)', '(gathered robot hat)']
+    hash_map['S1.0.cd'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(dishes_dirty)', '(gathered robot dog)']
+    hash_map['S1.0.o'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(dishes_dirty)', '(outside user)']
+
+    hash_map['S1.1.cbp'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(dishes_dirty)' , '(gathered robot backpack)']
+    hash_map['S1.1.cb'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(dishes_dirty)' , '(gathered robot book)']
+    hash_map['S1.1.cb'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(dishes_dirty)' , '(gathered robot remote)']
+    hash_map['S1.1.cwb'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(dishes_dirty)', '(gathered robot water_bottle)']
+    hash_map['S1.1.ct'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(dishes_dirty)', '(gathered robot tea)']
+    hash_map['S1.1.cc'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(dishes_dirty)', '(gathered robot compass)']
+    hash_map['S1.1.cs'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(dishes_dirty)', '(gathered robot sugar)']
+    hash_map['S1.1.dc'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)']
+    hash_map['S1.1.ch'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(dishes_dirty)', '(gathered robot hat)']
+    hash_map['S1.1.cd'] = ['(temp 1)', '(current_weather sunshine)', '(current_time morning)', '(dishes_dirty)', '(gathered robot dog)']
+
+    hash_map['S2.0.cwb'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered robot water_bottle)']
+    hash_map['S2.0.ct'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered robot tea)']
+    hash_map['S2.0.cs'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered robot sugar)']
+    hash_map['S2.0.cb'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered robot book)']
+    hash_map['S2.0.cr'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered robot remote)']
+    hash_map['S2.0.ch'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered robot hat)']
+    hash_map['S2.0.cd'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered robot dog)']
+
+    # hash_map['S2.x.cbp'] = ['(current_weather sunshine)', '(current_time morning)', '(book_reading user)', '(gathered robot backpack)']
+    # hash_map['S2.x.cb'] = ['(current_weather sunshine)', '(current_time morning)', '(book_reading user)', '(gathered robot book)']
+    # hash_map['S2.x.cr'] = ['(current_weather sunshine)', '(current_time morning)', '(book_reading user)', '(gathered robot remote)']
+    # hash_map['S2.x.cwb'] = ['(current_weather sunshine)', '(current_time morning)', '(book_reading user)', '(gathered robot water_bottle)']
+    # hash_map['S2.x.ct'] = ['(current_weather sunshine)', '(current_time morning)', '(book_reading user)', '(gathered robot tea)']
+    # hash_map['S2.x.cc'] = ['(current_weather sunshine)', '(current_time morning)', '(book_reading user)', '(gathered robot compass)']
+    # hash_map['S2.x.cs'] = ['(current_weather sunshine)', '(current_time morning)', '(book_reading user)', '(gathered robot sugar)']
+    # hash_map['S2.x.o'] = ['(current_weather sunshine)', '(current_time morning)', '(book_reading user)', '(outside user)']
+    # hash_map['S2.x.ch'] = ['(current_weather sunshine)', '(current_time morning)', '(book_reading user)', '(gathered robot hat)']
+    # hash_map['S2.x.cd'] = ['(current_weather sunshine)', '(current_time morning)', '(book_reading user)', '(gathered robot dog)']
+    #
+    # hash_map['S2.y.cbp'] = ['(current_weather sunshine)', '(current_time morning)', '(watch_tv user)', '(gathered robot backpack)']
+    # hash_map['S2.y.cb'] = ['(current_weather sunshine)', '(current_time morning)', '(watch_tv user)', '(gathered robot book)']
+    # hash_map['S2.y.cr'] = ['(current_weather sunshine)', '(current_time morning)', '(watch_tv user)', '(gathered robot remote)']
+    # hash_map['S2.y.cwb'] = ['(current_weather sunshine)', '(current_time morning)', '(watch_tv user)', '(gathered robot water_bottle)']
+    # hash_map['S2.y.ct'] = ['(current_weather sunshine)', '(current_time morning)', '(watch_tv user)', '(gathered robot tea)']
+    # hash_map['S2.y.cc'] = ['(current_weather sunshine)', '(current_time morning)', '(watch_tv user)', '(gathered robot compass)']
+    # hash_map['S2.y.cs'] = ['(current_weather sunshine)', '(current_time morning)', '(watch_tv user)', '(gathered robot sugar)']
+    # hash_map['S2.y.o'] = ['(current_weather sunshine)', '(current_time morning)', '(watch_tv user)', '(outside user)']
+    # hash_map['S2.y.ch'] = ['(current_weather sunshine)', '(current_time morning)', '(watch_tv user)', '(gathered robot hat)']
+    # hash_map['S2.y.cd'] = ['(current_weather sunshine)', '(current_time morning)', '(watch_tv user)', '(gathered robot dog)']
+
+    hash_map['S2.1.cbp'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user hat)', '(gathered robot backpack)']
+    hash_map['S2.1.cwb'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user hat)', '(gathered robot water_bottle)']
+    hash_map['S2.1.ct'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user hat)', '(gathered robot tea)']
+    hash_map['S2.1.cc'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user hat)', '(gathered robot compass)']
+    hash_map['S2.1.o'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user hat)', '(outside user)']
+    hash_map['S2.1.cb'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user hat)', '(gathered robot book)']
+    hash_map['S2.1.cr'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user hat)', '(gathered robot remote)']
+    hash_map['S2.1.ch'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user hat)', '(gathered robot hat)']
+    hash_map['S2.1.cd'] = ['(temp 2)', '(current_weather sunshine)', '(current_time morning)', '(gathered user hat)', '(gathered robot dog)']
+
+    hash_map['S3.0.ct'] = ['(temp 3)','(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered user water_bottle)', '(gathered robot tea)']
+    hash_map['S3.0.cs'] = ['(temp 3)','(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered user water_bottle)', '(gathered robot sugar)']
+    hash_map['S3.0.o'] = ['(temp 3)','(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered user water_bottle)', '(outside user)']
+    hash_map['S3.0.cb'] = ['(temp 3)','(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered user water_bottle)', '(gathered robot book)']
+    hash_map['S3.0.cr'] = ['(temp 3)','(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered user water_bottle)', '(gathered robot remote)']
+    hash_map['S3.0.ch'] = ['(temp 3)','(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered user water_bottle)', '(gathered robot hat)']
+    hash_map['S3.0.cd'] = ['(temp 3)','(current_weather sunshine)', '(current_time morning)', '(gathered user backpack)', '(gathered user compass)', '(gathered user water_bottle)', '(gathered robot dog)']
+
+
+    hash_map['S3.1.cbp'] = ['(temp 3)','(current_weather sunshine)', '(current_time morning)', '(gathered user sugar)', '(gathered user tea)', '(gathered robot backpack)']
+    hash_map['S3.1.cwb'] = ['(temp 3)','(current_weather sunshine)', '(current_time morning)', '(gathered user sugar)', '(gathered user tea)', '(gathered robot water_bottle)']
+    hash_map['S3.1.cc'] = ['(temp 3)','(current_weather sunshine)', '(current_time morning)', '(gathered user sugar)', '(gathered user tea)', '(gathered robot compass)']
+    hash_map['S3.1.o'] = ['(temp 3)','(current_weather sunshine)', '(current_time morning)', '(gathered user sugar)', '(gathered user tea)', '(outside user)']
+    hash_map['S3.1.cb'] = ['(temp 3)','(current_weather sunshine)', '(current_time morning)', '(gathered user sugar)', '(gathered user tea)', '(gathered robot book)']
+    hash_map['S3.1.cr'] = ['(temp 3)','(current_weather sunshine)', '(current_time morning)', '(gathered user sugar)', '(gathered user tea)', '(gathered robot remote)']
+    hash_map['S3.1.ch'] = ['(temp 3)','(current_weather sunshine)', '(current_time morning)', '(gathered user sugar)', '(gathered user tea)', '(gathered robot hat)']
+    hash_map['S3.1.cd'] = ['(temp 3)', '(current_weather sunshine)', '(current_time morning)', '(gathered user sugar)', '(gathered user tea)', '(gathered robot dog)']
+
+    hash_map['S4.0'] = ['(temp 4)', '(current_weather hail)', '(current_time noon)', '(outside user)']
+    hash_map['S4.0.safe'] = ['(temp 4)', '(current_weather hail)', '(current_time noon)', '(warned user)']
+    hash_map['S4.0.cbp'] = ['(temp 4)', '(current_weather hail)', '(current_time noon)', '(outside user)', '(gathered robot backpack)']
+    hash_map['S4.0.cwb'] = ['(temp 4)', '(current_weather hail)', '(current_time noon)', '(outside user)', '(gathered robot water_bottle)']
+    hash_map['S4.0.ct'] = ['(temp 4)', '(current_weather hail)', '(current_time noon)', '(outside user)', '(gathered robot tea)']
+    hash_map['S4.0.cc'] = ['(temp 4)', '(current_weather hail)', '(current_time noon)', '(outside user)', '(gathered robot compass)']
+    hash_map['S4.0.cs'] = ['(temp 4)', '(current_weather hail)', '(current_time noon)', '(outside user)', '(gathered robot sugar)']
+    hash_map['S4.0.cb'] = ['(temp 4)', '(current_weather hail)', '(current_time noon)', '(outside user)', '(gathered robot book)']
+    hash_map['S4.0.cr'] = ['(temp 4)', '(current_weather hail)', '(current_time noon)', '(outside user)', '(gathered robot remote)']
+    hash_map['S4.0.ch'] = ['(temp 4)', '(current_weather hail)', '(current_time noon)', '(outside user)', '(gathered robot hat)']
+    hash_map['S4.0.cd'] = ['(temp 4)', '(current_weather hail)', '(current_time noon)', '(outside user)', '(gathered robot dog)']
+
+    hash_map['S4.1'] = ['(temp 4)', '(current_weather rainy)', '(current_time noon)', '(outside user)']
+    hash_map['S4.1.safe'] = ['(temp 4)','(current_weather rainy)', '(current_time noon)', '(warned user)']
+    hash_map['S4.1.cbp'] = ['(temp 4)','(current_weather rainy)', '(current_time noon)', '(outside user)', '(gathered robot backpack)']
+    hash_map['S4.1.cwb'] = ['(temp 4)','(current_weather rainy)', '(current_time noon)', '(outside user)', '(gathered robot water_bottle)']
+    hash_map['S4.1.ct'] = ['(temp 4)','(current_weather rainy)', '(current_time noon)', '(outside user)', '(gathered robot tea)']
+    hash_map['S4.1.cc'] = ['(temp 4)','(current_weather rainy)', '(current_time noon)', '(outside user)', '(gathered robot compass)']
+    hash_map['S4.1.cs'] = ['(temp 4)','(current_weather rainy)', '(current_time noon)', '(outside user)', '(gathered robot sugar)']
+    hash_map['S4.1.cb'] = ['(temp 4)','(current_weather rainy)', '(current_time noon)', '(outside user)', '(gathered robot book)']
+    hash_map['S4.1.cr'] = ['(temp 4)','(current_weather rainy)', '(current_time noon)', '(outside user)', '(gathered robot remote)']
+    hash_map['S4.1.ch'] = ['(temp 4)','(current_weather rainy)', '(current_time noon)', '(outside user)', '(gathered robot hat)']
+    hash_map['S4.1.cd'] = ['(temp 4)','(current_weather rainy)', '(current_time noon)', '(outside user)', '(gathered robot dog)']
+
+
+    des_map['S0'] = 1.0
+    des_map['S1.0'] = 0.6
+    des_map['S1.1'] = 0.6
+    des_map['S2.0'] = 1.0
+    des_map['S2.x'] = 1.0
+    des_map['S2.y'] = 1.0
+    des_map['S2.1'] = 1.0
+    des_map['S3.0'] = 1.0
+    des_map['S3.1'] = 1.0
+    des_map['S4.0'] = 0
+    des_map['S4.1'] = 0.4
+
+    des_map['S0.cb'] = 0.01
+    des_map['S0.cbp'] = 0.01
+    des_map['S0.cr'] = 0.01
+    des_map['S0.cwb'] = 0.01
+    des_map['S0.ct'] = 0.01
+    des_map['S0.cc'] = 0.01
+    des_map['S0.cs'] = 0.01
+    des_map['S0.ch'] = 0.01
+    des_map['S0.cd'] = 0.01
+    des_map['S0.o'] = 0.01
+
+    des_map['S1.0.cwb'] = 0.01
+    des_map['S1.0.cb'] = 0.01
+    des_map['S1.0.cr'] = 0.01
+    des_map['S1.0.ct'] = 0.01
+    des_map['S1.0.cc'] = 0.01
+    des_map['S1.0.cs'] = 0.01
+    des_map['S1.0.ch'] = 0.01
+    des_map['S1.0.cd'] = 0.01
+    des_map['S1.0.dc'] = 1.0
+    des_map['S1.0.o'] = 0.01
+
+    des_map['S1.1.cbp'] =  0.01
+    des_map['S1.1.cb'] =  0.01
+    des_map['S1.1.cr'] =  0.01
+    des_map['S1.1.cwb'] =  0.01
+    des_map['S1.1.ct'] =  0.01
+    des_map['S1.1.cc'] =  0.01
+    des_map['S1.1.cs'] =  0.01
+    des_map['S1.1.ch'] =  0.01
+    des_map['S1.1.cd'] =  0.01
+    des_map['S1.1.dc'] = 1.0
+    des_map['S1.1.o'] =  0.01
+
+    des_map['S2.0.cwb'] = 0.01
+    des_map['S2.0.cb'] = 0.01
+    des_map['S2.0.cr'] = 0.01
+    des_map['S2.0.ct'] = 0.01
+    des_map['S2.0.cs'] = 0.01
+    des_map['S2.0.o'] = 0.01
+    des_map['S2.0.ch'] = 0.01
+    des_map['S2.0.cd'] = 0.01
+
+    # des_map['S2.x.cb'] = 0.5
+    # des_map['S2.x.cbp'] = 0.5
+    # des_map['S2.x.cr'] = 0.5
+    # des_map['S2.x.cwb'] = 0.5
+    # des_map['S2.x.ct'] = 0.5
+    # des_map['S2.x.cc'] = 0.5
+    # des_map['S2.x.cs'] = 0.5
+    # des_map['S2.x.o'] = 0.5
+    #
+    # des_map['S2.y.cb'] = 0.5
+    # des_map['S2.y.cbp'] = 0.5
+    # des_map['S2.y.cr'] = 0.5
+    # des_map['S2.y.cwb'] = 0.5
+    # des_map['S2.y.ct'] = 0.5
+    # des_map['S2.y.cc'] = 0.5
+    # des_map['S2.y.cs'] = 0.5
+    # des_map['S2.y.o'] = 0.5
+
+    des_map['S2.1.cb'] = 0.01
+    des_map['S2.1.cr'] = 0.01
+    des_map['S2.1.cbp'] = 0.01
+    des_map['S2.1.cwb'] = 0.01
+    des_map['S2.1.ct'] = 0.01
+    des_map['S2.1.cc'] = 0.01
+    des_map['S2.1.ch'] = 0.01
+    des_map['S2.1.cd'] = 0.01
+    des_map['S2.1.o'] = 0.01
+
+    des_map['S3.0.ct'] = 0.01
+    des_map['S3.0.cr'] = 0.01
+    des_map['S3.0.cb'] = 0.01
+    des_map['S3.0.cs'] = 0.01
+    des_map['S3.0.ch'] = 0.01
+    des_map['S3.0.cd'] = 0.01
+    des_map['S3.0.o'] = 0.01
+
+    des_map['S3.1.cb'] = 0.01
+    des_map['S3.1.cbp'] = 0.01
+    des_map['S3.1.r'] = 0.01
+    des_map['S3.1.cwb'] = 0.01
+    des_map['S3.1.cc'] = 0.01
+    des_map['S3.1.o'] = 0.01
+    des_map['S3.1.cr'] = 0.01
+    des_map['S3.1.ch'] = 0.01
+    des_map['S3.1.cd'] = 0.01
+
+    des_map['S4.0.safe'] = 1.0
+    des_map['S4.0.cbp'] = 0.01
+    des_map['S4.0.cr'] = 0.01
+    des_map['S4.0.cb'] = 0.01
+    des_map['S4.0.cwb'] = 0.01
+    des_map['S4.0.ct'] = 0.1
+    des_map['S4.0.cc'] = 0.1
+    des_map['S4.0.cs'] = 0.1
+    des_map['S4.0.ch'] = 0.1
+    des_map['S4.0.cd'] = 0.1
+
+    des_map['S4.1.safe'] = 1.0
+    des_map['S4.1.cb'] = 0.01
+    des_map['S4.1.cbp'] = 0.01
+    des_map['S4.1.cr'] = 0.01
+    des_map['S4.1.cwb'] = 0.01
+    des_map['S4.1.ct'] = 0.01
+    des_map['S4.1.cc'] = 0.01
+    des_map['S4.1.cs'] = 0.01
+    des_map['S4.1.ch'] = 0.01
+    des_map['S4.1.cd'] = 0.01
+
+    des_map['S0.safe'] = 0
+    des_map['S1.0.safe'] = 0
+    des_map['S1.1.safe'] = 0
+    des_map['S2.0.safe'] = 0
+    des_map['S2.x.safe'] = 0
+    des_map['S2.y.safe'] = 0
+    des_map['S2.1.safe'] = 0
+    des_map['S3.0.safe'] = 0
+    des_map['S3.1.safe'] = 0
+
+    return hash_map, des_map
 
 def free_map():
     rules = {}
@@ -287,24 +565,24 @@ if __name__ =='__main__':
     system['env'].add_state_change("(breakfast user)")
 
     #s1.0
-
-    # # add change in the world
-    # # # # #
-    system['env'].add_state_change("(not (temp 0))")
-    system['env'].add_state_change("(temp 1)")
-    system['env'].add_state_change("(not (breakfast user))")
-    system['env'].add_state_change("(dishes_dirty)")
-    system['env'].add_state_change("(gathered user backpack)")
     #
-    # #s2.0
+    # # # add change in the world
+    # # # # #
+    # system['env'].add_state_change("(not (temp 0))")
+    # system['env'].add_state_change("(temp 1)")
+    # system['env'].add_state_change("(not (breakfast user))")
+    # system['env'].add_state_change("(dishes_dirty)")
+    # system['env'].add_state_change("(gathered user backpack)")
     # #
+    # # #s2.0
+    # # #
     # # #add change in the world
     # system['env'].add_state_change("(not (temp 1))")
     # system['env'].add_state_change("(temp 2)")
     # system['env'].add_state_change("(not (dishes_dirty))")
     # system['env'].add_state_change("(gathered user compass)")
-    # # # #
-    # # # # S3.0
+    # # # # #
+    # # # # # S3.0
     # system['env'].add_state_change("(not (temp 2))")
     # system['env'].add_state_change("(temp 3)")
     # system['env'].add_state_change("(not (current_weather sunshine))")
