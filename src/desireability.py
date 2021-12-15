@@ -3,11 +3,9 @@ class CalculateDesireability():
     def __init__(self):
         self.map_of_undesirable_situations = {}
         self.desirable_situation = {}
-        self.des_map = {}
         self.des_map_flag = False
 
     def add_des_map(self, map):
-        self.des_map = map
         self.des_map_flag = True
 
     def add_situation(self, situ, rule, value):
@@ -31,33 +29,20 @@ class CalculateDesireability():
 
     def stateDesirabilityValue(self, state_obj):
 
+        # If state is empty, then there is no desirability, Which is 0
+        if (state_obj.state == []):
+            return 0
 
-        if(self.des_map_flag):
-            """
-                Desirability of the state set by desirability map
-                Is desirbaility is not set; state desirability set as '0'
-            """
-            if (state_obj.name in self.des_map):
-                return self.des_map[state_obj.name]
-            else:
-                return 0
+        if (state_obj.desirability != -1):
+            return state_obj.desirability
 
-        else:
-            """
-                Desirability of the state calculated by desirability function
-            """
+        if (self.des_map_flag):
+            return 0
 
-            # If state is empty, then there is no desirability, Which is 0
-            if (state_obj.state == []):
-                return 0
+        des = self.desirabilityFunction(state_obj.state)
 
-            # if (state_obj.desirability != -1):
-            #     return state_obj.desirability
-
-            des = self.desirabilityFunction(state_obj.state)
-
-            state_obj.setStateDesirability(des)
-            return des
+        state_obj.setStateDesirability(des)
+        return des
 
     def desirabilityFunction(self, state):
 

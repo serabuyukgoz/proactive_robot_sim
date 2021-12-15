@@ -49,6 +49,11 @@ class Equilibrium_Maintenance():
 
         return self.map_of_states, self.name_state_hash_map
 
+    def set_hashmap(self, hashmap, desmap):
+        for each_state in hashmap:
+            obj = self.return_object_of_state(hashmap[each_state])
+            obj.setStateDesirability(desmap[each_state])
+
     def return_state_hash_map(self):
         # return copy.deepcopy(self.name_state_hash_map)
         return self.name_state_hash_map
@@ -77,12 +82,13 @@ class Equilibrium_Maintenance():
                 k = hashmap[i]
                 if (len(key) == len(k.state)):
                     if (all([x in k.state for x in key])):
-                        return i
-            return None
+                        print(k.state)
+                        return i, k
+            return None, None
 
-        name = find_name(key_list)
+        name, k = find_name(key_list)
         if (name):
-            return name, hashmap
+            return k, name, hashmap
         else:
             name = ';'.join(key_list)
             ss = StateDefinition(name, key_list, -1)
@@ -109,7 +115,7 @@ class Equilibrium_Maintenance():
 
     def fuction_F_k(self, free_map, current_state):
         maps = {}
-        hash_map = {}
+        hash_map = self.name_state_hash_map
         undone_state = []
 
 
@@ -152,7 +158,7 @@ class Equilibrium_Maintenance():
     # Probabilistic way to create evolve_map
     def create_evolve_map_define(self, current_state, action_list):
         maps = {}
-        hash_map = {}
+        hash_map = self.name_state_hash_map
         undone_state = []
 
         name, hash_map = self.create_naming(current_state, hash_map)
